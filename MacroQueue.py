@@ -34,60 +34,70 @@ from matplotlib.backend_bases import MouseButton
 
 import wx
 import wx.xrc as xrc
+
+# from STMMacroQueue.GUIDesign import MacroSettingsDialog
 matplotlib.rc('image', origin='lower')
 from time import time as timer
 
 import itertools
 
-from SettingsDialog import SettingsDialog
+from Dialogs import SettingsDialog
+from Dialogs import MyMacroDialog as MacroDialog
+from Dialogs import MyMacroSettingsDialog as MacroSettingsDialog
+# from GUIDesign import MacroSettingsDialog
+
 from Macros import *
+
+# from GUIDesign import MacroDialog
 
 import Functions.RHK as RHKFunctions
 
-from inspect import getmembers, isfunction, signature
+import json
+
 
 IconFileName = "OJ.ico"
 
 # TODO:
-# Expand queue in X
-# Estimate time in status.
+# Tooltip
+# Make function buttons
+# MacroSettingsDialog
+    # Save changes  (Save as a json file: https://moonbooks.org/Articles/How-to-save-a-dictionary-in-a-json-file-with-python-/)
+    # Back button
+
+# Make buttons from saved Macros
+# Options in right click menu: Add Macro to Queue - Edit Macro
+
+# MyMacroDialog
+    # Open Macro given TheMacro
+
+# Expand queue when start,stop,step
 # Fix SettingsDialog - an extra "," messes it up.  The nonnumbers are not being removed.
 
+# Choose which software at begining
 # Cancel settings parameter - Currently gives error
 
-# Don't remake the bitmap for every function
-
 # Copy function in menu
-# After settings, remake function buttons
+# After settings, remake function buttons for the software
 
 
 
 class MainFrame(GUIDesign.MyFrame):
     DefaultSettings = {'Software':'RHK',"Update Rate (s)":1}
     SettingsType = {'Software':['Choice',['RHK','CreaTec']],"Update Rate (s)":["Numerical"]}
+    MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json"}
 
 # Scanning, fine motion, course motion, dI/dV scans, point spectra, tip form, 
     GenericFunctions = {"Wait":RHK_Scan,"Email":RHK_Scan}
     RHKFunctions = {"Scan":RHK_Scan,"Fine Motion":RHK_Scan,**GenericFunctions}
     Functions = {"RHK":RHKFunctions}
     TheQueue = []
-    Paused = False
+    Paused = True
     Running = False
 
     def __init__(self):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'QueueSettings.csv'
-
-        RHKFunctionsNames = dir(RHKFunctions)
-        MembersList = getmembers(RHKFunctions, isfunction) 
-        print(MembersList)
-        MembersList[0][1]()
-        MembersList[1][1](None)
-        # for Name,Function in MembersList:
-        #     sig = signature(Function)
-        #     for v in sig.parameters.values():
-        #         print(v)
 
         mp.set_start_method('spawn')
         self.OutgoingQueue = mp.Queue()
@@ -111,13 +121,16 @@ class MainFrame(GUIDesign.MyFrame):
                 if self.SettingsType[key][0] == 'Numerical':
                     self.SettingsDict[key] = int(self.SettingsDict[key]) if float(self.SettingsDict[key])%1 == 0 else float(self.SettingsDict[key])
         else:
-            self.SettingsDict = self.DefaultSettings
+            self.SettingsDict = self.DefaultSettings            
             pd.Series(self.SettingsDict).to_csv(self.SavedSettingsFile,header=False)
+
+        self.MacroPath = self.MacroPaths[self.SettingsDict["Software"]]
+        
         YBitmapSize = 20
         self.DownBitmap = wx.Bitmap( u"Bitmaps\\DownArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
         self.UpBitmap = wx.Bitmap( u"Bitmaps\\UpArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
         self.RemoveBitmap = wx.Bitmap( u"Bitmaps\\Remove.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
-        self.AddFunctionButtons()
+        self.MakeFunctionButtons()
         self.m_FunctionNameSizer = wx.FlexGridSizer( 0, 1, -6, 0 )
         self.m_FunctionNameSizer.AddGrowableCol( 0 )
         self.m_FunctionNameSizer.SetFlexibleDirection( wx.BOTH )
@@ -128,6 +141,8 @@ class MainFrame(GUIDesign.MyFrame):
             self.m_QueueWindow.FitInside()
         self.m_QueueWindow.Bind( wx.EVT_SIZE, OnQueueSize )
         self.Show()
+
+        self.StartMakeNewMacro(None)
 
     def CheckQueue(self,event):
         try:
@@ -160,22 +175,33 @@ class MainFrame(GUIDesign.MyFrame):
         self.Process.terminate()
         self.Process.join()
         self.Destroy()
-
-    def AddFunctionButtons(self):
+    def MakeFunctionButtons(self):
         self.FunctionButtonSizer = wx.FlexGridSizer(0,2,0,0)
+        
+        if os.path.exists(self.MacroPath):
+            with open(self.MacroPath, 'r') as fp:
+                AllTheMacros = json.load(fp)
+        else:
+            AllTheMacros = {}
+        # for FunctionName in AllTheMacros.keys():
         for FunctionName in self.Functions[self.SettingsDict['Software']].keys():
             self.Function = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 100,40 ), 0 )
             self.Function.Bind( wx.EVT_BUTTON, self.OnFunctionButton )
             self.FunctionButtonSizer.Add(self.Function,0, wx.ALL, 5)
-
         self.m_FunctionButtonWindow.SetSizer(self.FunctionButtonSizer)
     def OpenSettings(self,event):
         MysettingsDialog = SettingsDialog(self,self.SettingsDict,self.SettingsType,title = 'Settings')
         MysettingsDialog.ShowModal()
         pd.Series(self.SettingsDict).to_csv(self.SavedSettingsFile,header=False)
+        self.MacroPath = self.MacroPaths[self.SettingsDict["Software"]]
+        self.MakeFunctionButtons()
+
 
     def OnFunctionButton(self,event):
         FunctionLabel = event.GetEventObject().GetLabel()
+        # with open(self.MacroPath, 'r') as fp:
+        #     AllTheMacros = json.load(fp)
+        # ThisMacro = AllTheMacros[FunctionLabel]
         Function = self.Functions[self.SettingsDict['Software']][FunctionLabel]
         SettingsDict = Function.DefaultSettings.copy()
 
@@ -449,6 +475,27 @@ class MainFrame(GUIDesign.MyFrame):
                 self.TheQueue[0][1].Refresh()
         return
 
+
+
+    def StartMakeNewMacro(self,event):
+        MyMacroDialog = MacroDialog(self,self.SettingsDict)
+        MyMacroDialog.ShowModal()
+
+        # # https://docs.python.org/3/library/inspect.html
+        # # RHKFunctionsNames = dir(RHKFunctions)
+        
+        # FunctionSettings = {}
+        # for Name,Function in getmembers(RHKFunctions, isfunction):
+        #     print(Name)
+        #     print(getcomments(Function))
+        #     print(type(getcomments(Function)))
+        #     Settings = {Key:Value for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
+        #     FunctionSettings[Name] = Settings
+        # print(FunctionSettings)
+        pass
+    def DefineMacroSettings(self,TheMacro):
+        MyMacroSettingsDialog = MacroSettingsDialog(self,TheMacro)
+        MyMacroSettingsDialog.ShowModal()
 
 
 def Thread(IncomingQueue,OutgoingQueue):

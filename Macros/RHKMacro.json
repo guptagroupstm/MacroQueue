@@ -1,0 +1,26 @@
+{
+  "Basic Scan": [
+    [
+      "Set Bias",
+      {
+        "Bias": {
+          "DefaultValue": "1",
+          "Frozen": true
+        }
+      }
+    ],
+    [
+      "Set Setpoint",
+      {
+        "Setpoint": {
+          "DefaultValue": "1e-09",
+          "Frozen": false
+        }
+      }
+    ],
+    [
+      "Scan",
+      {}
+    ]
+  ]
+}

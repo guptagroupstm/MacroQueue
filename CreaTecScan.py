@@ -29,5 +29,15 @@ def dI_dV(Bias,Setpoint,ImageSize,XOffset=0,YOffset=0,nTCperPixel=2,NPixels=512,
         Status = STM.getp('STMAFM.SCANSTATUS','')
 
 if __name__ == "__main__":
-    dI_dV(Bias=1,Setpoint=1,ImageSize=100)
-    dI_dV(Bias=2,Setpoint=1,ImageSize=100)
+    # dI_dV(Bias=1,Setpoint=1,ImageSize=100)
+    # dI_dV(Bias=2,Setpoint=1,ImageSize=100)
+    X = STM.getp('BASICPARAM.GET',"Offsetx")
+    Y = STM.getp('BASICPARAM.GET',"Offsety")
+    print(X,Y)
+    time.sleep(1)
+    X = STM.setp('BASICPARAM.SET',("Offsetx",100))
+    Y = STM.setp('BASICPARAM.SET',("Offsety",100))
+    time.sleep(1)
+    X = STM.getp('BASICPARAM.GET',"Offsetx")
+    Y = STM.getp('BASICPARAM.GET',"Offsety")
+    print(X,Y)
