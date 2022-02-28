@@ -1,16 +1,14 @@
-from argon2 import Parameters
+from numpy import array
 import wx
-import pandas as pd
-
-from STMMacroQueue.Functions.RHK import Initialize
-
-from inspect import getmembers, isfunction, signature,getcomments
+from inspect import getmembers, isfunction,getcomments
 from GUIDesign import MacroDialog
 import inspect
 import Functions.RHK as RHKFunctions
 import json
 from GUIDesign import MacroSettingsDialog
 import os
+
+from GUIDesign import StartMacroDialog
 
 class SettingsDialog(wx.Dialog):
 
@@ -27,7 +25,6 @@ class SettingsDialog(wx.Dialog):
         # self.Bind( wx.EVT_INIT_DIALOG, self.InitUI )
         self.Show()
 
-        
 
     def InitUI(self,event=None):
 
@@ -136,11 +133,13 @@ class SettingsDialog(wx.Dialog):
 
 
 class MyMacroDialog ( MacroDialog ):
-    TheQueue = []
-    def __init__(self, parent,SettingsDict):
+    def __init__(self, parent,MacroName="",InitalMacro=[]):
         super().__init__(parent)
-        self.SettingsDict = SettingsDict
+        self.TheQueue = []
         self.SetFunctionButtons()
+        for Function in InitalMacro:
+            self.AddFunctionToQueue(None,Function)
+        self.m_MacroTextCtrl.SetValue(MacroName)
 
     def SetFunctionButtons(self):
         AddFunctionButtonSizer = wx.FlexGridSizer( 0, 3, 0, 0 )
@@ -188,9 +187,15 @@ class MyMacroDialog ( MacroDialog ):
         self.m_FunctionButtonScrolledWindow.Layout()
         AddFunctionButtonSizer.Fit( self.m_FunctionButtonScrolledWindow )
         return
-    def AddFunctionToQueue(self,event):
-        FunctionLabel = event.GetEventObject().GetLabel()
-        FunctionInfo = self.FunctionInfoList[FunctionLabel]
+    def AddFunctionToQueue(self,event=None,Function=None):
+        if Function is None:
+            FunctionLabel = event.GetEventObject().GetLabel()
+            FunctionInfo = self.FunctionInfoList[FunctionLabel].copy()
+        else:
+            FunctionLabel, ParametersDict = Function
+            FunctionInfo = self.FunctionInfoList[FunctionLabel].copy()
+            for ParameterName in ParametersDict.keys():
+                FunctionInfo[2][ParameterName] = {**FunctionInfo[2][ParameterName],**ParametersDict[ParameterName]}
         YBitmapSize = 20
         m_FunctionWindow = wx.Panel( self.m_FunctionQueueScrolledWindow, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1,-1), wx.TAB_TRAVERSAL )
         m_FunctionWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
@@ -346,9 +351,7 @@ class MyMacroDialog ( MacroDialog ):
     def Accept(self, event):
         TheMacro = [[Name,Parameters] for Name,Parameters, Function, Panel, NameText in self.TheQueue]
         self.OnExit(None)
-        self.Parent.DefineMacroSettings(TheMacro)
-        # ThisMacroSettingsDialog = MyMacroSettingsDialog(self.Parent,TheMacro)
-        # ThisMacroSettingsDialog.ShowModal()
+        self.Parent.DefineMacroSettings(self.m_MacroTextCtrl.GetValue(),TheMacro)
         return
     def OnExit(self, event):
         self.Destroy()
@@ -356,11 +359,13 @@ class MyMacroDialog ( MacroDialog ):
 
 
 class MyMacroSettingsDialog(MacroSettingsDialog):
-    TheMacroCtrls = {}
-    def __init__(self, parent, TheMacro):
+    def __init__(self, parent, Name, TheMacro):
         super().__init__(parent)
         self.TheMacro = TheMacro
+        self.TheMacroCtrls = {}
+        self.m_MacroTextCtrl.SetValue(Name)
         self.SetParameterPanels()
+
     def SetParameterPanels(self):
         m_MacroSettingScrolledWindowSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
         m_MacroSettingScrolledWindowSizer.SetFlexibleDirection( wx.BOTH )
@@ -380,7 +385,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             self.m_FunctionText.Wrap( -1 )
             # self.m_FunctionText.SetFont( wx.Font( 9, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 
-            FunctionSizer.Add( self.m_FunctionText, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+            FunctionSizer.Add( self.m_FunctionText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
             FunctionsParametersSizer = wx.FlexGridSizer( 1, 0, 0, 0 )
             FunctionsParametersSizer.SetFlexibleDirection( wx.BOTH )
             FunctionsParametersSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -388,10 +393,12 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             self.TheMacroCtrls[Name] = {}
             if len(Parameters) > 0:
                 for ParameterName,ParameterInfo in Parameters.items():
+                    Tooltip = ParameterInfo.pop("Tooltip")
 
                     self.ParameterPanel = wx.Panel( FunctionPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
                     self.ParameterPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
                     self.ParameterPanel.SetMinSize( wx.Size( 250,60 ) )
+                    self.ParameterPanel.SetToolTip(Tooltip)
 
                     ParameterSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
                     ParameterSizer.SetFlexibleDirection( wx.BOTH )
@@ -404,21 +411,25 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
 
                     self.ParameterNameText = wx.StaticText( self.ParameterPanel, wx.ID_ANY, ParameterName, wx.DefaultPosition, wx.Size( -1,15 ), 0 )
                     self.ParameterNameText.Wrap( -1 )
+                    self.ParameterNameText.SetToolTip(Tooltip)
 
                     self.ParameterNameText.SetMinSize( wx.Size( 120,15 ) )
 
-                    DefaultValueSizer.Add( self.ParameterNameText, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+                    DefaultValueSizer.Add( self.ParameterNameText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
 
                     ParameterDefaultValueText = wx.TextCtrl( self.ParameterPanel, wx.ID_ANY, f"{ParameterInfo['DefaultValue']}", wx.DefaultPosition, wx.DefaultSize, 0 )
-                    DefaultValueSizer.Add( ParameterDefaultValueText, 0, wx.ALL, 5 )
+                    ParameterDefaultValueText.SetToolTip(f"Set the Default value for {ParameterName}."+"\n"+Tooltip)
+                    DefaultValueSizer.Add( ParameterDefaultValueText, 1, wx.ALL, 5 )
 
 
                     ParameterSizer.Add( DefaultValueSizer, 1, wx.EXPAND, 5 )
 
                     FreezeParameterCheck = wx.CheckBox( self.ParameterPanel, wx.ID_ANY, u"Freeze Parameter", wx.DefaultPosition, wx.DefaultSize, 0 )
                     FreezeParameterCheck.SetMinSize( wx.Size( 110,15 ) )
+                    FreezeParameterCheck.SetToolTip(f"Always use the default parameter for {ParameterName}."+"\n"+Tooltip)
+                    FreezeParameterCheck.SetValue(ParameterInfo["Frozen"])
 
-                    ParameterSizer.Add( FreezeParameterCheck, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+                    ParameterSizer.Add( FreezeParameterCheck, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 
 
                     self.ParameterPanel.SetSizer( ParameterSizer )
@@ -426,11 +437,6 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                     ParameterSizer.Fit( self.ParameterPanel )
                     FunctionsParametersSizer.Add( self.ParameterPanel, 1, wx.EXPAND |wx.ALL, 5 )
 
-                    Tooltip = ParameterInfo.pop("Tooltip")
-                    self.ParameterPanel.SetToolTip(Tooltip)
-                    for child in self.ParameterPanel.GetChildren():
-                        # child.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
-                        child.SetToolTip(Tooltip)
                     self.TheMacroCtrls[Name][ParameterName] = [ParameterDefaultValueText,FreezeParameterCheck] 
 
 
@@ -444,6 +450,15 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
         self.m_MacroSettingScrolledWindow.SetSizer( m_MacroSettingScrolledWindowSizer )
         self.m_MacroSettingScrolledWindow.Layout()
         m_MacroSettingScrolledWindowSizer.Fit( self.m_MacroSettingScrolledWindow )
+        # m_MacroSettingScrolledWindowSizer.Layout()
+        Size = m_MacroSettingScrolledWindowSizer.GetSize()
+        ButtomSize = self.BottomPanel.GetSize()
+        TopSize = self.TopPanel.GetSize()
+        Width = Size[0]+50
+        Height = Size[1]+ButtomSize[1]+TopSize[1]+20
+        self.SetSize(Width,Height)
+        self.Center()
+
     def SaveMacro(self, event):
         self.UpdateTheMacro()
         MacroName = self.m_MacroTextCtrl.GetValue()
@@ -455,14 +470,14 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             def WriteFile(AllTheMacros):
                 os.makedirs("Macros",exist_ok=True)
                 with open(MacroPath, 'w') as fp:
-                    json.dump(AllTheMacros, fp,indent=2)
+                    json.dump(AllTheMacros, fp,indent=1)
                 self.Parent.MakeFunctionButtons()
                 self.Destroy()
             MacroPath = self.Parent.MacroPath
             if os.path.exists(MacroPath):
                 with open(MacroPath, 'r') as fp:
                     AllTheMacros = json.load(fp)
-                if MacroName in AllTheMacros.keys():
+                if MacroName in AllTheMacros.keys() and not self.TheMacro == AllTheMacros[MacroName]:
                     MyMessage = wx.MessageDialog(self,message=f"There is already a macro named {MacroName}.\nWould you like to overwrite?",caption="Warning - Overwrite Macro",style=wx.YES_NO)
                     YesOrNo = MyMessage.ShowModal()
                     if YesOrNo == wx.ID_YES:
@@ -473,10 +488,183 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                     WriteFile(AllTheMacros)
             else:
                 WriteFile({MacroName:self.TheMacro})
-
+    def OnBack(self, event):
+        self.UpdateTheMacro()
+        MacroName = self.m_MacroTextCtrl.GetValue()
+        TheMacro=self.TheMacro
+        self.Destroy()
+        ThisMacroDialog = MyMacroDialog(self.Parent,MacroName=MacroName,InitalMacro=TheMacro)
+        ThisMacroDialog.ShowModal()
+        return
     def UpdateTheMacro(self):
         for Name,Parameters in self.TheMacro:
             if len(Parameters) > 0:
                 for ParameterName,ParameterInfo in Parameters.items():
                     Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[Name][ParameterName][0].GetValue()
                     Parameters[ParameterName]['Frozen'] = self.TheMacroCtrls[Name][ParameterName][1].GetValue()
+
+class MyStartMacroDialog(StartMacroDialog):
+    def __init__(self, parent,MacroLabel,TheMacro):
+        super().__init__(parent)
+        self.SetTitle(MacroLabel)
+        self.TheMacroCtrls = {}
+        self.TheMacro = TheMacro
+        self.TheFunctionInfos = {}
+        self.SetParameterPanels()
+
+        self.StartButton.Enable(False)
+
+    def SetParameterPanels(self):
+        m_MacroSettingScrolledWindowSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
+        m_MacroSettingScrolledWindowSizer.SetFlexibleDirection( wx.BOTH )
+        m_MacroSettingScrolledWindowSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        def GetValueType(Value):
+            ValueType = type(Value)
+            if ValueType == list or Value == tuple:
+                return "Choice"
+            if ValueType == bool:
+                return "Boolean"
+            if ValueType == str:
+                return "String"
+            try:
+                FloatValue = float(Value)
+                return "Numerical"
+            except:
+                raise TypeError(f'The default variable, {Value}, cannot be put into one of the type categories.  It is of type {ValueType}.')
+        def UpdateTooltip(event):
+            ThisTextCtrl = event.GetEventObject()
+            ThisPanel = event.GetEventObject().GetParent()
+            Text = ThisTextCtrl.GetValue()
+            OldToolTip = ThisTextCtrl.GetToolTip().GetTip()
+            FirstLine = OldToolTip[:OldToolTip.find("\n")]
+            Tooltip = FirstLine + f"\n{Text}"
+            print(OldToolTip,FirstLine,Tooltip)
+            ThisPanel.SetToolTip(Tooltip)
+            for child in ThisPanel.GetChildren():
+                child.SetToolTip(Tooltip)
+        def RemoveNonNumbers(event):
+            ThisTextCtrl =event.GetEventObject()
+            Text = ThisTextCtrl.GetValue()
+            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-']
+            NewText = ''.join([digit for digit in Text if digit in AcceptableList])
+            if NewText != Text:
+                ThisTextCtrl.SetValue(NewText)
+            else:
+                ThisPanel = event.GetEventObject().GetParent()
+                OldToolTip = ThisTextCtrl.GetToolTip().GetTip()
+                FirstLine = OldToolTip[:OldToolTip.find("\n")]
+                Tooltip = FirstLine + f"\n{Text}"
+                ThisPanel.SetToolTip(Tooltip)
+                for child in ThisPanel.GetChildren():
+                    child.SetToolTip(Tooltip)
+        for FunctionName,Function in getmembers(RHKFunctions, isfunction):
+            if FunctionName != "Initialize" and FunctionName != "OnClose" and FunctionName != "OnCancel":
+                FunctionName = FunctionName.replace("_"," ")
+                Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
+                
+                Comments = getcomments(Function)
+                if Comments is not None:
+                    for line in Comments.splitlines():
+                        for parameter in Parameters.keys():
+                            ParameterIndex = line.find(parameter)
+                            if ParameterIndex != -1:
+                                EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
+                                Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
+                self.TheFunctionInfos[FunctionName] = [Function,Parameters.copy()]
+
+        for Name,Parameters in self.TheMacro:
+            FunctionPanel = wx.Panel( self.m_MacroSettingScrolledWindow, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL|wx.EXPAND )
+            FunctionPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
+
+            FunctionSizer = wx.FlexGridSizer( 1, 0, 0, 0 )
+            FunctionSizer.AddGrowableRow( 0 )
+            FunctionSizer.AddGrowableCol( 0 )
+            FunctionSizer.SetFlexibleDirection( wx.BOTH )
+            FunctionSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		# self.m_staticText3 = wx.StaticText( self.m_panel7, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		# self.m_checkBox1 = wx.CheckBox( self.m_panel7, wx.ID_ANY, u"Check Me!", wx.DefaultPosition, wx.DefaultSize, 0 )
+            m_FunctionText = wx.CheckBox( FunctionPanel, wx.ID_ANY, Name, wx.DefaultPosition, wx.DefaultSize, 0 )
+            m_FunctionText.SetValue(True)
+            # self.m_checkBox1.Bind( wx.EVT_CHECKBOX, FunctionName )
+            # m_FunctionText.Wrap( -1 )
+            FunctionPanel.SetToolTip(f"{Name} will be called a total of 1 time.")
+            m_FunctionText.SetToolTip(f"{Name} will be called a total of 1 time.")
+            
+
+            FunctionSizer.Add( m_FunctionText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+            FunctionsParametersSizer = wx.FlexGridSizer( 1, 0, 0, 0 )
+            FunctionsParametersSizer.SetFlexibleDirection( wx.BOTH )
+            FunctionsParametersSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+            self.TheMacroCtrls[Name] = [FunctionPanel,m_FunctionText,{}]
+            if len(Parameters) > 0:
+                for ParameterName,ParameterInfo in Parameters.items():
+                    ParameterInfo = {**ParameterInfo,**self.TheFunctionInfos[Name][1][ParameterName]}
+                    Tooltip = ParameterInfo["Tooltip"]
+                    Tooltip += f"\n{ParameterInfo['DefaultValue']}"
+
+                    ParameterPanel = wx.Panel( FunctionPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+                    ParameterPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+                    ParameterPanel.SetMinSize( wx.Size( 250,-1 ) )
+
+                    # ParameterSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
+                    # ParameterSizer.SetFlexibleDirection( wx.BOTH )
+                    # ParameterSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+                    DefaultValueSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
+                    DefaultValueSizer.AddGrowableCol( 0 )
+                    DefaultValueSizer.SetFlexibleDirection( wx.BOTH )
+                    DefaultValueSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+                    ParameterNameText = wx.StaticText( ParameterPanel, wx.ID_ANY, ParameterName, wx.DefaultPosition, wx.Size( -1,15 ), 0 )
+                    ParameterNameText.Wrap( -1 )
+
+                    ParameterNameText.SetMinSize( wx.Size( 120,15 ) )
+                    DefaultValueSizer.Add( ParameterNameText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+
+                    ParameterValueText = wx.TextCtrl( ParameterPanel, wx.ID_ANY, f"{ParameterInfo['DefaultValue']}", wx.DefaultPosition, wx.DefaultSize, 0 )
+                    if ParameterInfo['ValueType'] == 'Numerical':
+                        ParameterValueText.Bind( wx.EVT_TEXT, RemoveNonNumbers)
+                    else:
+                        ParameterValueText.Bind( wx.EVT_TEXT, self.UpdateTooltips)
+                    DefaultValueSizer.Add( ParameterValueText, 1, wx.ALL, 5 )
+
+
+                    # ParameterSizer.Add( DefaultValueSizer, 1, wx.EXPAND, 5 )
+
+
+
+                    ParameterPanel.SetSizer( DefaultValueSizer )
+                    ParameterPanel.Layout()
+                    ParameterPanel.SetToolTip(Tooltip)
+                    for child in ParameterPanel.GetChildren():
+                        child.SetToolTip(Tooltip)
+                    DefaultValueSizer.Fit( ParameterPanel )
+                    FunctionsParametersSizer.Add( ParameterPanel, 1, wx.EXPAND |wx.ALL, 5 )
+
+                    self.TheMacroCtrls[Name][2][ParameterName] = [ParameterPanel,ParameterValueText] 
+
+
+            FunctionSizer.Add( FunctionsParametersSizer, 1, wx.EXPAND, 5 )
+            FunctionPanel.SetSizer( FunctionSizer )
+            FunctionPanel.Layout()
+            FunctionSizer.Fit( FunctionPanel )
+            m_MacroSettingScrolledWindowSizer.Add( FunctionPanel, 1, wx.ALL|wx.EXPAND, 5 )
+
+
+        self.m_MacroSettingScrolledWindow.SetSizer( m_MacroSettingScrolledWindowSizer )
+        self.m_MacroSettingScrolledWindow.Layout()
+        m_MacroSettingScrolledWindowSizer.Fit( self.m_MacroSettingScrolledWindow )
+        # m_MacroSettingScrolledWindowSizer.Layout()
+        Size = m_MacroSettingScrolledWindowSizer.GetSize()
+        ButtomSize = self.BottomPanel.GetSize()
+        Width = Size[0]+50
+        Height = Size[1]+ButtomSize[1]+20
+        self.SetSize(Width,Height)
+        self.Center()
+    def AddToQueue(self, event):
+        pass
+    def OnCancel(self, event):
+        self.Destroy()
+        
+

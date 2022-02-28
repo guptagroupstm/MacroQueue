@@ -1,4 +1,5 @@
 import inspect
+from argon2 import Parameters
 import wx
 import os
 import sys
@@ -44,6 +45,7 @@ import itertools
 from Dialogs import SettingsDialog
 from Dialogs import MyMacroDialog as MacroDialog
 from Dialogs import MyMacroSettingsDialog as MacroSettingsDialog
+from Dialogs import MyStartMacroDialog as StartMacroDialog
 # from GUIDesign import MacroSettingsDialog
 
 from Macros import *
@@ -58,27 +60,27 @@ import json
 IconFileName = "OJ.ico"
 
 # TODO:
-# Tooltip
-# Make function buttons
-# MacroSettingsDialog
-    # Save changes  (Save as a json file: https://moonbooks.org/Articles/How-to-save-a-dictionary-in-a-json-file-with-python-/)
-    # Back button
+# MyStartMacroDialog
+    # Put value in tooltip as it will be read
+    # Update the number of each function will be repeated
+    # Expand queue when start,stop,step
+    # an extra "," messes it up.  The nonnumbers are not being removed.
+# Option to not do a function
 
-# Make buttons from saved Macros
-# Options in right click menu: Add Macro to Queue - Edit Macro
+    # Add to queue
+# Run the function
 
-# MyMacroDialog
-    # Open Macro given TheMacro
 
-# Expand queue when start,stop,step
-# Fix SettingsDialog - an extra "," messes it up.  The nonnumbers are not being removed.
+# Cancel scan (check every second)
 
-# Choose which software at begining
-# Cancel settings parameter - Currently gives error
+# Set Software as menu option.
+# Remove SettingsDialog
+# Ask which software on startup if it's not saved
 
-# Copy function in menu
-# After settings, remake function buttons for the software
+# Copy function in main queue menu
+# After Software updated, remake function buttons for the software
 
+# Use some nice units (Maybe do a group-wide poll for everyone's favorite units)
 
 
 class MainFrame(GUIDesign.MyFrame):
@@ -142,8 +144,6 @@ class MainFrame(GUIDesign.MyFrame):
         self.m_QueueWindow.Bind( wx.EVT_SIZE, OnQueueSize )
         self.Show()
 
-        self.StartMakeNewMacro(None)
-
     def CheckQueue(self,event):
         try:
             Message = self.OutgoingQueue.get(False)
@@ -176,19 +176,51 @@ class MainFrame(GUIDesign.MyFrame):
         self.Process.join()
         self.Destroy()
     def MakeFunctionButtons(self):
-        self.FunctionButtonSizer = wx.FlexGridSizer(0,2,0,0)
+        for child in self.m_FunctionButtonWindow.GetChildren():
+            child.Destroy()
+        FunctionButtonSizer = wx.FlexGridSizer(0,2,0,0)
         
         if os.path.exists(self.MacroPath):
             with open(self.MacroPath, 'r') as fp:
                 AllTheMacros = json.load(fp)
         else:
             AllTheMacros = {}
-        # for FunctionName in AllTheMacros.keys():
-        for FunctionName in self.Functions[self.SettingsDict['Software']].keys():
-            self.Function = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 100,40 ), 0 )
-            self.Function.Bind( wx.EVT_BUTTON, self.OnFunctionButton )
-            self.FunctionButtonSizer.Add(self.Function,0, wx.ALL, 5)
-        self.m_FunctionButtonWindow.SetSizer(self.FunctionButtonSizer)
+        # for FunctionName in self.Functions[self.SettingsDict['Software']].keys():
+        for FunctionName in AllTheMacros.keys():
+            FunctionButton = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 100,40 ), 0 )
+            FunctionButton.Bind( wx.EVT_BUTTON, self.OnFunctionButton )
+            FunctionButtonSizer.Add(FunctionButton,0, wx.ALL, 5)
+            def FunctionRightClick(event):
+                ThisButton = event.GetEventObject()
+                popupmenu = wx.Menu()
+                menuItem = popupmenu.Append(-1, 'Add to Queue')
+                def Queued(event2):
+                    self.OnFunctionButton(event)
+                self.Bind(wx.EVT_MENU, Queued, menuItem)
+                menuItem = popupmenu.Append(-1, 'Edit')
+                def Edit(event):
+                    MacroLabel = ThisButton.GetLabel()
+                    MyMacroDialog = MacroDialog(self,MacroName=MacroLabel,InitalMacro=AllTheMacros[MacroLabel])
+                    MyMacroDialog.ShowModal()
+                self.Bind(wx.EVT_MENU, Edit, menuItem)
+                menuItem = popupmenu.Append(-1, 'Delete')
+                def Delete(event):
+                    MacroLabel = ThisButton.GetLabel()
+                    MyMessage = wx.MessageDialog(self,message=f"Are you sure that you want to delete {MacroLabel}?\nThis cannot be undone.",caption="Delete Macro",style=wx.YES_NO)
+                    YesOrNo = MyMessage.ShowModal()
+                    if YesOrNo == wx.ID_YES:
+                        with open(self.MacroPath, 'r') as fp:
+                            AllTheMacros = json.load(fp)
+                        AllTheMacros.pop(MacroLabel)
+                        with open(self.MacroPath, 'w') as fp:
+                            json.dump(AllTheMacros, fp,indent=1)
+                        self.MakeFunctionButtons()
+                        self.m_FunctionButtonWindow.Layout()
+                self.Bind(wx.EVT_MENU, Delete, menuItem)
+                ThisButton.PopupMenu(popupmenu)
+            FunctionButton.Bind( wx.EVT_RIGHT_DOWN, FunctionRightClick )
+        self.m_FunctionButtonWindow.SetSizer(FunctionButtonSizer)
+        self.m_FunctionButtonWindow.Layout()
     def OpenSettings(self,event):
         MysettingsDialog = SettingsDialog(self,self.SettingsDict,self.SettingsType,title = 'Settings')
         MysettingsDialog.ShowModal()
@@ -198,16 +230,29 @@ class MainFrame(GUIDesign.MyFrame):
 
 
     def OnFunctionButton(self,event):
-        FunctionLabel = event.GetEventObject().GetLabel()
-        # with open(self.MacroPath, 'r') as fp:
-        #     AllTheMacros = json.load(fp)
-        # ThisMacro = AllTheMacros[FunctionLabel]
-        Function = self.Functions[self.SettingsDict['Software']][FunctionLabel]
-        SettingsDict = Function.DefaultSettings.copy()
+        MacroLabel = event.GetEventObject().GetLabel()
+        with open(self.MacroPath, 'r') as fp:
+            AllTheMacros = json.load(fp)
+        ThisMacro = AllTheMacros[MacroLabel]
+        FrozenSettingsDict = {}
+        SettingsDict = {}
+        for FunctionName, Parameters in ThisMacro:
+            for Name,ParameterInfo in Parameters.items():
+                if not ParameterInfo["Frozen"]:
+                    SettingsDict[Name] = ParameterInfo["DefaultValue"]
+                else:
+                    FrozenSettingsDict[Name] = ParameterInfo["DefaultValue"]
 
-        settingsDialog = SettingsDialog(self,SettingsDict,Function.SettingsType, title = f'{FunctionLabel} Parameters',ExpandOutput=True)
-        settingsDialog.ShowModal()
+            # print(Function)
+        # Function = self.Functions[self.SettingsDict['Software']][FunctionLabel]
+        # SettingsDict = Function.DefaultSettings.copy()
+        DefaultSettingsTypeDict = {key:["Numerical"] for key,value in SettingsDict.items()}
+        MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacro)
+        MyStartMacroDialog.ShowModal()
+        # settingsDialog = SettingsDialog(self,SettingsDict,DefaultSettingsTypeDict, title = f'{MacroLabel} Parameters',ExpandOutput=True)
+        # settingsDialog.ShowModal()
 
+        return 
         ExpandedInputSpace = {}
         nDataPoints = 1
         #To get a list of all possible combinations of inputs,
@@ -401,6 +446,7 @@ class MainFrame(GUIDesign.MyFrame):
                 child.SetToolTip(thisSettingString)
             self.TheQueue[Index][1].GetChildren()[-1].SetLabel(thisSettingString)
         self.Bind(wx.EVT_MENU, Edit, menuItem)
+        menuItem.Enable(False)
         if Index == 0 and self.Running:
             menuItem.Enable(False)
 
@@ -478,7 +524,7 @@ class MainFrame(GUIDesign.MyFrame):
 
 
     def StartMakeNewMacro(self,event):
-        MyMacroDialog = MacroDialog(self,self.SettingsDict)
+        MyMacroDialog = MacroDialog(self)
         MyMacroDialog.ShowModal()
 
         # # https://docs.python.org/3/library/inspect.html
@@ -493,8 +539,8 @@ class MainFrame(GUIDesign.MyFrame):
         #     FunctionSettings[Name] = Settings
         # print(FunctionSettings)
         pass
-    def DefineMacroSettings(self,TheMacro):
-        MyMacroSettingsDialog = MacroSettingsDialog(self,TheMacro)
+    def DefineMacroSettings(self,Name,TheMacro):
+        MyMacroSettingsDialog = MacroSettingsDialog(self,Name,TheMacro)
         MyMacroSettingsDialog.ShowModal()
 
 

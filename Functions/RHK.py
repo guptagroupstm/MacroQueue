@@ -35,7 +35,7 @@ def Set_Bias_Rate(BiasRate=1):
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
 
-# Setpoint=The current setpoint in Amps
+# Setpoint=The current setpoint in A
 def Set_Setpoint(Setpoint=1e-9):
     Message = f"SetHWSubParameter, Z PI Controller 1, Set Point, Value, {Setpoint}\n"
     Socket.send(Message.encode())

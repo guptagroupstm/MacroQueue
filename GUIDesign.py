@@ -244,7 +244,7 @@ class MacroDialog ( wx.Dialog ):
 		fgSizer8.SetFlexibleDirection( wx.BOTH )
 		fgSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		self.applyButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Accept", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.applyButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Next", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer8.Add( self.applyButton, 0, wx.ALL, 5 )
 
 		self.closeButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -295,7 +295,7 @@ class MacroDialog ( wx.Dialog ):
 class MacroSettingsDialog ( wx.Dialog ):
 
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Choose the Default Parameters", pos = wx.DefaultPosition, size = wx.Size( 800,400 ), style = wx.DEFAULT_DIALOG_STYLE|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.RESIZE_BORDER )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Choose the Default Parameters", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.RESIZE_BORDER )
 
 		self.SetSizeHints( wx.Size( 200,250 ), wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
@@ -375,6 +375,7 @@ class MacroSettingsDialog ( wx.Dialog ):
 
 		self.SetSizer( vbox )
 		self.Layout()
+		vbox.Fit( self )
 
 		self.Centre( wx.BOTH )
 
@@ -391,6 +392,82 @@ class MacroSettingsDialog ( wx.Dialog ):
 		event.Skip()
 
 	def OnBack( self, event ):
+		event.Skip()
+
+
+###########################################################################
+## Class StartMacroDialog
+###########################################################################
+
+class StartMacroDialog ( wx.Dialog ):
+
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.RESIZE_BORDER )
+
+		self.SetSizeHints( wx.Size( 200,250 ), wx.DefaultSize )
+		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+
+		vbox = wx.FlexGridSizer( 0, 1, 0, 0 )
+		vbox.AddGrowableCol( 0 )
+		vbox.AddGrowableRow( 0 )
+		vbox.SetFlexibleDirection( wx.BOTH )
+		vbox.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		self.m_MacroSettingScrolledWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.VSCROLL )
+		self.m_MacroSettingScrolledWindow.SetScrollRate( 5, 5 )
+		self.m_MacroSettingScrolledWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+
+		vbox.Add( self.m_MacroSettingScrolledWindow, 1, wx.ALL|wx.EXPAND, 5 )
+
+		self.BottomPanel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.BottomPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+
+		bSizer3 = wx.BoxSizer( wx.VERTICAL )
+
+		self.m_panel7 = wx.Panel( self.BottomPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer8 = wx.FlexGridSizer( 1, 0, 0, 0 )
+		fgSizer8.AddGrowableRow( 0 )
+		fgSizer8.SetFlexibleDirection( wx.BOTH )
+		fgSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		self.StartButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Add to Queue", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer8.Add( self.StartButton, 0, wx.ALL, 5 )
+
+		self.CancelButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer8.Add( self.CancelButton, 0, wx.ALL, 5 )
+
+
+		self.m_panel7.SetSizer( fgSizer8 )
+		self.m_panel7.Layout()
+		fgSizer8.Fit( self.m_panel7 )
+		bSizer3.Add( self.m_panel7, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+
+
+		self.BottomPanel.SetSizer( bSizer3 )
+		self.BottomPanel.Layout()
+		bSizer3.Fit( self.BottomPanel )
+		vbox.Add( self.BottomPanel, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL|wx.EXPAND, 5 )
+
+
+		self.SetSizer( vbox )
+		self.Layout()
+		vbox.Fit( self )
+
+		self.Centre( wx.BOTH )
+
+		# Connect Events
+		self.StartButton.Bind( wx.EVT_BUTTON, self.AddToQueue )
+		self.CancelButton.Bind( wx.EVT_BUTTON, self.OnCancel )
+
+	def __del__( self ):
+		pass
+
+
+	# Virtual event handlers, override them in your derived class
+	def AddToQueue( self, event ):
+		event.Skip()
+
+	def OnCancel( self, event ):
 		event.Skip()
 
 
