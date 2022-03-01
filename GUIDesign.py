@@ -425,6 +425,8 @@ class StartMacroDialog ( wx.Dialog ):
 		bSizer3 = wx.BoxSizer( wx.VERTICAL )
 
 		self.m_panel7 = wx.Panel( self.BottomPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel7.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+
 		fgSizer8 = wx.FlexGridSizer( 1, 0, 0, 0 )
 		fgSizer8.AddGrowableRow( 0 )
 		fgSizer8.SetFlexibleDirection( wx.BOTH )

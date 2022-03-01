@@ -64,23 +64,26 @@ IconFileName = "OJ.ico"
     # Put value in tooltip as it will be read
     # Update the number of each function will be repeated
     # Expand queue when start,stop,step
-    # an extra "," messes it up.  The nonnumbers are not being removed.
 # Option to not do a function
 
     # Add to queue
 # Run the function
 
+# Boolean and choice options
 
 # Cancel scan (check every second)
 
 # Set Software as menu option.
 # Remove SettingsDialog
 # Ask which software on startup if it's not saved
-
-# Copy function in main queue menu
 # After Software updated, remake function buttons for the software
 
+# Copy function in main queue menu
+
+
 # Use some nice units (Maybe do a group-wide poll for everyone's favorite units)
+
+# Repeat Macro until cancelled
 
 
 class MainFrame(GUIDesign.MyFrame):

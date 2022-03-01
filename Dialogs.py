@@ -7,6 +7,8 @@ import Functions.RHK as RHKFunctions
 import json
 from GUIDesign import MacroSettingsDialog
 import os
+from functools import partial
+import numpy as np
 
 from GUIDesign import StartMacroDialog
 
@@ -504,20 +506,18 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                     Parameters[ParameterName]['Frozen'] = self.TheMacroCtrls[Name][ParameterName][1].GetValue()
 
 class MyStartMacroDialog(StartMacroDialog):
-    def __init__(self, parent,MacroLabel,TheMacro):
+    def __init__(self, parent,MacroLabel,TheDefaultMacro):
         super().__init__(parent)
         self.SetTitle(MacroLabel)
-        self.TheMacroCtrls = {}
-        self.TheMacro = TheMacro
-        self.TheFunctionInfos = {}
+        self.TheStartMacroCtrls = {}
+        self.TheDefaultMacro = TheDefaultMacro
+        self.ProcessMacro(TheDefaultMacro)
         self.SetParameterPanels()
+        self.UpdateFunctionTooltips()
 
         self.StartButton.Enable(False)
 
-    def SetParameterPanels(self):
-        m_MacroSettingScrolledWindowSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
-        m_MacroSettingScrolledWindowSizer.SetFlexibleDirection( wx.BOTH )
-        m_MacroSettingScrolledWindowSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+    def ProcessMacro(self,DefaultMacro):
         def GetValueType(Value):
             ValueType = type(Value)
             if ValueType == list or Value == tuple:
@@ -531,6 +531,55 @@ class MyStartMacroDialog(StartMacroDialog):
                 return "Numerical"
             except:
                 raise TypeError(f'The default variable, {Value}, cannot be put into one of the type categories.  It is of type {ValueType}.')
+        self.TheFunctionInfos = {}
+        for FunctionName,Function in getmembers(RHKFunctions, isfunction):
+            # if FunctionName != "Initialize" and FunctionName != "OnClose" and FunctionName != "OnCancel":
+            FunctionName = FunctionName.replace("_"," ")
+            Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
+            
+            Comments = getcomments(Function)
+            if Comments is not None:
+                for line in Comments.splitlines():
+                    for parameter in Parameters.keys():
+                        ParameterIndex = line.find(parameter)
+                        if ParameterIndex != -1:
+                            EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
+                            Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
+            self.TheFunctionInfos[FunctionName] = [Function,Parameters.copy()]
+        self.TheMacro = []
+        for Name,Parameters in DefaultMacro:
+            for ParameterName, Info in Parameters.items():
+                Info["DefaultToolTip"] =  self.TheFunctionInfos[Name][1][ParameterName]["Tooltip"]
+                Info["ValueType"] =  self.TheFunctionInfos[Name][1][ParameterName]["ValueType"]
+            ThisFunction = {"Name":Name,"Parameters":Parameters,"NCalls":1,"Included":True}
+            self.TheMacro.append(ThisFunction)
+        
+        pass
+    def UpdateFunctionTooltips(self):
+        NTotalCalls = 1
+        for FunctionCtrls, FunctionInfo in zip(self.TheStartMacroCtrls.values(),self.TheMacro):
+            Name = FunctionInfo['Name']
+            Included = FunctionInfo['Included']
+            FunctionPanel = FunctionCtrls[0]
+            m_FunctionTextCheck = FunctionCtrls[1]
+            NCalls = FunctionInfo['NCalls']
+            if Included:
+                NTotalCalls *= NCalls
+                if NTotalCalls == 1:
+                    FunctionPanel.SetToolTip(f"{Name} will be called a total of {NTotalCalls} time.")
+                    m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {NTotalCalls} time.")
+                if NTotalCalls > 1:
+                    FunctionPanel.SetToolTip(f"{Name} will be called a total of {NTotalCalls} times.")
+                    m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {NTotalCalls} times.")
+            else:
+                FunctionPanel.SetToolTip(f"{Name} will not be called.")
+                m_FunctionTextCheck.SetToolTip(f"{Name} will not be called.")
+
+    def SetParameterPanels(self):
+        m_MacroSettingScrolledWindowSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
+        m_MacroSettingScrolledWindowSizer.SetFlexibleDirection( wx.BOTH )
+        m_MacroSettingScrolledWindowSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
         def UpdateTooltip(event):
             ThisTextCtrl = event.GetEventObject()
             ThisPanel = event.GetEventObject().GetParent()
@@ -538,41 +587,46 @@ class MyStartMacroDialog(StartMacroDialog):
             OldToolTip = ThisTextCtrl.GetToolTip().GetTip()
             FirstLine = OldToolTip[:OldToolTip.find("\n")]
             Tooltip = FirstLine + f"\n{Text}"
-            print(OldToolTip,FirstLine,Tooltip)
             ThisPanel.SetToolTip(Tooltip)
             for child in ThisPanel.GetChildren():
                 child.SetToolTip(Tooltip)
-        def RemoveNonNumbers(event):
-            ThisTextCtrl =event.GetEventObject()
-            Text = ThisTextCtrl.GetValue()
-            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-']
-            NewText = ''.join([digit for digit in Text if digit in AcceptableList])
-            if NewText != Text:
-                ThisTextCtrl.SetValue(NewText)
+        def TranslateNumerical(OldString,DefaultValue):
+            def CleanNumber(String):
+                while len(String) > 0 and String[0] in [',',';','e','E']:
+                    String = String[1:]
+                while len(String) > 0 and String[-1] in ['.',',',';','e','E','-']:
+                    String = String[:-1]
+                return String
+            OldString = CleanNumber(OldString)
+            while len(OldString) == 0:
+                OldString = CleanNumber(DefaultValue)
+            if ',' in OldString:
+                NewString = OldString.replace(";",",")
+                NewString = NewString.split(',')
+                NewString = [CleanNumber(Item) for Item in NewString]
+                NewString = [f"{float(X)}" if float(X)%1 != 0 else f"{int(X)}" for X in NewString if len(X)>0]
+                NCalls = len(NewString)
+                NewString = ','.join(NewString)
+            elif ';' in OldString:
+                NewString = OldString.split(';')
+                if len(NewString) == 3 and float(NewString[2]) != 0:
+                    NewString = np.arange(*[float(X) for X in NewString])
+                    NewString = [f"{float(X)}" if float(X)%1 != 0 else f"{int(X)}" for X in NewString]
+                else:
+                    NewString = [CleanNumber(Item) for Item in NewString]
+                    NewString = [f"{float(X)}" if float(X)%1 != 0 else f"{int(X)}" for X in NewString if len(X)>0]
+                NCalls = len(NewString)
+                NewString = ','.join(NewString)
             else:
-                ThisPanel = event.GetEventObject().GetParent()
-                OldToolTip = ThisTextCtrl.GetToolTip().GetTip()
-                FirstLine = OldToolTip[:OldToolTip.find("\n")]
-                Tooltip = FirstLine + f"\n{Text}"
-                ThisPanel.SetToolTip(Tooltip)
-                for child in ThisPanel.GetChildren():
-                    child.SetToolTip(Tooltip)
-        for FunctionName,Function in getmembers(RHKFunctions, isfunction):
-            if FunctionName != "Initialize" and FunctionName != "OnClose" and FunctionName != "OnCancel":
-                FunctionName = FunctionName.replace("_"," ")
-                Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
-                
-                Comments = getcomments(Function)
-                if Comments is not None:
-                    for line in Comments.splitlines():
-                        for parameter in Parameters.keys():
-                            ParameterIndex = line.find(parameter)
-                            if ParameterIndex != -1:
-                                EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
-                                Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
-                self.TheFunctionInfos[FunctionName] = [Function,Parameters.copy()]
+                NCalls = 1
+                NewString = OldString
+            return NewString,NCalls
 
-        for Name,Parameters in self.TheMacro:
+
+
+        for Function in self.TheMacro:
+            Name = Function["Name"]
+            Parameters = Function["Parameters"]
             FunctionPanel = wx.Panel( self.m_MacroSettingScrolledWindow, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL|wx.EXPAND )
             FunctionPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
 
@@ -581,22 +635,27 @@ class MyStartMacroDialog(StartMacroDialog):
             FunctionSizer.AddGrowableCol( 0 )
             FunctionSizer.SetFlexibleDirection( wx.BOTH )
             FunctionSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-		# self.m_staticText3 = wx.StaticText( self.m_panel7, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
-		# self.m_checkBox1 = wx.CheckBox( self.m_panel7, wx.ID_ANY, u"Check Me!", wx.DefaultPosition, wx.DefaultSize, 0 )
-            m_FunctionText = wx.CheckBox( FunctionPanel, wx.ID_ANY, Name, wx.DefaultPosition, wx.DefaultSize, 0 )
-            m_FunctionText.SetValue(True)
-            # self.m_checkBox1.Bind( wx.EVT_CHECKBOX, FunctionName )
+            m_FunctionTextCheck = wx.CheckBox( FunctionPanel, wx.ID_ANY, Name, wx.DefaultPosition, wx.DefaultSize, 0 )
+            m_FunctionTextCheck.SetValue(True)
+
+            def TextCheckFunction(Name,ThisFunction,event):
+                Checked = event.GetEventObject().GetValue()
+                ThisFunction["Included"] = Checked
+                Parameters = self.TheStartMacroCtrls[Name][2]
+                for ParameterName,ParameterInfo in Parameters.items():
+                    self.TheStartMacroCtrls[Name][2][ParameterName][1].Enable(Checked)
+                self.UpdateFunctionTooltips()
+            ThisTextCheckFunction = partial(TextCheckFunction,Name,Function)
+            m_FunctionTextCheck.Bind( wx.EVT_CHECKBOX, ThisTextCheckFunction )
             # m_FunctionText.Wrap( -1 )
-            FunctionPanel.SetToolTip(f"{Name} will be called a total of 1 time.")
-            m_FunctionText.SetToolTip(f"{Name} will be called a total of 1 time.")
             
 
-            FunctionSizer.Add( m_FunctionText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+            FunctionSizer.Add( m_FunctionTextCheck, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
             FunctionsParametersSizer = wx.FlexGridSizer( 1, 0, 0, 0 )
             FunctionsParametersSizer.SetFlexibleDirection( wx.BOTH )
             FunctionsParametersSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-            self.TheMacroCtrls[Name] = [FunctionPanel,m_FunctionText,{}]
+            self.TheStartMacroCtrls[Name] = [FunctionPanel,m_FunctionTextCheck,{}]
             if len(Parameters) > 0:
                 for ParameterName,ParameterInfo in Parameters.items():
                     ParameterInfo = {**ParameterInfo,**self.TheFunctionInfos[Name][1][ParameterName]}
@@ -623,8 +682,27 @@ class MyStartMacroDialog(StartMacroDialog):
                     DefaultValueSizer.Add( ParameterNameText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
 
                     ParameterValueText = wx.TextCtrl( ParameterPanel, wx.ID_ANY, f"{ParameterInfo['DefaultValue']}", wx.DefaultPosition, wx.DefaultSize, 0 )
+                    def RemoveNonNumbers(Name,DefaultValue,ThisFunction,event):
+                        ThisTextCtrl =event.GetEventObject()
+                        Text = ThisTextCtrl.GetValue()
+                        AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
+                        NewText = ''.join([digit for digit in Text if digit in AcceptableList])
+                        if NewText != Text:
+                            ThisTextCtrl.SetValue(NewText)
+                        else:
+                            ThisPanel = event.GetEventObject().GetParent()
+                            OldToolTip = ThisTextCtrl.GetToolTip().GetTip()
+                            FirstLine = OldToolTip[:OldToolTip.find("\n")]
+                            TranslatedText, NCalls = TranslateNumerical(Text,DefaultValue)
+                            ThisFunction['NCalls'] = NCalls
+                            Tooltip = FirstLine + f"\n{TranslatedText}"
+                            ThisPanel.SetToolTip(Tooltip)
+                            for child in ThisPanel.GetChildren():
+                                child.SetToolTip(Tooltip)
+                        self.UpdateFunctionTooltips()
                     if ParameterInfo['ValueType'] == 'Numerical':
-                        ParameterValueText.Bind( wx.EVT_TEXT, RemoveNonNumbers)
+                        ThisRemoveNonNumbers = partial(RemoveNonNumbers,Name,f"{ParameterInfo['DefaultValue']}",Function)
+                        ParameterValueText.Bind( wx.EVT_TEXT, ThisRemoveNonNumbers)
                     else:
                         ParameterValueText.Bind( wx.EVT_TEXT, self.UpdateTooltips)
                     DefaultValueSizer.Add( ParameterValueText, 1, wx.ALL, 5 )
@@ -642,9 +720,7 @@ class MyStartMacroDialog(StartMacroDialog):
                     DefaultValueSizer.Fit( ParameterPanel )
                     FunctionsParametersSizer.Add( ParameterPanel, 1, wx.EXPAND |wx.ALL, 5 )
 
-                    self.TheMacroCtrls[Name][2][ParameterName] = [ParameterPanel,ParameterValueText] 
-
-
+                    self.TheStartMacroCtrls[Name][2][ParameterName] = [ParameterPanel,ParameterValueText] 
             FunctionSizer.Add( FunctionsParametersSizer, 1, wx.EXPAND, 5 )
             FunctionPanel.SetSizer( FunctionSizer )
             FunctionPanel.Layout()

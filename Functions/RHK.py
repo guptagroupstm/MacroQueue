@@ -20,6 +20,14 @@ def OnClose():
         Socket.shutdown(2)
         Socket.close()
 
+def Approach(Parameter1= 0):
+    pass
+def Z_Course_Step_Out(Parameter1= 0):
+    pass
+def Z_Course_Step_In(Parameter1= 0):
+    pass
+def Course_Step(X=0,Y=0):
+    pass
 
 # Bias=The bias voltage in V
 def Set_Bias(Bias= 0):
