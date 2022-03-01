@@ -46,5 +46,11 @@ def Set_NPixels(NPixels=512):
 def Set_Scan_Speed(LineSpeed=2e-9):
     MySXM.SendWait(f"ScanPara('Speed',{LineSpeed});")
 
-def Scan():
-    pass
+def Scan(Filename="Scan"):
+    # Set the filename
+    MySXM.execute("ScanImage", 1000)
+    while MySXM.NotGotAnswer and not Cancel:
+        SXMRemote.loop()
+    if Cancel:
+        # Is there a way to make it stop scanning?
+        pass
