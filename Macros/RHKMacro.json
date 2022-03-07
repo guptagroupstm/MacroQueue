@@ -1,26 +1,29 @@
 {
  "Basic Scan": [
   [
-   "Set Bias",
-   {
-    "Bias": {
-     "DefaultValue": "0",
-     "Frozen": false
-    }
-   }
-  ],
-  [
    "Set Setpoint",
    {
     "Setpoint": {
      "DefaultValue": "1e-09",
      "Frozen": false
     }
-   }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "0",
+     "Frozen": false
+    }
+   },
+   true
   ],
   [
    "Scan",
-   {}
+   {},
+   true
   ]
  ],
  "Normal Scan": [
@@ -29,62 +32,127 @@
    {
     "NPixels": {
      "DefaultValue": "512",
-     "Frozen": false
+     "Frozen": false,
+     "ValueType": "Numerical"
     }
-   }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "100",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
   ],
   [
    "Set Scan Window Position",
    {
     "XOffset": {
      "DefaultValue": "0",
-     "Frozen": false
+     "Frozen": false,
+     "ValueType": "Numerical"
     },
     "YOffset": {
      "DefaultValue": "0",
-     "Frozen": false
+     "Frozen": false,
+     "ValueType": "Numerical"
     }
-   }
-  ],
-  [
-   "Set Scan Image Size",
-   {
-    "ImageSize": {
-     "DefaultValue": "1e-09",
-     "Frozen": false
-    }
-   }
-  ],
-  [
-   "Set Scan Speed",
-   {
-    "LineSpeed": {
-     "DefaultValue": "2e-09",
-     "Frozen": false
-    }
-   }
-  ],
-  [
-   "Set Bias",
-   {
-    "Bias": {
-     "DefaultValue": "0",
-     "Frozen": false
-    }
-   }
+   },
+   false
   ],
   [
    "Set Setpoint",
    {
     "Setpoint": {
-     "DefaultValue": "1e-09",
-     "Frozen": false
+     "DefaultValue": "100",
+     "Frozen": false,
+     "ValueType": "Numerical"
     }
-   }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
   ],
   [
    "Scan",
-   {}
+   {},
+   true
+  ]
+ ],
+ "Wait&Print": [
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "2",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   true
+  ],
+  [
+   "Print",
+   {
+    "Number": {
+     "DefaultValue": "5",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   true
+  ]
+ ],
+ "Test": [
+  [
+   "Test",
+   {
+    "Boolean": {
+     "DefaultValue": true,
+     "Frozen": false,
+     "ValueType": "Boolean"
+    },
+    "String": {
+     "DefaultValue": "SomeString",
+     "Frozen": false,
+     "ValueType": "String"
+    },
+    "Choice": {
+     "DefaultValue": "Combo",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "Choice",
+      "Combo",
+      "3rd",
+      "4th"
+     ]
+    }
+   },
+   true
   ]
  ]
 }

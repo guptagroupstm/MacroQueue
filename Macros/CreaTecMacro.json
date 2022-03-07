@@ -1,0 +1,229 @@
+{
+ "Scan": [
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "Speed": {
+     "DefaultValue": "100",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Scan",
+   {},
+   true
+  ]
+ ],
+ "dIdV Scan": [
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "Speed": {
+     "DefaultValue": "100",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "dIdV Scan",
+   {},
+   true
+  ]
+ ],
+ "Spectrum": [
+  [
+   "Fine Move Tip",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   true
+  ],
+  [
+   "Spectrum",
+   {},
+   true
+  ]
+ ]
+}

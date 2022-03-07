@@ -43,15 +43,26 @@ class MyFrame ( wx.Frame ):
 
 		self.m_menubar1.Append( self.m_MacroMenu, u"Macro" )
 
-		self.m_SettingsMenu = wx.Menu()
-		self.m_SettingsMenuItem = wx.MenuItem( self.m_SettingsMenu, wx.ID_ANY, u"Settings", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_SettingsMenu.Append( self.m_SettingsMenuItem )
+		self.m_Connectmenu = wx.Menu()
+		self.m_menuItem7 = wx.MenuItem( self.m_Connectmenu, wx.ID_ANY, u"Connect", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_Connectmenu.Append( self.m_menuItem7 )
 
-		self.m_OpenSettingsMenuItem = wx.MenuItem( self.m_SettingsMenu, wx.ID_ANY, u"Open Settings File", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_SettingsMenu.Append( self.m_OpenSettingsMenuItem )
-		self.m_OpenSettingsMenuItem.Enable( False )
+		self.m_menuItem8 = wx.MenuItem( self.m_Connectmenu, wx.ID_ANY, u"Disconnect", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_Connectmenu.Append( self.m_menuItem8 )
 
-		self.m_menubar1.Append( self.m_SettingsMenu, u"Settings" )
+		self.m_menubar1.Append( self.m_Connectmenu, u"Connect" )
+
+		self.m_SystemMenu = wx.Menu()
+		self.m_RHKmenuItem = wx.MenuItem( self.m_SystemMenu, wx.ID_ANY, u"RHK", wx.EmptyString, wx.ITEM_CHECK )
+		self.m_SystemMenu.Append( self.m_RHKmenuItem )
+
+		self.m_CreaTecmenuItem = wx.MenuItem( self.m_SystemMenu, wx.ID_ANY, u"CreaTec", wx.EmptyString, wx.ITEM_CHECK )
+		self.m_SystemMenu.Append( self.m_CreaTecmenuItem )
+
+		self.m_SXMmenuItem = wx.MenuItem( self.m_SystemMenu, wx.ID_ANY, u"SXM", wx.EmptyString, wx.ITEM_CHECK )
+		self.m_SystemMenu.Append( self.m_SXMmenuItem )
+
+		self.m_menubar1.Append( self.m_SystemMenu, u"System" )
 
 		self.SetMenuBar( self.m_menubar1 )
 
@@ -112,8 +123,11 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.OnClose, id = self.m_ExitMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.StartMakeNewMacro, id = self.m_MakeMacroMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OpenMacroFile, id = self.m_OpenMacroMenuItem.GetId() )
-		self.Bind( wx.EVT_MENU, self.OpenSettings, id = self.m_SettingsMenuItem.GetId() )
-		self.Bind( wx.EVT_MENU, self.OpenSettingsFile, id = self.m_OpenSettingsMenuItem.GetId() )
+		self.Bind( wx.EVT_MENU, self.AddConnectToQueue, id = self.m_menuItem7.GetId() )
+		self.Bind( wx.EVT_MENU, self.AddDisconnectToQueue, id = self.m_menuItem8.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnRHKSoftware, id = self.m_RHKmenuItem.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnCreaTecSoftware, id = self.m_CreaTecmenuItem.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnSXMSoftware, id = self.m_SXMmenuItem.GetId() )
 		self.Bind( wx.EVT_TIMER, self.CheckQueue, id=wx.ID_ANY )
 		self.m_PauseASAPButton.Bind( wx.EVT_BUTTON, self.PauseASAP )
 		self.m_PauseAfterButton.Bind( wx.EVT_BUTTON, self.Pause )
@@ -143,10 +157,19 @@ class MyFrame ( wx.Frame ):
 	def OpenMacroFile( self, event ):
 		event.Skip()
 
-	def OpenSettings( self, event ):
+	def AddConnectToQueue( self, event ):
 		event.Skip()
 
-	def OpenSettingsFile( self, event ):
+	def AddDisconnectToQueue( self, event ):
+		event.Skip()
+
+	def OnRHKSoftware( self, event ):
+		event.Skip()
+
+	def OnCreaTecSoftware( self, event ):
+		event.Skip()
+
+	def OnSXMSoftware( self, event ):
 		event.Skip()
 
 	def CheckQueue( self, event ):
@@ -159,6 +182,74 @@ class MyFrame ( wx.Frame ):
 		event.Skip()
 
 	def ClearQueue( self, event ):
+		event.Skip()
+
+
+###########################################################################
+## Class ChooseSoftware
+###########################################################################
+
+class ChooseSoftware ( wx.Dialog ):
+
+	def __init__( self, parent ):
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Choose the STM Software", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+
+		fgSizer12 = wx.FlexGridSizer( 0, 1, 0, 0 )
+		fgSizer12.SetFlexibleDirection( wx.BOTH )
+		fgSizer12.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		self.m_ChooseSoftwareText = wx.StaticText( self, wx.ID_ANY, u"Please select the STM Software you wish to use", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_ChooseSoftwareText.Wrap( -1 )
+
+		fgSizer12.Add( self.m_ChooseSoftwareText, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+
+		self.m_panel11 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel11.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
+
+		bSizer6 = wx.BoxSizer( wx.HORIZONTAL )
+
+		self.m_RHKbutton = wx.Button( self.m_panel11, wx.ID_ANY, u"RHK", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer6.Add( self.m_RHKbutton, 0, wx.ALL, 5 )
+
+		self.m_CreaTecbutton = wx.Button( self.m_panel11, wx.ID_ANY, u"CreaTec", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer6.Add( self.m_CreaTecbutton, 0, wx.ALL, 5 )
+
+		self.m_SXMbutton = wx.Button( self.m_panel11, wx.ID_ANY, u"SXM", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer6.Add( self.m_SXMbutton, 0, wx.ALL, 5 )
+
+
+		self.m_panel11.SetSizer( bSizer6 )
+		self.m_panel11.Layout()
+		bSizer6.Fit( self.m_panel11 )
+		fgSizer12.Add( self.m_panel11, 1, wx.EXPAND |wx.ALL, 5 )
+
+
+		self.SetSizer( fgSizer12 )
+		self.Layout()
+		fgSizer12.Fit( self )
+
+		self.Centre( wx.BOTH )
+
+		# Connect Events
+		self.m_RHKbutton.Bind( wx.EVT_BUTTON, self.OnRHK )
+		self.m_CreaTecbutton.Bind( wx.EVT_BUTTON, self.OnCreaTec )
+		self.m_SXMbutton.Bind( wx.EVT_BUTTON, self.OnSXM )
+
+	def __del__( self ):
+		pass
+
+
+	# Virtual event handlers, override them in your derived class
+	def OnRHK( self, event ):
+		event.Skip()
+
+	def OnCreaTec( self, event ):
+		event.Skip()
+
+	def OnSXM( self, event ):
 		event.Skip()
 
 
