@@ -21,9 +21,8 @@ def Set_Bias(Bias= 0):
 
 # Setpoint=The current setpoint in Amps
 def Set_Setpoint(Setpoint=1e-9):
-    #under feedback called REF as in reference point or something
-    
-    pass
+   MySXM.SendWait(f"FeedPara('ref', {Setpoint});")
+   MySXM.SendWait(f"FeedPara('Ref2', {Setpoint});") 
 
 
 # XOffset=The X center of the image in nm
@@ -50,12 +49,18 @@ def Set_Scan_Speed(LineSpeed=2e-9):
     MySXM.SendWait(f"ScanPara('Speed',{LineSpeed});")
 
 def Scan():
-    #scan image
-   
-    pass
+    MySXM.execute("ScanImage")
 
 '''find motion
 coarse motion for x,y,z (different command for z)
 approach 
 spectra
 '''
+def Scan(Filename="Scan"):
+    # Set the filename
+    MySXM.execute("ScanImage", 1000)
+    while MySXM.NotGotAnswer and not Cancel:
+        SXMRemote.loop()
+    if Cancel:
+        # Is there a way to make it stop scanning?
+        pass

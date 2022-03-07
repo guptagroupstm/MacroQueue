@@ -20,6 +20,14 @@ def OnClose():
         Socket.shutdown(2)
         Socket.close()
 
+def Approach(Parameter1= 0):
+    pass
+def Z_Course_Step_Out(Parameter1= 0):
+    pass
+def Z_Course_Step_In(Parameter1= 0):
+    pass
+def Course_Step(X=0,Y=0):
+    pass
 
 # Bias=The bias voltage in V
 def Set_Bias(Bias= 0):
@@ -35,7 +43,7 @@ def Set_Bias_Rate(BiasRate=1):
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
 
-# Setpoint=The current setpoint in Amps
+# Setpoint=The current setpoint in A
 def Set_Setpoint(Setpoint=1e-9):
     Message = f"SetHWSubParameter, Z PI Controller 1, Set Point, Value, {Setpoint}\n"
     Socket.send(Message.encode())
