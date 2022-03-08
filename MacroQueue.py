@@ -43,30 +43,19 @@ import json
 IconFileName = "OJ.ico"
 
 
-# BUG:
-# After editing a macro, a int is expressed as a float (5 -> 5.0)
-
 # TODO:
-# Functions
-# Check Resolution
-# Use some nice units
-# Cancel scan (check every second)
-# dI/dV scan
-# Email
-# Set Resolution (nm/pixel)
-# Set Speed (nm/s, line time, pixel time)
-# CreaTec Functions
-
-
-# Start Macro Dialog.  Make it start bigger
+# Add a help dialog page
 
 # Make an .ICO
 # Make into an EXE
 
-# Add a help dialog page
-# Copy function in main queue menu
+# SciT notation
+# Ramping & scanning : set status bar 3
 
-# Repeat Macro until cancelled?
+
+# Email
+# Set Speed (nm/s, line time, pixel time)
+
 
 
 class MainFrame(GUIDesign.MyFrame):
@@ -289,6 +278,21 @@ class MainFrame(GUIDesign.MyFrame):
         if Index == 0 and self.Running:
             menuItem.Enable(False)
 
+        menuItem = popupmenu.Append(-1, 'Copy')
+        def Copy(event):
+            MacroLabel = self.TheQueue[Index][2].GetLabel()
+            Macro = self.TheQueue[Index][0]
+            self.AddSingleMacroToQueue(MacroName=MacroLabel,Macro=Macro)
+            CopiedIndex = len(self.TheQueue)-1
+            Function = self.TheQueue.pop(CopiedIndex)
+            self.TheQueue.insert(Index+1,Function)
+            self.m_FunctionNameSizer.Remove(CopiedIndex)
+            self.m_FunctionNameSizer.Insert(Index+1,Function[1], 0, wx.ALL|wx.EXPAND, 5)
+            self.m_QueueWindow.FitInside()
+            pass
+        self.Bind(wx.EVT_MENU, Copy, menuItem)
+        # menuItem.Enable(False)
+    
 
         if Index == 0 and self.Running:
             menuItem = popupmenu.Append(-1, 'Cancel')
@@ -459,144 +463,149 @@ class MainFrame(GUIDesign.MyFrame):
                         Macro.append([ExpandedMacroFunction,False])
                         TheUpdatedExpandedMacros.append(Macro)
         for Macro in TheExpandedMacros:
+            self.AddSingleMacroToQueue(MacroName,Macro)
+    def AddSingleMacroToQueue(self,MacroName,Macro):
+        thisSettingString = ""
+        for Function,Included in Macro:
+            if Included:
+                for key, value in Function['Parameters'].items():
+                    thisSettingString+=f"{key} = {value}, "
+        thisSettingString = thisSettingString[:-2]
+
+        YBitmapSize = 30
+        m_FunctionWindow = wx.Panel( self.m_QueueWindow, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1,-1), wx.TAB_TRAVERSAL )
+        m_FunctionWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
+        m_FunctionWindow.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
+        bSizer1 = wx.FlexGridSizer( 1, 10, 0, 0 )
+        bSizer1.SetFlexibleDirection( wx.BOTH )
+        bSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        bSizer1.AddGrowableCol(6)
+        # bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
+        m_FunctionWindow.Hide()
+
+
+        m_FunctionNameText = wx.StaticText( m_FunctionWindow, wx.ID_ANY, MacroName, wx.DefaultPosition, wx.Size( -1,-1), wx.ALIGN_RIGHT)
+        m_FunctionNameText.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
+        bSizer1.Add( m_FunctionNameText, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 2 )
+
+        Text = wx.StaticText( m_FunctionWindow, wx.ID_ANY, "", wx.DefaultPosition, wx.Size( 10,YBitmapSize), wx.ALIGN_CENTER_HORIZONTAL)
+        Text.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
+        bSizer1.Add( Text, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2 )
+
+        m_Up = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.UpBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
+        bSizer1.Add( m_Up, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
+
+
+        m_Up.Bind( wx.EVT_BUTTON, self.MoveUpInQueue)
+
+        m_Down = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.DownBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
+        bSizer1.Add( m_Down, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
+
+        m_Down.Bind( wx.EVT_BUTTON, self.MoveDowninQueue)
+            
+        m_Remove = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.RemoveBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
+        bSizer1.Add( m_Remove, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
+
+        m_Remove.Bind( wx.EVT_BUTTON, self.RemoveFromQueue)
+
+
+
+        m_Edit = wx.Button( m_FunctionWindow, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.Size(40,YBitmapSize), 0 )
+        bSizer1.Add( m_Edit, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
+
+        m_Edit.Bind( wx.EVT_BUTTON, self.EditMacroInQueue)
+        # m_Edit.Enable(False)
+
+
+        
+        SettingText = wx.StaticText( m_FunctionWindow, wx.ID_ANY, thisSettingString, wx.DefaultPosition, wx.Size( 10,YBitmapSize), wx.ALIGN_RIGHT)
+        SettingText.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
+        bSizer1.Add( SettingText, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 2 )
+
+        m_FunctionWindow.SetToolTip(thisSettingString)
+        for child in m_FunctionWindow.GetChildren():
+                child.SetToolTip(thisSettingString)
+
+
+        m_FunctionWindow.SetSizer( bSizer1 )
+        m_FunctionWindow.Layout()
+        bSizer1.Fit( m_FunctionWindow )
+        # fgSizer3.Add( self.m_FunctionWindow, 1, wx.EXPAND |wx.ALL, 2 )
+
+        m_FunctionWindow.Show()
+        self.TheQueue.append([Macro,m_FunctionWindow,m_FunctionNameText])
+        self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
+        self.m_QueueWindow.FitInside()
+    def MoveUpInQueue(self,event):
+        ThisPanel = event.GetEventObject().GetParent()
+        for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
+            Index = ThisIndex
+            if ThisPanel.GetId() == Panel.GetId():
+                break
+        if Index == 0 or (Index == 1 and self.Running):
+            pass
+        else:
+            Function = self.TheQueue.pop(Index)
+            self.TheQueue.insert(Index-1,Function)
+            self.m_FunctionNameSizer.Remove(Index)
+            self.m_FunctionNameSizer.Insert(Index-1,ThisPanel, 0, wx.ALL|wx.EXPAND, 5)
+            self.m_QueueWindow.FitInside()
+    def MoveDowninQueue(self,event):
+        ThisPanel = event.GetEventObject().GetParent()
+        for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
+            Index = ThisIndex
+            if ThisPanel.GetId() == Panel.GetId():
+                break
+        if (Index == 0 and self.Running) or (Index == len(self.TheQueue)-1):
+            pass
+        else:
+            Function = self.TheQueue.pop(Index)
+            self.TheQueue.insert(Index+1,Function)
+            self.m_FunctionNameSizer.Remove(Index)
+            self.m_FunctionNameSizer.Insert(Index+1,ThisPanel, 0, wx.ALL|wx.EXPAND, 5)
+            self.m_QueueWindow.FitInside()
+    def RemoveFromQueue(self,event):
+        ThisPanel = event.GetEventObject().GetParent()
+        for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
+            Index = ThisIndex
+            if ThisPanel.GetId() == Panel.GetId():
+                break
+        if Index == 0 and self.Running:
+            ThisPanel.SetBackgroundColour('red')
+            ThisPanel.Refresh()
+            self.Cancel()
+            # self.IncomingQueue.put(("Cancel",))
+        else:
+            self.TheQueue.pop(Index)
+            ThisPanel.Destroy()
+            self.m_QueueWindow.FitInside()
+    def EditMacroInQueue(self,event):
+        ThisPanel = event.GetEventObject().GetParent()
+        for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
+            Index = ThisIndex
+            if ThisPanel.GetId() == Panel.GetId():
+                break
+        if Index == 0 and self.Running:
+            pass
+        else:
+            OriginallyPaused = self.Paused
+            self.Paused = True
+            MacroLabel = self.TheQueue[Index][2].GetLabel()
+            ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.TheQueue[Index][0]]
+            MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,Index=Index)
+            MyStartMacroDialog.ShowModal()
+            self.Paused = OriginallyPaused
             thisSettingString = ""
-            for Function,Included in Macro:
+            ThisMacro = self.TheQueue[Index][0]
+            for Function, Included in ThisMacro:
                 if Included:
                     for key, value in Function['Parameters'].items():
                         thisSettingString+=f"{key} = {value}, "
             thisSettingString = thisSettingString[:-2]
-
-            YBitmapSize = 30
-            m_FunctionWindow = wx.Panel( self.m_QueueWindow, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1,-1), wx.TAB_TRAVERSAL )
-            m_FunctionWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
-            m_FunctionWindow.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
-            bSizer1 = wx.FlexGridSizer( 1, 10, 0, 0 )
-            bSizer1.SetFlexibleDirection( wx.BOTH )
-            bSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-            bSizer1.AddGrowableCol(6)
-            # bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
-            m_FunctionWindow.Hide()
-
-
-            m_FunctionNameText = wx.StaticText( m_FunctionWindow, wx.ID_ANY, MacroName, wx.DefaultPosition, wx.Size( -1,-1), wx.ALIGN_RIGHT)
-            m_FunctionNameText.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
-            bSizer1.Add( m_FunctionNameText, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 2 )
-
-            Text = wx.StaticText( m_FunctionWindow, wx.ID_ANY, "", wx.DefaultPosition, wx.Size( 10,YBitmapSize), wx.ALIGN_CENTER_HORIZONTAL)
-            Text.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
-            bSizer1.Add( Text, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2 )
-
-            m_Up = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.UpBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
-            bSizer1.Add( m_Up, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
-
-            def MoveUp(event):
-                ThisPanel = event.GetEventObject().GetParent()
-                for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
-                    Index = ThisIndex
-                    if ThisPanel.GetId() == Panel.GetId():
-                        break
-                if Index == 0 or (Index == 1 and self.Running):
-                    pass
-                else:
-                    Function = self.TheQueue.pop(Index)
-                    self.TheQueue.insert(Index-1,Function)
-                    self.m_FunctionNameSizer.Remove(Index)
-                    self.m_FunctionNameSizer.Insert(Index-1,ThisPanel, 0, wx.ALL|wx.EXPAND, 5)
-                    self.m_QueueWindow.FitInside()
-            m_Up.Bind( wx.EVT_BUTTON, MoveUp)
-
-            m_Down = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.DownBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
-            bSizer1.Add( m_Down, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
-            def MoveDown(event):
-                ThisPanel = event.GetEventObject().GetParent()
-                for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
-                    Index = ThisIndex
-                    if ThisPanel.GetId() == Panel.GetId():
-                        break
-                if (Index == 0 and self.Running) or (Index == len(self.TheQueue)-1):
-                    pass
-                else:
-                    Function = self.TheQueue.pop(Index)
-                    self.TheQueue.insert(Index+1,Function)
-                    self.m_FunctionNameSizer.Remove(Index)
-                    self.m_FunctionNameSizer.Insert(Index+1,ThisPanel, 0, wx.ALL|wx.EXPAND, 5)
-                    self.m_QueueWindow.FitInside()
-            m_Down.Bind( wx.EVT_BUTTON, MoveDown)
-                
-            m_Remove = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.RemoveBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
-            bSizer1.Add( m_Remove, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
-            def Remove(event):
-                ThisPanel = event.GetEventObject().GetParent()
-                for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
-                    Index = ThisIndex
-                    if ThisPanel.GetId() == Panel.GetId():
-                        break
-                if Index == 0 and self.Running:
-                    ThisPanel.SetBackgroundColour('red')
-                    ThisPanel.Refresh()
-                    self.Cancel()
-                    # self.IncomingQueue.put(("Cancel",))
-                else:
-                    self.TheQueue.pop(Index)
-                    ThisPanel.Destroy()
-                    self.m_QueueWindow.FitInside()
-            m_Remove.Bind( wx.EVT_BUTTON, Remove)
-
-
-
-            m_Edit = wx.Button( m_FunctionWindow, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.Size(40,YBitmapSize), 0 )
-            bSizer1.Add( m_Edit, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
-            def Edit(event):
-                ThisPanel = event.GetEventObject().GetParent()
-                for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
-                    Index = ThisIndex
-                    if ThisPanel.GetId() == Panel.GetId():
-                        break
-                if Index == 0 and self.Running:
-                    pass
-                else:
-                    OriginallyPaused = self.Paused
-                    self.Paused = True
-                    MacroLabel = self.TheQueue[Index][2].GetLabel()
-                    ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.TheQueue[Index][0]]
-                    MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,Index=Index)
-                    MyStartMacroDialog.ShowModal()
-                    self.Paused = OriginallyPaused
-                    thisSettingString = ""
-                    ThisMacro = self.TheQueue[Index][0]
-                    for Function, Included in ThisMacro:
-                        if Included:
-                            for key, value in Function['Parameters'].items():
-                                thisSettingString+=f"{key} = {value}, "
-                    thisSettingString = thisSettingString[:-2]
-                    for child in self.TheQueue[Index][1].GetChildren():
-                        child.SetToolTip(thisSettingString)
-                    self.TheQueue[Index][1].GetChildren()[-1].SetLabel(thisSettingString)
-                    self.Layout()
-            m_Edit.Bind( wx.EVT_BUTTON, Edit)
-            # m_Edit.Enable(False)
-
-
-            
-            SettingText = wx.StaticText( m_FunctionWindow, wx.ID_ANY, thisSettingString, wx.DefaultPosition, wx.Size( 10,YBitmapSize), wx.ALIGN_RIGHT)
-            SettingText.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
-            bSizer1.Add( SettingText, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 2 )
-
-            m_FunctionWindow.SetToolTip(thisSettingString)
-            for child in m_FunctionWindow.GetChildren():
-                    child.SetToolTip(thisSettingString)
-
-
-            m_FunctionWindow.SetSizer( bSizer1 )
-            m_FunctionWindow.Layout()
-            bSizer1.Fit( m_FunctionWindow )
-            # fgSizer3.Add( self.m_FunctionWindow, 1, wx.EXPAND |wx.ALL, 2 )
-
-            m_FunctionWindow.Show()
-            self.TheQueue.append([Macro,m_FunctionWindow,m_FunctionNameText])
-            self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
-            self.m_QueueWindow.FitInside()
-        pass
+            for child in self.TheQueue[Index][1].GetChildren():
+                child.SetToolTip(thisSettingString)
+            self.TheQueue[Index][1].GetChildren()[-1].SetLabel(thisSettingString)
+            self.Layout()
     def AddConnectToQueue(self, event=None):
         Initialize = [['Initialize',{},True]]
         MyStartMacroDialog = StartMacroDialog(self,"Connect",Initialize)
@@ -619,7 +628,7 @@ class MainFrame(GUIDesign.MyFrame):
         ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
         ThisChooseSoftwareDialog.OnSXM()
         return
-
+    
 def Thread(IncomingQueue,OutgoingQueue):
     Functions = {"RHK":RHKFunctions,"CreaTec":CreaTecFunctions,"SXM":SXMFunctions,"General":GeneralFunctions}
     while True:

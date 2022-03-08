@@ -1,4 +1,4 @@
-from numpy import array
+from numpy import array, floor, log10
 import wx
 from inspect import getmembers, isfunction,getcomments
 from GUIDesign import MacroDialog
@@ -11,7 +11,7 @@ from functools import partial
 import numpy as np
 
 from GUIDesign import StartMacroDialog
-from STMMacroQueue.GUIDesign import ChooseSoftware
+from GUIDesign import ChooseSoftware
 import pandas as pd
 class SettingsDialog(wx.Dialog):
 
@@ -186,8 +186,12 @@ class MyMacroDialog ( MacroDialog ):
                             ParameterIndex = line.find(parameter)
                             if ParameterIndex != -1:
                                 EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
-                                Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
-                
+                                SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
+                                if SemiColonIndex != -1:
+                                    Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
+                                    Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
+                                else:
+                                    Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:] 
                 FunctionButton.Bind(wx.EVT_BUTTON, self.AddFunctionToQueue)
 
 
@@ -440,7 +444,11 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                     DefaultValueSizer.SetFlexibleDirection( wx.BOTH )
                     DefaultValueSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-                    self.ParameterNameText = wx.StaticText( self.ParameterPanel, wx.ID_ANY, ParameterName, wx.DefaultPosition, wx.Size( -1,15 ), 0 )
+                    ThisParameterName = ParameterName
+                    if 'Units' in ParameterInfo.keys():
+                        ThisParameterName = ThisParameterName + f" ({ParameterInfo['Units']})"
+
+                    self.ParameterNameText = wx.StaticText( self.ParameterPanel, wx.ID_ANY, ThisParameterName, wx.DefaultPosition, wx.Size( -1,15 ), 0 )
                     self.ParameterNameText.Wrap( -1 )
                     self.ParameterNameText.SetToolTip(Tooltip)
 
@@ -590,7 +598,12 @@ class MyStartMacroDialog(StartMacroDialog):
                         ParameterIndex = line.find(parameter)
                         if ParameterIndex != -1:
                             EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
-                            Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
+                            SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
+                            if SemiColonIndex != -1:
+                                Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
+                                Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
+                            else:
+                                Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
             self.TheFunctionInfos[FunctionName] = [Function,Parameters.copy()]
         self.TheMacro = []
         for Name,Parameters,Included in DefaultMacro:
@@ -611,7 +624,7 @@ class MyStartMacroDialog(StartMacroDialog):
             self.TheMacro.append(ThisFunction)
         
     def UpdateFunctionTooltips(self):
-        NTotalCalls = 1
+        self.NTotalCalls = 1
         for FunctionCtrls, FunctionInfo in zip(self.TheStartMacroCtrls.values(),self.TheMacro):
             Name = FunctionInfo['Name']
             Included = FunctionInfo['Included']
@@ -624,20 +637,27 @@ class MyStartMacroDialog(StartMacroDialog):
                 NFucntionCalls *= NCalls
 
             if Included:
-                NTotalCalls *= NFucntionCalls
-                if NTotalCalls == 1:
-                    FunctionPanel.SetToolTip(f"{Name} will be called a total of {NTotalCalls} time.")
-                    m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {NTotalCalls} time.")
-                if NTotalCalls > 1:
+                self.NTotalCalls *= NFucntionCalls
+                if self.NTotalCalls == 1:
+                    FunctionPanel.SetToolTip(f"{Name} will be called a total of {self.NTotalCalls} time.")
+                    m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {self.NTotalCalls} time.")
+                if self.NTotalCalls > 1:
                     if NFucntionCalls == 1:
-                        FunctionPanel.SetToolTip(f"{Name} will be called a total of {NTotalCalls} times.")
-                        m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {NTotalCalls} times.")
+                        FunctionPanel.SetToolTip(f"{Name} will be called a total of {self.NTotalCalls} times.")
+                        m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {self.NTotalCalls} times.")
                     else:
-                        FunctionPanel.SetToolTip(f"{Name} will be called a total of {NTotalCalls} times with {NFucntionCalls} different parameters.")
-                        m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {NTotalCalls} times with {NFucntionCalls} different parameters.")
+                        FunctionPanel.SetToolTip(f"{Name} will be called a total of {self.NTotalCalls} times with {NFucntionCalls} different parameters.")
+                        m_FunctionTextCheck.SetToolTip(f"{Name} will be called a total of {self.NTotalCalls} times with {NFucntionCalls} different parameters.")
             else:
                 FunctionPanel.SetToolTip(f"{Name} will not be called.")
                 m_FunctionTextCheck.SetToolTip(f"{Name} will not be called.")
+            if self.NTotalCalls == 1:
+                self.StartButton.SetWindowStyleFlag(wx.TEXT_ALIGNMENT_RIGHT)
+                self.StartButton.SetLabel("Add to Queue")
+            else:
+                self.StartButton.SetWindowStyleFlag(wx.TEXT_ALIGNMENT_RIGHT)
+                self.StartButton.SetLabel(f"Add to Queue x{self.NTotalCalls}")
+
 
     def SetParameterPanels(self):
         m_MacroSettingScrolledWindowSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
@@ -698,13 +718,17 @@ class MyStartMacroDialog(StartMacroDialog):
                         DefaultValueSizer.SetFlexibleDirection( wx.BOTH )
                         DefaultValueSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-                        ParameterNameText = wx.StaticText( ParameterPanel, wx.ID_ANY, ParameterName, wx.DefaultPosition, wx.Size( -1,15 ), 0 )
+                        ThisParameterName = ParameterName
+                        if 'Units' in self.TheFunctionInfos[Name][1][ParameterName].keys():
+                            ThisParameterName = ThisParameterName + f" ({self.TheFunctionInfos[Name][1][ParameterName]['Units']})"
+
+                        ParameterNameText = wx.StaticText( ParameterPanel, wx.ID_ANY, ThisParameterName, wx.DefaultPosition, wx.Size( -1,15 ), 0 )
                         ParameterNameText.Wrap( -1 )
 
                         ParameterNameText.SetMinSize( wx.Size( 120,15 ) )
                         DefaultValueSizer.Add( ParameterNameText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
 
-                        def RemoveNonNumbers(Name,DefaultValue,ThisFunction,ParameterName,event):
+                        def RemoveNonNumbers(Name,DefaultValue,ThisFunction,ParameterName,FunctionTextCheck,event):
                             ThisTextCtrl =event.GetEventObject()
                             Text = ThisTextCtrl.GetValue()
                             if not  self.EdittingMode:
@@ -725,12 +749,20 @@ class MyStartMacroDialog(StartMacroDialog):
                                 TranslatedText,Numbers, NCalls = self.TranslateNumerical(Text,DefaultValue)
                                 ThisFunction['Parameters'][ParameterName]['Value'] = Numbers
                                 ThisFunction['Parameters'][ParameterName]['NCalls'] = NCalls
-                                Tooltip = FirstLine + f"{TranslatedText}"
+                                if len(TranslatedText) > 400:
+                                    Tooltip = FirstLine + TranslatedText[:160]+"...\n..."+TranslatedText[-160:]
+                                else:
+                                    Tooltip = FirstLine + f"{TranslatedText}"
                                 ThisPanel.SetToolTip(Tooltip)
                                 for child in ThisPanel.GetChildren():
                                     child.SetToolTip(Tooltip)
+                            FunctionTextCheck.SetValue(True)
+                            ThisFunction["Included"] = True
+                            Parameters = self.TheStartMacroCtrls[Name][2]
+                            for ParameterName,ParameterInfo in Parameters.items():
+                                self.TheStartMacroCtrls[Name][2][ParameterName][1].Enable(True)
                             self.UpdateFunctionTooltips()
-                        def UpdateParameters(Name,ThisFunction,ParameterName,event):
+                        def UpdateParameters(Name,ThisFunction,ParameterName,FunctionTextCheck,event):
                             Value = event.GetEventObject().GetValue()
                             ThisPanel = event.GetEventObject().GetParent()
 
@@ -746,7 +778,13 @@ class MyStartMacroDialog(StartMacroDialog):
                             ThisPanel.SetToolTip(Tooltip)
                             for child in ThisPanel.GetChildren():
                                 child.SetToolTip(Tooltip)
-                        def UpdateChoiceParameters(Name,ThisFunction,ParameterName,event):
+                            FunctionTextCheck.SetValue(True)
+                            ThisFunction["Included"] = True
+                            Parameters = self.TheStartMacroCtrls[Name][2]
+                            for ParameterName,ParameterInfo in Parameters.items():
+                                self.TheStartMacroCtrls[Name][2][ParameterName][1].Enable(True)
+                            self.UpdateFunctionTooltips()
+                        def UpdateChoiceParameters(Name,ThisFunction,ParameterName,FunctionTextCheck,event):
                             Value = event.GetEventObject().GetStringSelection()
                             ThisPanel = event.GetEventObject().GetParent()
 
@@ -762,24 +800,30 @@ class MyStartMacroDialog(StartMacroDialog):
                             ThisPanel.SetToolTip(Tooltip)
                             for child in ThisPanel.GetChildren():
                                 child.SetToolTip(Tooltip)
+                            FunctionTextCheck.SetValue(True)
+                            ThisFunction["Included"] = True
+                            Parameters = self.TheStartMacroCtrls[Name][2]
+                            for ParameterName,ParameterInfo in Parameters.items():
+                                self.TheStartMacroCtrls[Name][2][ParameterName][1].Enable(True)
+                            self.UpdateFunctionTooltips()
                         if ParameterInfo['ValueType'] == 'Numerical':
                             ParameterValueText = wx.TextCtrl( ParameterPanel, wx.ID_ANY, f"{ParameterInfo['DefaultValue']}", wx.DefaultPosition, wx.DefaultSize, 0 )
-                            ThisRemoveNonNumbers = partial(RemoveNonNumbers,Name,f"{ParameterInfo['DefaultValue']}",Function,ParameterName)
+                            ThisRemoveNonNumbers = partial(RemoveNonNumbers,Name,f"{ParameterInfo['DefaultValue']}",Function,ParameterName,m_FunctionTextCheck)
                             ParameterValueText.Bind( wx.EVT_TEXT, ThisRemoveNonNumbers)
                         elif ParameterInfo['ValueType'] == 'Choice':
                             ParameterValueText = wx.Choice( ParameterPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.TheFunctionInfos[Name][1][ParameterName]['DefaultValue'])
                             ParameterValueText.SetStringSelection(ParameterInfo['DefaultValue'])
-                            ThisUpdateParameters = partial(UpdateChoiceParameters,Name,Function,ParameterName)
+                            ThisUpdateParameters = partial(UpdateChoiceParameters,Name,Function,ParameterName,m_FunctionTextCheck)
                             ParameterValueText.Bind( wx.EVT_CHOICE, ThisUpdateParameters)
                         elif ParameterInfo['ValueType'] == 'Boolean':
                             ParameterValueText = wx.CheckBox( ParameterPanel, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, 0 )
                             ParameterValueText.SetValue(ParameterInfo['DefaultValue'])
-                            ThisUpdateParameters = partial(UpdateParameters,Name,Function,ParameterName)
+                            ThisUpdateParameters = partial(UpdateParameters,Name,Function,ParameterName,m_FunctionTextCheck)
                             ParameterValueText.Bind( wx.EVT_CHECKBOX, ThisUpdateParameters)
                         elif ParameterInfo['ValueType'] == 'String':
                             ParameterValueText = wx.TextCtrl( ParameterPanel, wx.ID_ANY, ParameterInfo['DefaultValue'], wx.DefaultPosition, wx.DefaultSize, 0 )
                             ParameterValueText.SetValue(ParameterInfo['DefaultValue'])
-                            ThisUpdateParameters = partial(UpdateParameters,Name,Function,ParameterName)
+                            ThisUpdateParameters = partial(UpdateParameters,Name,Function,ParameterName,m_FunctionTextCheck)
                             ParameterValueText.Bind( wx.EVT_TEXT, ThisUpdateParameters)
                         DefaultValueSizer.Add( ParameterValueText, 1, wx.ALL, 5 )
 
@@ -850,7 +894,7 @@ class MyStartMacroDialog(StartMacroDialog):
             NewString = OldString.replace(";",",")
             NewString = NewString.split(',')
             NewString = [CleanNumber(Item) for Item in NewString if CleanNumber(Item) is not None]
-            Numbers = [float(X) if float(X)%1 != 0 else int(X) for X in NewString if len(X)>0]
+            Numbers = [float(X) if float(X)%1 != 0 else int(float(X)) for X in NewString if len(X)>0]
             NewString = [f"{X}" for X in Numbers]
             NCalls = len(NewString)
             NewString = ','.join(NewString)
@@ -861,7 +905,13 @@ class MyStartMacroDialog(StartMacroDialog):
                 NewString = [float(X) for X in NewString]
                 NewString[1] += NewString[2]/1000
                 NewString = np.arange(*NewString)
-                Numbers = [float(X) if float(X)%1 != 0 else int(float(X)) for X in NewString]
+                def round_sig(x, sig):
+                    x = round(x, sig-int(floor(log10(abs(x))))-1) if x !=0 else 0
+                    if x%1==0:
+                        x=int(x)
+                    return x
+                Numbers = [round_sig(float(X),8)for X in NewString]
+
                 NewString = [f"{X}" for X in Numbers]
             else:
                 Numbers = [float(X) if float(X)%1 != 0 else int(float(X)) for X in NewString if len(X)>0]
@@ -873,7 +923,7 @@ class MyStartMacroDialog(StartMacroDialog):
             NewString = CleanNumber(OldString)
             while NewString is None or len(NewString) == 0:
                 NewString = ScrubNumber(DefaultValue)
-            Numbers = [float(NewString)]
+            Numbers = [float(NewString)] if float(NewString)%1 != 0 else [int(float(NewString))]
         if NCalls == 0:
             NewString = ScrubNumber(DefaultValue)
             while NewString is None or len(NewString) == 0:
@@ -884,6 +934,11 @@ class MyStartMacroDialog(StartMacroDialog):
 
     def AddToQueue(self, event=None):
         if not self.EdittingMode:
+            if self.NTotalCalls > 100:
+                MyMessage = wx.MessageDialog(self,message=f"You are about to add {self.NTotalCalls} to the queue.\nWould you like to proceed?\nIf so, This dialog will stop responding for a few moments.",caption="Warning - That's a lot of Macros",style=wx.YES_NO)
+                YesOrNo = MyMessage.ShowModal()
+                if YesOrNo != wx.ID_YES:
+                    return
             self.Parent.AddMacroToQueue(self.TheMacro,self.MacroName)
         else:
             ThisMacro = []

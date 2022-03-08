@@ -225,5 +225,34 @@
    {},
    true
   ]
+ ],
+ "Basic Scan": [
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Scan",
+   {},
+   true
+  ]
  ]
 }

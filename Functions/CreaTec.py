@@ -7,6 +7,8 @@ import pyvisa
 STM = None
 BUFFER_SIZE = None
 Cancel = False
+BField = None
+
 def Initialize():
     global STM
     STM = win32com.client.Dispatch("pstmafm.stmafmrem")
@@ -17,6 +19,29 @@ def OnClose():
     if STM is not None:
         pass
 
+    if BField is not None:
+        pass
+
+def ConnectMagneticFieldController():
+    global BField
+    pass
+
+
+def SetBField(B=1,ramp_spped=0.1):
+    if BField is not None:
+        pass
+    # Make sure current stays below +/- 10 A
+    # Hard limit on ramp speed
+
+    # 10 Amps is 1 T
+    # Amps or T input parameter
+
+    # Add BField to memo
+    pass
+
+def TurnBFieldOff():
+    pass
+
 # def Approach(Parameter1= 0):
 #     pass
 # def Z_Course_Step_Out(Parameter1= 0):
@@ -26,14 +51,15 @@ def OnClose():
 # def Course_Step(X=0,Y=0):
 #     pass
 
-# Bias=The bias voltage in V
+# Bias=V;The bias voltage in V
 def Set_Bias(Bias= 0):
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
 
 
-# Setpoint=The current setpoint in pA
+
+# Setpoint=pA;The current setpoint in pA
 def Set_Setpoint(Setpoint=100):
-    Setpoint *= 1e-12 #Convert from pA to A (RHK uses A)
+    Setpoint *= 1e-12 #Convert from pA to A
     STM.setp('SCAN.SETPOINT.AMPERE',Setpoint)
 
 
@@ -61,8 +87,8 @@ def Fine_Move_Tip(HowToSetPosition=['nm','Image Coord','Voltage'],XOffset=0,YOff
     
 
 
-# HowToSetSize=Choose to set the Image Size in A directly or the Resolution in A/pixel
-# ImageSize=The length of a row and column in A, or A/pixel
+# HowToSetSize=Choose to set the Image Size in Å directly or the Resolution in Å/pixel
+# ImageSize=Å;The length of a row and column in Å or Å/pixel
 def Set_Scan_Image_Size(HowToSetSize=['Image Size','Resolution'],ImageSize=100):
     ImageSize /= 10 # for A
     if HowToSetSize == 'Image Size':
@@ -73,7 +99,7 @@ def Set_Scan_Image_Size(HowToSetSize=['Image Size','Resolution'],ImageSize=100):
     STM.setp('SCAN.IMAGESIZE.NM.X',ImageSize)
 
 
-# Angle=The angle on the scan in degrees
+# Angle=degrees;The angle on the scan in degrees
 def Set_Scan_Window_Angle(Angle=0):
     STM.setp('SCAN.ROTATION.DEG',Angle)
 
@@ -81,7 +107,7 @@ def Set_Scan_Window_Angle(Angle=0):
 def Set_NPixels(NPixels=512):
     STM.setp('SCAN.IMAGESIZE.PIXEL', (NPixels, NPixels))
 
-# LineSpeed=The speed the tip moves in nm/s
+# LineSpeed=nm/s;The speed the tip moves in nm/s
 def Set_Scan_Speed(Speed=2):
     STM.setp('SCAN.SPEED.NM/SEC',Speed)
 

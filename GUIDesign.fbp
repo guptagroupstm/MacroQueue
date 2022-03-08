@@ -304,7 +304,7 @@
                 <property name="permission">protected</property>
                 <event name="OnTimer">CheckQueue</event>
             </object>
-            <object class="wxFlexGridSizer" expanded="0">
+            <object class="wxFlexGridSizer" expanded="1">
                 <property name="cols">3</property>
                 <property name="flexible_direction">wxBOTH</property>
                 <property name="growablecols">2</property>
@@ -2419,7 +2419,7 @@
                 </object>
             </object>
         </object>
-        <object class="Dialog" expanded="0">
+        <object class="Dialog" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg">wxSYS_COLOUR_INACTIVECAPTION</property>
@@ -2703,7 +2703,7 @@
                                                 <property name="pressed"></property>
                                                 <property name="resize">Resizable</property>
                                                 <property name="show">1</property>
-                                                <property name="size"></property>
+                                                <property name="size">110,-1</property>
                                                 <property name="style"></property>
                                                 <property name="subclass">; ; forward_declare</property>
                                                 <property name="toolbar_pane">0</property>

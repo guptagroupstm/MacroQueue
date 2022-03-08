@@ -64,6 +64,18 @@ class MyFrame ( wx.Frame ):
 
 		self.m_menubar1.Append( self.m_SystemMenu, u"System" )
 
+		self.m_menu5 = wx.Menu()
+		self.m_menuItem10 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Basic Usage", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.Append( self.m_menuItem10 )
+
+		self.m_menuItem11 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Make a Macro", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.Append( self.m_menuItem11 )
+
+		self.m_menuItem12 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Write New Function", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.Append( self.m_menuItem12 )
+
+		self.m_menubar1.Append( self.m_menu5, u"Help" )
+
 		self.SetMenuBar( self.m_menubar1 )
 
 		self.m_statusBar = self.CreateStatusBar( 5, wx.STB_SIZEGRIP, wx.ID_ANY )
@@ -523,7 +535,7 @@ class StartMacroDialog ( wx.Dialog ):
 		fgSizer8.SetFlexibleDirection( wx.BOTH )
 		fgSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		self.StartButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Add to Queue", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.StartButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Add to Queue", wx.DefaultPosition, wx.Size( 110,-1 ), 0 )
 		fgSizer8.Add( self.StartButton, 0, wx.ALL, 5 )
 
 		self.CancelButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
