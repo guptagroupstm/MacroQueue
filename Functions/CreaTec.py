@@ -112,8 +112,14 @@ def Set_Scan_Speed(Speed=2):
     STM.setp('SCAN.SPEED.NM/SEC',Speed)
 
 def Scan():
+    print(STM.getp('SCAN.IMAGESIZE.NM.X',''))
+    print('1')
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
+    print(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
+    print('2')
     Lines = float(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
+    print(STM.getp('SCAN.SPEED.NM/SEC',""))
+    print('3')
     Speed = float(STM.getp('SCAN.SPEED.NM/SEC',""))
     Time = (np.floor(Lines * Size/Speed)-5)/10
     Time = 0 if Time <= 0 else Time

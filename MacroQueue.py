@@ -1,16 +1,15 @@
-from argon2 import Parameters
 import wx
 import os
 import sys
 import pandas as pd
-from shutil import copytree,rmtree
+# from shutil import copytree,rmtree
 # from functools import partial
-import win32com.client
+# import win32com.client
 # import plotly.graph_objects as go
 # import plotly.express as px
 import multiprocessing as mp
 import numpy as np
-from math import log10 , floor
+# from math import log10 , floor
 import queue
 import GUIDesign
 import threading
@@ -40,22 +39,25 @@ import Functions.General as GeneralFunctions
 import json
 
 
-IconFileName = "OJ.ico"
+IconFileName = "MacroQueueIcon.ico"
 
 
 # TODO:
-# Add a help dialog page
-
-# Make an .ICO
-# Make into an EXE
+# Set max size
 
 # SciT notation
 # Ramping & scanning : set status bar 3
+# Progress bar: https://stackoverflow.com/questions/1883528/wxpython-progress-bar
 
+# Write the help dialog
+
+# Check dialog when opening souce when frozen
 
 # Email
 # Set Speed (nm/s, line time, pixel time)
 
+# In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
+# On close, I cancel the scan.  Should I try to prevent that?
 
 
 class MainFrame(GUIDesign.MyFrame):
@@ -69,6 +71,7 @@ class MainFrame(GUIDesign.MyFrame):
 
     def __init__(self):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+        print(application_path)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
 
@@ -99,14 +102,16 @@ class MainFrame(GUIDesign.MyFrame):
 
         
         YBitmapSize = 20
-        self.DownBitmap = wx.Bitmap( u"Bitmaps\\DownArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
-        self.UpBitmap = wx.Bitmap( u"Bitmaps\\UpArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
-        self.RemoveBitmap = wx.Bitmap( u"Bitmaps\\Remove.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
+        self.DownBitmap = wx.Bitmap( u"Bitmaps/DownArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
+        self.UpBitmap = wx.Bitmap( u"Bitmaps/UpArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
+        self.RemoveBitmap = wx.Bitmap( u"Bitmaps/Remove.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
         self.m_FunctionNameSizer = wx.FlexGridSizer( 0, 1, -6, 0 )
         self.m_FunctionNameSizer.AddGrowableCol( 0 )
         self.m_FunctionNameSizer.SetFlexibleDirection( wx.BOTH )
         self.m_FunctionNameSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         self.m_QueueWindow.SetSizer(self.m_FunctionNameSizer)
+        dt = MyPanelDropTarget(self.m_QueueWindow,self)
+        self.m_QueueWindow.SetDropTarget(dt)
         def OnQueueSize(event):
             # self.m_QueueWindow.Layout()
             self.m_QueueWindow.FitInside()
@@ -349,25 +354,17 @@ class MainFrame(GUIDesign.MyFrame):
         if self.Paused:
             self.Paused = False
             self.m_PauseAfterButton.SetLabel("Pause After Function")
-            if self.Running:
-                if len(self.TheQueue) >= 2:
-                    self.TheQueue[1][1].SetBackgroundColour(wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ))
-                    self.TheQueue[1][1].Refresh()
-            else:
-                if len(self.TheQueue) >= 1:
-                    self.TheQueue[0][1].SetBackgroundColour(wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ))
-                    self.TheQueue[0][1].Refresh()
+            for i,Macro in enumerate(self.TheQueue):
+                if (i > 0 and self.Running) or not self.Running:
+                    Macro[1].SetBackgroundColour(wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ))
+                    Macro[1].Refresh()
         else:
             self.Paused = True
             self.m_PauseAfterButton.SetLabel("Resume")
-            if self.Running:
-                if len(self.TheQueue) >= 2:
-                    self.TheQueue[1][1].SetBackgroundColour('yellow')
-                    self.TheQueue[1][1].Refresh()
-            else:
-                if len(self.TheQueue) >= 1:
-                    self.TheQueue[0][1].SetBackgroundColour('yellow')
-                    self.TheQueue[0][1].Refresh()
+            for i,Macro in enumerate(self.TheQueue):
+                if (i > 0 and self.Running) or not self.Running:
+                    Macro[1].SetBackgroundColour(wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE))
+                    Macro[1].Refresh()
         return
     def Cancel(self):
         if not self.Paused:
@@ -474,7 +471,9 @@ class MainFrame(GUIDesign.MyFrame):
 
         YBitmapSize = 30
         m_FunctionWindow = wx.Panel( self.m_QueueWindow, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1,-1), wx.TAB_TRAVERSAL )
-        m_FunctionWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
+        m_FunctionWindow.Bind(wx.EVT_MOTION, self.OnStartDrag)
+        Color = wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) if (not self.Paused or self.m_PauseAfterButton.GetLabel() == "Start") else wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE)
+        m_FunctionWindow.SetBackgroundColour(Color)
         m_FunctionWindow.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
         bSizer1 = wx.FlexGridSizer( 1, 10, 0, 0 )
         bSizer1.SetFlexibleDirection( wx.BOTH )
@@ -606,6 +605,20 @@ class MainFrame(GUIDesign.MyFrame):
                 child.SetToolTip(thisSettingString)
             self.TheQueue[Index][1].GetChildren()[-1].SetLabel(thisSettingString)
             self.Layout()
+    def OnStartDrag(self, event):
+        if event.Dragging():
+            ThisPanel = event.GetEventObject()
+            ThisPanel.SetBackgroundColour('Blue')
+            ThisPanel.Refresh()
+            for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
+                Index = ThisIndex
+                if ThisPanel.GetId() == Panel.GetId():
+                    break
+            data = wx.TextDataObject()
+            data.SetText(f"{Index}")
+            dropSource = wx.DropSource(ThisPanel)
+            dropSource.SetData(data)
+            result = dropSource.DoDragDrop()
     def AddConnectToQueue(self, event=None):
         Initialize = [['Initialize',{},True]]
         MyStartMacroDialog = StartMacroDialog(self,"Connect",Initialize)
@@ -628,7 +641,90 @@ class MainFrame(GUIDesign.MyFrame):
         ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
         ThisChooseSoftwareDialog.OnSXM()
         return
-    
+    def BasicUseageHelp(self, event):
+        HelpMessage = "Heyyyy\n"
+        HelpMessage += "Wooooorld\n"
+        MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Basic Usage")
+        MyMessage.ShowModal()
+        return 
+    def MakeAMacroHelp(self, event):
+        HelpMessage = "Heyyyy\n"
+        HelpMessage += "Wooooorld\n"
+        MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Make a Macro")
+        MyMessage.ShowModal()
+        return
+    def WriteANewFunctionHelp(self, event):
+        HelpMessage = "Heyyyy\n"
+        HelpMessage += "Wooooorld\n"
+        MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Write a new function")
+        MyMessage.ShowModal()
+        return
+    def OpenSourceFolder(self, event):
+        if getattr(sys, 'frozen', False):
+            MyMessage = wx.MessageDialog(self,message=f"This will take you to the software source files for the MacroQueue.exe on this computer.  Any changes will be forgotten when the EXE file is remade or updated.\nWould you like to continue?.",caption="Warning - Exe Source Files",style=wx.YES_NO)
+            YesOrNo = MyMessage.ShowModal()
+            if YesOrNo == wx.ID_NO:
+                return
+        FolderPath = os.path.realpath("Functions/")
+        os.startfile(FolderPath)
+        return
+class MyPanelDropTarget(wx.DropTarget):
+    def __init__(self, window,Parent): 
+        wx.DropTarget.__init__(self)
+        self.window = window
+        self.Parent = Parent
+        self.data = wx.TextDataObject()
+        self.SetDataObject(self.data)
+	
+    def OnDragOver(self, x, y, d):
+        if not self.GetData():
+            return wx.DragNone
+
+        Index = int(self.data.GetText())
+        
+        ThisPanel = self.Parent.TheQueue[Index][1]
+        for ThisIndex,(Function,Panel,t) in enumerate(self.Parent.TheQueue):
+            NewIndex = ThisIndex
+            MinY = Panel.GetPosition()[1]
+            MaxY = MinY + Panel.GetSize()[1]
+            if y < (MinY+MaxY)/2:
+                break
+        if self.Parent.Running and NewIndex == 0:
+            NewIndex == 1
+
+        data = wx.TextDataObject()
+        data.SetText(f"{NewIndex}")
+        self.data = data
+        Function = self.Parent.TheQueue.pop(Index)
+        self.Parent.TheQueue.insert(NewIndex,Function)
+        self.Parent.m_FunctionNameSizer.Remove(Index)
+        self.Parent.m_FunctionNameSizer.Insert(NewIndex,ThisPanel, 0, wx.ALL|wx.EXPAND, 5)
+        self.Parent.m_QueueWindow.FitInside()
+        return d
+
+    def OnData(self, x, y, d):
+        if not self.GetData():
+            return wx.DragNone
+        Index = int(self.data.GetText())
+        
+        ThisPanel = self.Parent.TheQueue[Index][1]
+        # for ThisIndex,(Function,Panel,t) in enumerate(self.Parent.TheQueue):
+        #     NewIndex = ThisIndex
+        #     MinY = Panel.GetPosition()[1]
+        #     MaxY = MinY + Panel.GetSize()[1]
+        #     if y < (MinY+MaxY)/2:
+        #         break
+        # Function = self.Parent.TheQueue.pop(Index)
+        # self.Parent.TheQueue.insert(NewIndex,Function)
+        # self.Parent.m_FunctionNameSizer.Remove(Index)
+        # self.Parent.m_FunctionNameSizer.Insert(NewIndex,ThisPanel, 0, wx.ALL|wx.EXPAND, 5)
+        # self.Parent.m_QueueWindow.FitInside()
+        Color = wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) if (not self.Parent.Paused or self.Parent.m_PauseAfterButton.GetLabel() == "Start") else wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE)
+        ThisPanel.SetBackgroundColour( Color)
+        ThisPanel.Refresh()
+
+        return d
+
 def Thread(IncomingQueue,OutgoingQueue):
     Functions = {"RHK":RHKFunctions,"CreaTec":CreaTecFunctions,"SXM":SXMFunctions,"General":GeneralFunctions}
     while True:

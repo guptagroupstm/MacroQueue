@@ -26,7 +26,6 @@ class MyFrame ( wx.Frame ):
 		self.m_FileMenu = wx.Menu()
 		self.m_SourceMenuItem = wx.MenuItem( self.m_FileMenu, wx.ID_ANY, u"Open Source Folder", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_FileMenu.Append( self.m_SourceMenuItem )
-		self.m_SourceMenuItem.Enable( False )
 
 		self.m_ExitMenuItem = wx.MenuItem( self.m_FileMenu, wx.ID_ANY, u"Exit", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_FileMenu.Append( self.m_ExitMenuItem )
@@ -140,6 +139,9 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.OnRHKSoftware, id = self.m_RHKmenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnCreaTecSoftware, id = self.m_CreaTecmenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnSXMSoftware, id = self.m_SXMmenuItem.GetId() )
+		self.Bind( wx.EVT_MENU, self.BasicUseageHelp, id = self.m_menuItem10.GetId() )
+		self.Bind( wx.EVT_MENU, self.MakeAMacroHelp, id = self.m_menuItem11.GetId() )
+		self.Bind( wx.EVT_MENU, self.WriteANewFunctionHelp, id = self.m_menuItem12.GetId() )
 		self.Bind( wx.EVT_TIMER, self.CheckQueue, id=wx.ID_ANY )
 		self.m_PauseASAPButton.Bind( wx.EVT_BUTTON, self.PauseASAP )
 		self.m_PauseAfterButton.Bind( wx.EVT_BUTTON, self.Pause )
@@ -182,6 +184,15 @@ class MyFrame ( wx.Frame ):
 		event.Skip()
 
 	def OnSXMSoftware( self, event ):
+		event.Skip()
+
+	def BasicUseageHelp( self, event ):
+		event.Skip()
+
+	def MakeAMacroHelp( self, event ):
+		event.Skip()
+
+	def WriteANewFunctionHelp( self, event ):
 		event.Skip()
 
 	def CheckQueue( self, event ):

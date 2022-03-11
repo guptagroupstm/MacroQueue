@@ -325,7 +325,7 @@ class MyMacroDialog ( MacroDialog ):
         ThisText = event.GetEventObject()
         if ThisText.GetLabel() != "panel":
             ThisText = ThisText.GetParent()
-        for ThisIndex,(Label, Function, Parameters, Panel, NameText) in enumerate(self.TheQueue):
+        for ThisIndex,(Label, Function, Parameters, Panel, NameText,Included) in enumerate(self.TheQueue):
             Index = ThisIndex
             if ThisText.GetId() == Panel.GetId():
                 break
@@ -366,7 +366,7 @@ class MyMacroDialog ( MacroDialog ):
 
         menuItem = popupmenu.Append(-1, 'Clear All Below')
         def RemoveBelow(event):
-            for RemoveIndex,(Label, Function, Parameters, RemovePanel, NameText) in enumerate(self.TheQueue):
+            for RemoveIndex,(Label, Function, Parameters, RemovePanel, NameText,Included) in enumerate(self.TheQueue):
                 if RemoveIndex > Index:
                     RemovePanel.Destroy()
             self.TheQueue = self.TheQueue[:Index+1]
@@ -428,7 +428,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             self.TheMacroCtrls[Name] = {}
             if len(Parameters) > 0:
                 for ParameterName,ParameterInfo in Parameters.items():
-                    Tooltip = ParameterInfo.pop("Tooltip")
+                    Tooltip = ParameterInfo["Tooltip"]
 
                     self.ParameterPanel = wx.Panel( FunctionPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
                     self.ParameterPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
@@ -504,7 +504,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
         ButtomSize = self.BottomPanel.GetSize()
         TopSize = self.TopPanel.GetSize()
         Width = Size[0]+50
-        Height = Size[1]+ButtomSize[1]+TopSize[1]+20
+        Height = Size[1]+ButtomSize[1]+TopSize[1]+100
         self.SetSize(Width,Height)
         self.Center()
 
