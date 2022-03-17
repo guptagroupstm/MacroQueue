@@ -36,9 +36,8 @@ class MyFrame ( wx.Frame ):
 		self.m_MakeMacroMenuItem = wx.MenuItem( self.m_MacroMenu, wx.ID_ANY, u"Make New Macro", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_MacroMenu.Append( self.m_MakeMacroMenuItem )
 
-		self.m_OpenMacroMenuItem = wx.MenuItem( self.m_MacroMenu, wx.ID_ANY, u"Open Macro File", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_OpenMacroMenuItem = wx.MenuItem( self.m_MacroMenu, wx.ID_ANY, u"Open Macro Folder", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_MacroMenu.Append( self.m_OpenMacroMenuItem )
-		self.m_OpenMacroMenuItem.Enable( False )
 
 		self.m_menubar1.Append( self.m_MacroMenu, u"Macro" )
 

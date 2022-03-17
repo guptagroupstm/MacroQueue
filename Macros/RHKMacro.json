@@ -1,37 +1,11 @@
 {
- "Basic Scan": [
-  [
-   "Set Setpoint",
-   {
-    "Setpoint": {
-     "DefaultValue": "1e-09",
-     "Frozen": false
-    }
-   },
-   false
-  ],
-  [
-   "Set Bias",
-   {
-    "Bias": {
-     "DefaultValue": "0",
-     "Frozen": false
-    }
-   },
-   true
-  ],
-  [
-   "Scan",
-   {},
-   true
-  ]
- ],
  "Normal Scan": [
   [
    "Set NPixels",
    {
     "NPixels": {
      "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column",
      "Frozen": false,
      "ValueType": "Numerical"
     }
@@ -43,6 +17,7 @@
    {
     "HowToSetSize": {
      "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in nm directly or the Resolution in nm/pixel",
      "Frozen": false,
      "ValueType": "Choice",
      "DefaultList": [
@@ -52,8 +27,23 @@
     },
     "ImageSize": {
      "DefaultValue": "100",
+     "Tooltip": "The length of a row and column in nm or nm/pixel",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "LineSpeed": {
+     "DefaultValue": "400",
+     "Tooltip": "The speed the tip moves in nm/s",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm/s"
     }
    },
    false
@@ -63,13 +53,17 @@
    {
     "XOffset": {
      "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "nm"
     },
     "YOffset": {
      "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "nm"
     }
    },
    false
@@ -79,8 +73,10 @@
    {
     "Setpoint": {
      "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "pA"
     }
    },
    false
@@ -90,8 +86,10 @@
    {
     "Bias": {
      "DefaultValue": "1",
+     "Tooltip": "The bias voltage in Volts",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "V"
     }
    },
    false
@@ -99,59 +97,6 @@
   [
    "Scan",
    {},
-   true
-  ]
- ],
- "Wait&Print": [
-  [
-   "Wait",
-   {
-    "WaitTime": {
-     "DefaultValue": "2",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    }
-   },
-   true
-  ],
-  [
-   "Print",
-   {
-    "Number": {
-     "DefaultValue": "5",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    }
-   },
-   true
-  ]
- ],
- "Test": [
-  [
-   "Test",
-   {
-    "Boolean": {
-     "DefaultValue": true,
-     "Frozen": false,
-     "ValueType": "Boolean"
-    },
-    "String": {
-     "DefaultValue": "SomeString",
-     "Frozen": false,
-     "ValueType": "String"
-    },
-    "Choice": {
-     "DefaultValue": "Combo",
-     "Frozen": false,
-     "ValueType": "Choice",
-     "DefaultList": [
-      "Choice",
-      "Combo",
-      "3rd",
-      "4th"
-     ]
-    }
-   },
    true
   ]
  ]

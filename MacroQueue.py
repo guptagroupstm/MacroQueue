@@ -43,18 +43,45 @@ IconFileName = "MacroQueueIcon.ico"
 
 
 # TODO:
-# Set max size
+# RHK functions
+# Cancel Scan
+# Scan - Only top down (Or make it an option)
+# RHK Scan doesn't stop???
+# Set Speed (nm/s, line time, pixel time)
+# Set position option (absolute or relative)
+# Set default save folder
+
+# ETC
+    # Get scan speed / size / NLines during Initialize
+    # When the single macro is added to the queue, add a estimated time to each function (Usually zero for non-scan functions)
+    # Add to macro tooltip: "\n \n This will finish at 6:05 pm today" 
+        # \n This will finish at 6:05 pm tomorrow"
+        # \n This will finish at 6:05 pm 3/16/2022"
+
+# Edit macro should say "Save Changes" not "Add to queue"
+# Edit macro fails for choice parameters.
+
+# Have a log dialog that can be opened (but doesn't have to be).  The log dialog shows whatever is printed (or the equivlant)
 
 # SciT notation
 # Ramping & scanning : set status bar 3
 # Progress bar: https://stackoverflow.com/questions/1883528/wxpython-progress-bar
 
+# left click function panel to include/not include
+
+# Change function order for a given function??
+
 # Write the help dialog
+
+# Add units to tooltip in make MacroSettings
 
 # Check dialog when opening souce when frozen
 
+# Save PDF
 # Email
-# Set Speed (nm/s, line time, pixel time)
+
+
+
 
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
@@ -151,7 +178,7 @@ class MainFrame(GUIDesign.MyFrame):
             FunctionPanel.SetBackgroundColour('green')
             FunctionPanel.Refresh()
             self.IncomingQueue.put(("StartFunction",Macro))
-            self.StatusBar.SetStatusText(FunctionText.GetLabel(),0)
+            self.StatusBar.SetStatusText(f"Macro: {FunctionText.GetLabel()}",0)
             self.StatusBar.SetStatusText("",1)
         return
 
@@ -530,10 +557,12 @@ class MainFrame(GUIDesign.MyFrame):
         m_FunctionWindow.Layout()
         bSizer1.Fit( m_FunctionWindow )
         # fgSizer3.Add( self.m_FunctionWindow, 1, wx.EXPAND |wx.ALL, 2 )
-
         m_FunctionWindow.Show()
         self.TheQueue.append([Macro,m_FunctionWindow,m_FunctionNameText])
         self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
+        # gauge = wx.Gauge(m_FunctionWindow, range = 20, size = m_FunctionWindow.GetSize(), style = wx.GA_HORIZONTAL)
+        # self.m_FunctionNameSizer.Add( gauge, 0, wx.ALL|wx.EXPAND, 5 )
+        # gauge.SetPosition((0,0))
         self.m_QueueWindow.FitInside()
     def MoveUpInQueue(self,event):
         ThisPanel = event.GetEventObject().GetParent()
@@ -668,6 +697,10 @@ class MainFrame(GUIDesign.MyFrame):
         FolderPath = os.path.realpath("Functions/")
         os.startfile(FolderPath)
         return
+    def OpenMacroFile(self, event):
+        FolderPath = os.path.realpath("Macros/")
+        os.startfile(FolderPath)
+        return
 class MyPanelDropTarget(wx.DropTarget):
     def __init__(self, window,Parent): 
         wx.DropTarget.__init__(self)
@@ -732,6 +765,8 @@ def Thread(IncomingQueue,OutgoingQueue):
         if Message[0] == "SoftwareChange":
             Software = Message[1]
             FunctionDict = {Name.replace("_"," "):Function for Name,Function in (getmembers(Functions[Software], isfunction) + getmembers(Functions["General"], isfunction))}
+            Functions[Software].OutgoingQueue = OutgoingQueue
+            Functions["General"].OutgoingQueue = OutgoingQueue
         if Message[0] == "OnClose":
             if "OnClose" in FunctionDict.keys():
                 try:
@@ -743,6 +778,7 @@ def Thread(IncomingQueue,OutgoingQueue):
             Name = None
             try:
                 Macro = Message[1]
+                Functions[Software].CurrentMacro = Macro
                 for ThisFunction,Included in Macro:
                     Name = ThisFunction['Name']
                     Parameters = ThisFunction['Parameters']

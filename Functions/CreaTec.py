@@ -5,30 +5,35 @@ from time import time as timer
 import pyvisa
 
 STM = None
-BUFFER_SIZE = None
+CurrentMacro = None
+OutgoingQueue = None
 Cancel = False
 BField = None
 
+OnCloseFunctions = []
+
 def Initialize():
-    global STM
+    global STM, OnCloseFunctions
     STM = win32com.client.Dispatch("pstmafm.stmafmrem")
     time.sleep(0.1)
+    # OnCloseFunctions.append()
 
 
 def OnClose():
+    # global OnCloseFunctions
+    # for f in OnCloseFunctions:
+    #     f()
     if STM is not None:
         pass
 
     if BField is not None:
         pass
 
-def ConnectMagneticFieldController():
+
+def Set_BField(B=1,ramp_spped=0.1):
     global BField
-    pass
-
-
-def SetBField(B=1,ramp_spped=0.1):
     if BField is not None:
+        # ConnectMagneticFieldController()
         pass
     # Make sure current stays below +/- 10 A
     # Hard limit on ramp speed
@@ -39,8 +44,8 @@ def SetBField(B=1,ramp_spped=0.1):
     # Add BField to memo
     pass
 
-def TurnBFieldOff():
-    pass
+# def Turn_BField_Off():
+#     pass
 
 # def Approach(Parameter1= 0):
 #     pass
@@ -112,29 +117,27 @@ def Set_Scan_Speed(Speed=2):
     STM.setp('SCAN.SPEED.NM/SEC',Speed)
 
 def Scan():
-    print(STM.getp('SCAN.IMAGESIZE.NM.X',''))
-    print('1')
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
-    print(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
-    print('2')
     Lines = float(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
-    print(STM.getp('SCAN.SPEED.NM/SEC',""))
-    print('3')
     Speed = float(STM.getp('SCAN.SPEED.NM/SEC',""))
-    Time = (np.floor(Lines * Size/Speed)-5)/10
-    Time = 0 if Time <= 0 else Time
+    ScanTime = Lines * Size/Speed
+    CheckTime = int(np.ceil(ScanTime/500))
+    # Time = 0 if Time <= 0 else Time
 
     STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT'))
     time.sleep(1)
     STM.setp('STMAFM.BTN.START' ,'')
+    StartTime = timer()
     Status = STM.getp('STMAFM.SCANSTATUS','')
+    print(Status,Cancel)
     while Status == 2 and not Cancel:
         Status = STM.getp('STMAFM.SCANSTATUS','')
-        time.sleep(1)
-        i = 0
-        while not Cancel and i < Time:
-            i+=1
-            time.sleep(1)
+        StartCheckTime = timer()
+        while not Cancel and timer() - StartCheckTime < CheckTime:
+            Percent = round(100*((timer() - StartTime)/ScanTime),1)
+            OutgoingQueue.put(("SetStatus",(f"Scan Completion: {Percent}%",2)))
+            time.sleep(0.5)
+        print(Status,Cancel)
     if Cancel:
         STM.setp('STMAFM.BTN.STOP',"")
 

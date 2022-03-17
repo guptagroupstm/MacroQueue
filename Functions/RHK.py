@@ -30,18 +30,18 @@ def OnClose():
 #     pass
 
 # Bias=V;The bias voltage in Volts
-def Set_Bias(Bias= 0):
+def Set_Bias(Bias= 1):
     Message = f"SetSWParameter, STM Bias, Value, {Bias}\n"
     Socket.send(Message.encode())
-    data = Socket.recv(BUFFER_SIZE)
+    # data = Socket.recv(BUFFER_SIZE)
     time.sleep(0.5)
     data = Socket.recv(BUFFER_SIZE)
 
-# BiasRate=V/s;The rate the bias changes in Volts per second 
-def Set_Bias_Rate(BiasRate=1):
-    Message = "SetSWParameter, STM Bias, Rate, {BiasRate}\n"
-    Socket.send(Message.encode())
-    data = Socket.recv(BUFFER_SIZE)
+# # BiasRate=V/s;The rate the bias changes in Volts per second 
+# def Set_Bias_Rate(BiasRate=1):
+#     Message = "SetSWParameter, STM Bias, Rate, {BiasRate}\n"
+#     Socket.send(Message.encode())
+#     data = Socket.recv(BUFFER_SIZE)
 
 # Setpoint=pA;The current setpoint in pA
 def Set_Setpoint(Setpoint=100):
@@ -92,15 +92,42 @@ def Set_NPixels(NPixels=512):
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
 
-# LineSpeed=nm/s;The speed the tip moves in nm/s
-def Set_Scan_Speed(LineSpeed=2):
-    LineSpeed *= 1e-9
-    Message = f"SetSWParameter, Scan Area Window, Scan Speed, {LineSpeed}\n"
-    Socket.send(Message.encode())
-    data = Socket.recv(BUFFER_SIZE)
+# HowToSetSpeed=Choose to set the Image Speed is set
+# Speed=The speed the tip moves in nm/s, s/line, or s/pixel
+def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
+    if HowToSetSpeed == 'nm/s':
+        Speed *= 1e-9
+        Message = f"SetSWParameter, Scan Area Window, Image Navigation Speed, Tip Speed"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        Message = f"SetSWParameter, Scan Area Window, Scan Speed, {Speed}\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+    if HowToSetSpeed == 's/line':
+        Message = f"SetSWParameter, Scan Area Window, Image Navigation Speed, Image Speed"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed}\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+    if HowToSetSpeed == 's/pixel':
+        Message = f"SetSWParameter, Scan Area Window, Image Navigation Speed, Image Speed"
+        Socket.send(Message.encode())
+        time.sleep(0.5)
+        data = Socket.recv(BUFFER_SIZE)
+        Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
+        Socket.send(Message.encode())
+        NPixels = float(Socket.recv(BUFFER_SIZE))
+        Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed*NPixels}\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+
+
+# def Move_To_Image_Start():
+#     pass
+
 
 def Scan():
-    print ("Received data:", data)
     Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Scan Count Mode, Single\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
@@ -110,3 +137,8 @@ def Scan():
     data = Socket.recv(BUFFER_SIZE)
     data = Socket.recv(BUFFER_SIZE)
 
+# def dIdV_Scan():
+#     pass
+
+# def Spectra():
+#     pass

@@ -505,6 +505,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
         TopSize = self.TopPanel.GetSize()
         Width = Size[0]+50
         Height = Size[1]+ButtomSize[1]+TopSize[1]+100
+        Height = 800 if Height > 800 else Height
         self.SetSize(Width,Height)
         self.Center()
 
@@ -864,6 +865,7 @@ class MyStartMacroDialog(StartMacroDialog):
         ButtomSize = self.BottomPanel.GetSize()
         Width = Size[0]+30
         Height = Size[1]+ButtomSize[1]+100
+        Height = 800 if Height > 800 else Height
         self.SetSize(Width,Height)
         self.Center()
     def TranslateNumerical(self,OldString,DefaultValue):
