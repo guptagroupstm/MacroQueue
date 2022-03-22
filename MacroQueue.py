@@ -75,7 +75,7 @@ IconFileName = "MacroQueueIcon.ico"
 # Ramping & scanning : set status bar 3
 # Progress bar: https://stackoverflow.com/questions/1883528/wxpython-progress-bar
 
-
+# Createc Scan time wrong.  Factor of 2.  Forward and back?
 
 
 # Write the help dialog
