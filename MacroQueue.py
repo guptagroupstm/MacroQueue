@@ -43,6 +43,13 @@ IconFileName = "MacroQueueIcon.ico"
 
 
 # TODO:
+# Before candiacy:
+# Change function order for a given macro
+# Allow for changes in functions when reading a old macro file.  Start with default.
+# Show number of items in queue in status bar
+
+# np arange stop responding when len > ~100,000
+
 # RHK functions
 # Cancel Scan
 # Scan - Only top down (Or make it an option)
@@ -51,6 +58,7 @@ IconFileName = "MacroQueueIcon.ico"
 # Set position option (absolute or relative)
 # Set default save folder
 
+
 # ETC
     # Get scan speed / size / NLines during Initialize
     # When the single macro is added to the queue, add a estimated time to each function (Usually zero for non-scan functions)
@@ -58,8 +66,8 @@ IconFileName = "MacroQueueIcon.ico"
         # \n This will finish at 6:05 pm tomorrow"
         # \n This will finish at 6:05 pm 3/16/2022"
 
-# Edit macro should say "Save Changes" not "Add to queue"
-# Edit macro fails for choice parameters.
+# Don't hold m_FunctionWindow,m_FunctionNameText in self.TheQueue.  The text only needs to be MacroLabel.  The window is only used to set the tooltip
+
 
 # Have a log dialog that can be opened (but doesn't have to be).  The log dialog shows whatever is printed (or the equivlant)
 
@@ -67,20 +75,16 @@ IconFileName = "MacroQueueIcon.ico"
 # Ramping & scanning : set status bar 3
 # Progress bar: https://stackoverflow.com/questions/1883528/wxpython-progress-bar
 
-# left click function panel to include/not include
 
-# Change function order for a given function??
+
 
 # Write the help dialog
 
-# Add units to tooltip in make MacroSettings
 
-# Check dialog when opening souce when frozen
+# Check dialog when opening souce when frozen   #  What did I mean when I wrote this???
 
 # Save PDF
 # Email
-
-
 
 
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
@@ -93,6 +97,7 @@ class MainFrame(GUIDesign.MyFrame):
 # Scanning, fine motion, course motion, dI/dV scans, point spectra, tip form, 
     Functions = {"RHK":RHKFunctions,"CreaTec":CreaTecFunctions,"SXM":SXMFunctions,"General":GeneralFunctions}
     TheQueue = []
+    AddToQueue = []
     Paused = True
     Running = False
 
@@ -180,8 +185,24 @@ class MainFrame(GUIDesign.MyFrame):
             self.IncomingQueue.put(("StartFunction",Macro))
             self.StatusBar.SetStatusText(f"Macro: {FunctionText.GetLabel()}",0)
             self.StatusBar.SetStatusText("",1)
-        return
+        if len(self.AddToQueue) > 0  and len(self.TheQueue) < 500:
+            AddN = 5
+            AddN = AddN if len(self.AddToQueue) > AddN else len(self.AddToQueue)
+            for i in range(AddN):
+                MacroName,Macro = self.AddToQueue.pop(0)
+                self.AddSingleMacroToQueue(MacroName,Macro)
+            self.m_QueueWindow.FitInside()
+            # self.m_QueueWindow.Layout()
 
+        return
+    def IdleLoop(self, event):
+        if len(self.AddToQueue) > 0 and len(self.TheQueue) < 500:
+            AddN = 3
+            AddN = AddN if len(self.AddToQueue) > AddN else len(self.AddToQueue)
+            for i in range(AddN):
+                MacroName,Macro = self.AddToQueue.pop(0)
+                self.AddSingleMacroToQueue(MacroName,Macro)
+            self.m_QueueWindow.FitInside()
     def OnClose(self,event):
         self.ClearQueue()
         self.IncomingQueue.put(['OnClose'])
@@ -347,6 +368,7 @@ class MainFrame(GUIDesign.MyFrame):
             for RemoveIndex,(Function,RemovePanel,Text) in enumerate(self.TheQueue):
                 if RemoveIndex > Index:
                     RemovePanel.Destroy()
+            self.AddToQueue = []
             self.TheQueue = self.TheQueue[:Index+1]
             self.m_QueueWindow.FitInside()
             # print(self.m_FunctionNameSizer.GetChildren())
@@ -362,6 +384,7 @@ class MainFrame(GUIDesign.MyFrame):
         ThisText.PopupMenu(popupmenu,event.GetX()+20,event.GetY())
         return
     def ClearQueue(self,event=None):
+        self.AddToQueue = []
         if len(self.TheQueue) > 0:
             if self.Running:
                 for RemoveIndex,(Function,RemovePanel,Text) in enumerate(self.TheQueue):
@@ -487,8 +510,10 @@ class MainFrame(GUIDesign.MyFrame):
                         Macro.append([ExpandedMacroFunction,False])
                         TheUpdatedExpandedMacros.append(Macro)
         for Macro in TheExpandedMacros:
-            self.AddSingleMacroToQueue(MacroName,Macro)
+            self.AddToQueue.append([MacroName,Macro])
+            # self.AddSingleMacroToQueue(MacroName,Macro)
     def AddSingleMacroToQueue(self,MacroName,Macro):
+        StartTime = timer()
         thisSettingString = ""
         for Function,Included in Macro:
             if Included:
@@ -497,7 +522,12 @@ class MainFrame(GUIDesign.MyFrame):
         thisSettingString = thisSettingString[:-2]
 
         YBitmapSize = 30
-        m_FunctionWindow = wx.Panel( self.m_QueueWindow, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1,-1), wx.TAB_TRAVERSAL )
+        m_FunctionWindow = wx.Panel( self.m_QueueWindow, wx.ID_ANY, (5000,5000), wx.Size(-1,-1), wx.TAB_TRAVERSAL | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
+        m_FunctionWindow.Hide()
+        m_FunctionWindow.SetPosition(wx.DefaultPosition)
+        m_FunctionWindow.Show()
+
+        # self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
         m_FunctionWindow.Bind(wx.EVT_MOTION, self.OnStartDrag)
         Color = wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) if (not self.Paused or self.m_PauseAfterButton.GetLabel() == "Start") else wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE)
         m_FunctionWindow.SetBackgroundColour(Color)
@@ -507,8 +537,6 @@ class MainFrame(GUIDesign.MyFrame):
         bSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         bSizer1.AddGrowableCol(6)
         # bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
-        m_FunctionWindow.Hide()
-
 
         m_FunctionNameText = wx.StaticText( m_FunctionWindow, wx.ID_ANY, MacroName, wx.DefaultPosition, wx.Size( -1,-1), wx.ALIGN_RIGHT)
         m_FunctionNameText.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
@@ -520,8 +548,6 @@ class MainFrame(GUIDesign.MyFrame):
 
         m_Up = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.UpBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
         bSizer1.Add( m_Up, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
-
-
         m_Up.Bind( wx.EVT_BUTTON, self.MoveUpInQueue)
 
         m_Down = wx.BitmapButton( m_FunctionWindow, wx.ID_ANY, self.DownBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
@@ -552,18 +578,19 @@ class MainFrame(GUIDesign.MyFrame):
         for child in m_FunctionWindow.GetChildren():
                 child.SetToolTip(thisSettingString)
 
-
         m_FunctionWindow.SetSizer( bSizer1 )
-        m_FunctionWindow.Layout()
+        # m_FunctionWindow.Layout()
         bSizer1.Fit( m_FunctionWindow )
-        # fgSizer3.Add( self.m_FunctionWindow, 1, wx.EXPAND |wx.ALL, 2 )
-        m_FunctionWindow.Show()
+        Index = len(self.TheQueue)
         self.TheQueue.append([Macro,m_FunctionWindow,m_FunctionNameText])
         self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
+        # self.m_FunctionNameSizer.Insert(Index,m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5)
         # gauge = wx.Gauge(m_FunctionWindow, range = 20, size = m_FunctionWindow.GetSize(), style = wx.GA_HORIZONTAL)
         # self.m_FunctionNameSizer.Add( gauge, 0, wx.ALL|wx.EXPAND, 5 )
         # gauge.SetPosition((0,0))
         self.m_QueueWindow.FitInside()
+        self.m_QueueWindow.Layout()
+
     def MoveUpInQueue(self,event):
         ThisPanel = event.GetEventObject().GetParent()
         for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
@@ -671,20 +698,20 @@ class MainFrame(GUIDesign.MyFrame):
         ThisChooseSoftwareDialog.OnSXM()
         return
     def BasicUseageHelp(self, event):
-        HelpMessage = "Heyyyy\n"
-        HelpMessage += "Wooooorld\n"
+        HelpMessage = "Not yet written.\n"
+        HelpMessage += "Saving for last.\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Basic Usage")
         MyMessage.ShowModal()
         return 
     def MakeAMacroHelp(self, event):
-        HelpMessage = "Heyyyy\n"
-        HelpMessage += "Wooooorld\n"
+        HelpMessage = "Not yet written.\n"
+        HelpMessage += "Saving for last.\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Make a Macro")
         MyMessage.ShowModal()
         return
     def WriteANewFunctionHelp(self, event):
-        HelpMessage = "Heyyyy\n"
-        HelpMessage += "Wooooorld\n"
+        HelpMessage = "Not yet written.\n"
+        HelpMessage += "Saving for last.\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Write a new function")
         MyMessage.ShowModal()
         return

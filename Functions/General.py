@@ -4,7 +4,7 @@ Cancel = False
 
 
 # WaitTime=s;The time to wait in seconds
-def Wait(WaitTime=10):
+def Wait(WaitTime=1):
     sleep(WaitTime)
 
 def Print(Number=0):

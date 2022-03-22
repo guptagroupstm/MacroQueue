@@ -129,15 +129,13 @@ def Scan():
     STM.setp('STMAFM.BTN.START' ,'')
     StartTime = timer()
     Status = STM.getp('STMAFM.SCANSTATUS','')
-    print(Status,Cancel)
     while Status == 2 and not Cancel:
         Status = STM.getp('STMAFM.SCANSTATUS','')
         StartCheckTime = timer()
         while not Cancel and timer() - StartCheckTime < CheckTime:
             Percent = round(100*((timer() - StartTime)/ScanTime),1)
-            OutgoingQueue.put(("SetStatus",(f"Scan Completion: {Percent}%",2)))
+            OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
             time.sleep(0.5)
-        print(Status,Cancel)
     if Cancel:
         STM.setp('STMAFM.BTN.STOP',"")
 

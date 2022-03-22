@@ -1,15 +1,19 @@
 import numpy as np
 import time
 import socket
+from time import time as timer
 
 Socket = None
 BUFFER_SIZE = None
 Cancel = False
+OutgoingQueue = None
+
 def Initialize():
     global Socket, BUFFER_SIZE
     IP_Address_R9_PC   = '127.0.0.1'
     TCP_Port_R9s       = 12600
     BUFFER_SIZE = 1024
+    socket.setdefaulttimeout(3)
     Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     Socket.connect((IP_Address_R9_PC, TCP_Port_R9s))
     time.sleep(0.1)
@@ -33,8 +37,7 @@ def OnClose():
 def Set_Bias(Bias= 1):
     Message = f"SetSWParameter, STM Bias, Value, {Bias}\n"
     Socket.send(Message.encode())
-    # data = Socket.recv(BUFFER_SIZE)
-    time.sleep(0.5)
+    data = Socket.recv(BUFFER_SIZE)
     data = Socket.recv(BUFFER_SIZE)
 
 # # BiasRate=V/s;The rate the bias changes in Volts per second 
@@ -124,7 +127,23 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
 
 
 # def Move_To_Image_Start():
-#     pass
+#     Message = f"GetSWParameter, Scan Area Window, Rotate Angle\n"
+#     Socket.send(Message.encode())
+#     Angle = float(Socket.recv(BUFFER_SIZE))
+#     Message = f'GetSWParameter, Scan Area Window, Scan Area Size\n'
+#     Socket.send(Message.encode())
+#     Size = float(Socket.recv(BUFFER_SIZE))
+#     Message = f'GetSWParameter, Scan Area Window, X Offset\n'
+#     Socket.send(Message.encode())
+#     XOffset = float(Socket.recv(BUFFER_SIZE))
+#     Message = f'SetSWParameter, Scan Area Window, Y Offset\n'
+#     Socket.send(Message.encode())
+#     YOffset = float(Socket.recv(BUFFER_SIZE))
+#     c, s = np.cos(Angle),np.sin(Angle)
+#     X = c*Size - s*Size
+#     Y = s*Size + c*Size
+#     X += XOffset
+#     Y += YOffset
 
 
 def Scan():
@@ -132,10 +151,38 @@ def Scan():
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
 
+
+    Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
+    Socket.send(Message.encode())
+    Lines = float(Socket.recv(BUFFER_SIZE))
+    Message = f"GetSWParameter, Scan Area Window, Line Time\n"
+    Socket.send(Message.encode())
+    LineTime = float(Socket.recv(BUFFER_SIZE))
+    Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Over Scan Count\n"
+    Socket.send(Message.encode())
+    OverScanCount = float(Socket.recv(BUFFER_SIZE))
+    ScanTime = (Lines+OverScanCount)*LineTime
+
     Message = "StartProcedure, Comb Scan\n"
     Socket.send(Message.encode())
+    
     data = Socket.recv(BUFFER_SIZE)
-    data = Socket.recv(BUFFER_SIZE)
+    # data = Socket.recv(BUFFER_SIZE)
+
+    StartTime = timer()
+    while not Cancel:
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+            print(f"Scan Data: {data}")
+            break
+        except Exception as e:
+            print(e)
+            pass
+        Percent = round(100*((timer() - StartTime)/ScanTime),1)
+        OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
+    if Cancel:
+        # STM.setp('STMAFM.BTN.STOP',"")
+        pass
 
 # def dIdV_Scan():
 #     pass

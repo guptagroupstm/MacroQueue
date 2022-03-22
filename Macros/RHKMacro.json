@@ -1,69 +1,24 @@
 {
- "Normal Scan": [
-  [
-   "Set NPixels",
-   {
-    "NPixels": {
-     "DefaultValue": "512",
-     "Tooltip": "The number of pixels in each row and each column",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Image Size",
-   {
-    "HowToSetSize": {
-     "DefaultValue": "Image Size",
-     "Tooltip": "Choose to set the Image Size in nm directly or the Resolution in nm/pixel",
-     "Frozen": false,
-     "ValueType": "Choice",
-     "DefaultList": [
-      "Image Size",
-      "Resolution"
-     ]
-    },
-    "ImageSize": {
-     "DefaultValue": "100",
-     "Tooltip": "The length of a row and column in nm or nm/pixel",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "nm"
-    }
-   },
-   false
-  ],
+ "Basic Scan": [
   [
    "Set Scan Speed",
    {
-    "LineSpeed": {
-     "DefaultValue": "400",
-     "Tooltip": "The speed the tip moves in nm/s",
+    "HowToSetSpeed": {
+     "DefaultValue": "nm/s",
+     "Tooltip": "Choose to set the Image Speed is set",
      "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "nm/s"
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Window Position",
-   {
-    "XOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The X center of the image in nm",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "nm"
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
     },
-    "YOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The Y center of the image in nm",
+    "Speed": {
+     "DefaultValue": "2",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
      "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "nm"
+     "ValueType": "Numerical"
     }
    },
    false

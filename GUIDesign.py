@@ -532,36 +532,34 @@ class StartMacroDialog ( wx.Dialog ):
 
 		vbox.Add( self.m_MacroSettingScrolledWindow, 1, wx.ALL|wx.EXPAND, 5 )
 
-		self.BottomPanel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.BottomPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+		self.BottomPanel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,40 ), wx.TAB_TRAVERSAL )
+		self.BottomPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
 
-		bSizer3 = wx.BoxSizer( wx.VERTICAL )
+		bSizer6 = wx.BoxSizer( wx.VERTICAL )
 
-		self.m_panel7 = wx.Panel( self.BottomPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_panel7.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+		self.m_panel12 = wx.Panel( self.BottomPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel12.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
 
 		fgSizer8 = wx.FlexGridSizer( 1, 0, 0, 0 )
-		fgSizer8.AddGrowableRow( 0 )
 		fgSizer8.SetFlexibleDirection( wx.BOTH )
 		fgSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		self.StartButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Add to Queue", wx.DefaultPosition, wx.Size( 110,-1 ), 0 )
+		self.StartButton = wx.Button( self.m_panel12, wx.ID_ANY, u"Add to Queue", wx.DefaultPosition, wx.Size( 110,-1 ), 0 )
 		fgSizer8.Add( self.StartButton, 0, wx.ALL, 5 )
 
-		self.CancelButton = wx.Button( self.m_panel7, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.CancelButton = wx.Button( self.m_panel12, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer8.Add( self.CancelButton, 0, wx.ALL, 5 )
 
 
-		self.m_panel7.SetSizer( fgSizer8 )
-		self.m_panel7.Layout()
-		fgSizer8.Fit( self.m_panel7 )
-		bSizer3.Add( self.m_panel7, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		self.m_panel12.SetSizer( fgSizer8 )
+		self.m_panel12.Layout()
+		fgSizer8.Fit( self.m_panel12 )
+		bSizer6.Add( self.m_panel12, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 
 
-		self.BottomPanel.SetSizer( bSizer3 )
+		self.BottomPanel.SetSizer( bSizer6 )
 		self.BottomPanel.Layout()
-		bSizer3.Fit( self.BottomPanel )
-		vbox.Add( self.BottomPanel, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL|wx.EXPAND, 5 )
+		vbox.Add( self.BottomPanel, 1, wx.ALL|wx.EXPAND, 5 )
 
 
 		self.SetSizer( vbox )
