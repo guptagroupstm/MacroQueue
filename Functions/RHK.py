@@ -38,7 +38,12 @@ def Set_Bias(Bias= 1):
     Message = f"SetSWParameter, STM Bias, Value, {Bias}\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
-    data = Socket.recv(BUFFER_SIZE)
+    time.sleep(3)
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
 
 # # BiasRate=V/s;The rate the bias changes in Volts per second 
 # def Set_Bias_Rate(BiasRate=1):
@@ -74,6 +79,10 @@ def Set_Scan_Image_Size(HowToSetSize=['Image Size','Resolution'],ImageSize=100):
     if HowToSetSize == 'Image Size':
         Message = f'SetSWParameter, Scan Area Window, Scan Area Size, {ImageSize}\n'
     elif HowToSetSize == 'Resolution':
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+        except:
+            pass
         Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
         Socket.send(Message.encode())
         Pixels = Socket.recv(BUFFER_SIZE)
@@ -95,9 +104,13 @@ def Set_NPixels(NPixels=512):
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
 
-# HowToSetSpeed=Choose to set the Image Speed is set
+# HowToSetSpeed=Choose how the Image Speed is set
 # Speed=The speed the tip moves in nm/s, s/line, or s/pixel
 def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
     if HowToSetSpeed == 'nm/s':
         Speed *= 1e-9
         Message = f"SetSWParameter, Scan Area Window, Image Navigation Speed, Tip Speed"
@@ -125,28 +138,51 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
 
-
-# def Move_To_Image_Start():
-#     Message = f"GetSWParameter, Scan Area Window, Rotate Angle\n"
-#     Socket.send(Message.encode())
-#     Angle = float(Socket.recv(BUFFER_SIZE))
-#     Message = f'GetSWParameter, Scan Area Window, Scan Area Size\n'
-#     Socket.send(Message.encode())
-#     Size = float(Socket.recv(BUFFER_SIZE))
-#     Message = f'GetSWParameter, Scan Area Window, X Offset\n'
-#     Socket.send(Message.encode())
-#     XOffset = float(Socket.recv(BUFFER_SIZE))
-#     Message = f'SetSWParameter, Scan Area Window, Y Offset\n'
-#     Socket.send(Message.encode())
-#     YOffset = float(Socket.recv(BUFFER_SIZE))
-#     c, s = np.cos(Angle),np.sin(Angle)
-#     X = c*Size - s*Size
-#     Y = s*Size + c*Size
-#     X += XOffset
-#     Y += YOffset
+# Wait_Time=s;The time to wait after the tip is moved in seconds.
+def Move_To_Image_Start(Wait_Time=10):
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
+    Message = f"GetSWParameter, Scan Area Window, Rotate Angle\n"
+    Socket.send(Message.encode())
+    Angle = float(Socket.recv(BUFFER_SIZE))
+    Message = f'GetSWParameter, Scan Area Window, Scan Area Size\n'
+    Socket.send(Message.encode())
+    Size = float(Socket.recv(BUFFER_SIZE))
+    Message = f'GetSWParameter, Scan Area Window, X Offset\n'
+    Socket.send(Message.encode())
+    XOffset = float(Socket.recv(BUFFER_SIZE))
+    Message = f'GetSWParameter, Scan Area Window, Y Offset\n'
+    Socket.send(Message.encode())
+    YOffset = float(Socket.recv(BUFFER_SIZE))
+    c, s = np.cos(Angle),np.sin(Angle)
+    X = c*Size - s*Size
+    Y = s*Size + c*Size
+    X += XOffset
+    Y += YOffset
+    Message = f"SetSWParameter, Scan Area Window, Tip X in scan coordinates, {X}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    Message = f"SetSWParameter, Scan Area Window, Tip Y in scan coordinates, {Y}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    Message = f"StartProcedure, Move Tip\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    data = Socket.recv(BUFFER_SIZE)
+    time.sleep(Wait_Time)
 
 
 def Scan():
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
+    Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Alternate Slow Scan, Top Down Only\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
     Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Scan Count Mode, Single\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
@@ -161,7 +197,7 @@ def Scan():
     Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Over Scan Count\n"
     Socket.send(Message.encode())
     OverScanCount = float(Socket.recv(BUFFER_SIZE))
-    ScanTime = (Lines+OverScanCount)*LineTime
+    ScanTime = 2*(Lines+OverScanCount)*LineTime
 
     Message = "StartProcedure, Comb Scan\n"
     Socket.send(Message.encode())
@@ -181,11 +217,57 @@ def Scan():
         Percent = round(100*((timer() - StartTime)/ScanTime),1)
         OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
     if Cancel:
-        # STM.setp('STMAFM.BTN.STOP',"")
+        Message = "StopProcedure, Comb Scan\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+
+def dIdV_Scan():
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
         pass
+    Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Alternate Slow Scan, Top Down Only\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
 
-# def dIdV_Scan():
-#     pass
+    Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Scan Count Mode, Single\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
 
+    Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
+    Socket.send(Message.encode())
+    Lines = float(Socket.recv(BUFFER_SIZE))
+    Message = f"GetSWParameter, Scan Area Window, Line Time\n"
+    Socket.send(Message.encode())
+    LineTime = float(Socket.recv(BUFFER_SIZE))
+    Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Over Scan Count\n"
+    Socket.send(Message.encode())
+    OverScanCount = float(Socket.recv(BUFFER_SIZE))
+    ScanTime = 2*(Lines+OverScanCount)*LineTime
+
+    Message = "StartProcedure, dI-dV Map Scan Speed\n"
+    Socket.send(Message.encode())
+    
+    data = Socket.recv(BUFFER_SIZE)
+    # data = Socket.recv(BUFFER_SIZE)
+
+    StartTime = timer()
+    while not Cancel:
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+            print(f"Scan Data: {data}")
+            break
+        except Exception as e:
+            print(e)
+            pass
+        Percent = round(100*((timer() - StartTime)/ScanTime),1)
+        OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
+    if Cancel:
+        Message = "StopProcedure, dI-dV Map Scan Speed\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+    Message = f"SetHWParameter, Drive CH1, Modulation, Disable\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
 # def Spectra():
 #     pass

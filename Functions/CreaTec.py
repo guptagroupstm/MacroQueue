@@ -113,14 +113,27 @@ def Set_NPixels(NPixels=512):
     STM.setp('SCAN.IMAGESIZE.PIXEL', (NPixels, NPixels))
 
 # LineSpeed=nm/s;The speed the tip moves in nm/s
-def Set_Scan_Speed(Speed=2):
+# def Set_Scan_Speed(Speed=2):
+    
+# HowToSetSpeed=Choose how the Image Speed is set
+# Speed=The speed the tip moves in nm/s, s/line, or s/pixel
+def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):    
+    if HowToSetSpeed == 'nm/s':
+        pass
+    if HowToSetSpeed == 's/line':
+        Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
+        Speed = Size/Speed
+    if HowToSetSpeed == 's/pixel':
+        Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
+        Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
+        Speed = Size/(Speed*Pixels)
     STM.setp('SCAN.SPEED.NM/SEC',Speed)
 
 def Scan():
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
     Lines = float(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
     Speed = float(STM.getp('SCAN.SPEED.NM/SEC',""))
-    ScanTime = Lines * Size/Speed
+    ScanTime = 2*Lines * Size/Speed
     CheckTime = int(np.ceil(ScanTime/500))
     # Time = 0 if Time <= 0 else Time
 

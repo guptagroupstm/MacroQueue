@@ -48,11 +48,15 @@ IconFileName = "MacroQueueIcon.ico"
 # Allow for changes in functions when reading a old macro file.  Start with default.
 # Show number of items in queue in status bar
 
+# Pause after disconnect
+# Autoadd connect after disconnect
+# Remove Status bar 3 when scan is canceled.
+
 # np arange stop responding when len > ~100,000
 
 # RHK functions
 # Cancel Scan
-# Scan - Only top down (Or make it an option)
+# Scan - Only top down
 # RHK Scan doesn't stop???
 # Set Speed (nm/s, line time, pixel time)
 # Set position option (absolute or relative)
