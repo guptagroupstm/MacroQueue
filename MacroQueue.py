@@ -42,9 +42,12 @@ import json
 IconFileName = "MacroQueueIcon.ico"
 
 
+# BUG:
+# Function in macro twice??  (I use function name as dict key in start dialog.  Replace dict with (ordered) list)
+
 # TODO:
-# Before candiacy:
-# Change function order for a given macro
+# Decrease minimum y size
+# Allow the macro buttons and the Pause/Clear button to disappear when the size is smaller
 # Allow for changes in functions when reading a old macro file.  Start with default.
 # Show number of items in queue in status bar
 

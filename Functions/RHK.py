@@ -126,7 +126,7 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
         Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
-    if HowToSetSpeed == 's/pixel':
+    if HowToSetSpeed == 'ms/pixel':
         Message = f"SetSWParameter, Scan Area Window, Image Navigation Speed, Image Speed"
         Socket.send(Message.encode())
         time.sleep(0.5)
@@ -134,7 +134,7 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
         Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
         Socket.send(Message.encode())
         NPixels = float(Socket.recv(BUFFER_SIZE))
-        Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed*NPixels}\n"
+        Message = f"SetSWParameter, Scan Area Window, Line Time, {NPixels*Speed/1000}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
 
@@ -157,8 +157,8 @@ def Move_To_Image_Start(Wait_Time=10):
     Socket.send(Message.encode())
     YOffset = float(Socket.recv(BUFFER_SIZE))
     c, s = np.cos(Angle),np.sin(Angle)
-    X = c*Size - s*Size
-    Y = s*Size + c*Size
+    X = c*Size/2 - s*Size/2
+    Y = s*Size/2 + c*Size/2
     X += XOffset
     Y += YOffset
     Message = f"SetSWParameter, Scan Area Window, Tip X in scan coordinates, {X}\n"

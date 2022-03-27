@@ -626,10 +626,11 @@ class MyStartMacroDialog(StartMacroDialog):
         
     def UpdateFunctionTooltips(self):
         self.NTotalCalls = 1
-        for FunctionCtrls, FunctionInfo in zip(self.TheStartMacroCtrls.values(),self.TheMacro):
+        for FunctionInfo in self.TheMacro:
             Name = FunctionInfo['Name']
             Included = FunctionInfo['Included']
             Parameters = FunctionInfo['Parameters']
+            FunctionCtrls = self.TheStartMacroCtrls[Name]
             FunctionPanel = FunctionCtrls[0]
             m_FunctionTextCheck = FunctionCtrls[1]
             NFucntionCalls = 1
@@ -682,9 +683,38 @@ class MyStartMacroDialog(StartMacroDialog):
 
             FunctionSizer = wx.FlexGridSizer( 1, 0, 0, 0 )
             FunctionSizer.AddGrowableRow( 0 )
-            FunctionSizer.AddGrowableCol( 0 )
+            FunctionSizer.AddGrowableCol( 2 )
             FunctionSizer.SetFlexibleDirection( wx.BOTH )
             FunctionSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+            
+            m_Up = wx.BitmapButton( FunctionPanel, wx.ID_ANY, self.Parent.UpBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
+            FunctionSizer.Add( m_Up, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
+            def MoveUpInMacro(ThisFunction,ThisFunctionPanel,event):
+                Index = self.TheMacro.index(ThisFunction)
+                if Index > 0:
+                    Function = self.TheMacro.pop(Index)
+                    self.TheMacro.insert(Index-1,Function)
+                    m_MacroSettingScrolledWindowSizer.Remove(Index)
+                    m_MacroSettingScrolledWindowSizer.Insert(Index-1,ThisFunctionPanel, 0, wx.ALL|wx.EXPAND, 5)
+                    self.m_MacroSettingScrolledWindow.FitInside()
+                    self.UpdateFunctionTooltips()
+            ThisMoveUpInMacro = partial(MoveUpInMacro,Function,FunctionPanel)
+            m_Up.Bind( wx.EVT_BUTTON, ThisMoveUpInMacro)
+            
+            m_Down = wx.BitmapButton( FunctionPanel, wx.ID_ANY, self.Parent.DownBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW|0 )
+            FunctionSizer.Add( m_Down, 0, wx.ALL|wx.ALIGN_CENTER, 2 )
+            def MoveDownInMacro(ThisFunction,ThisFunctionPanel,event):
+                Index = self.TheMacro.index(ThisFunction)
+                if Index +1 < len(self.TheMacro):
+                    Function = self.TheMacro.pop(Index)
+                    self.TheMacro.insert(Index+1,Function)
+                    m_MacroSettingScrolledWindowSizer.Remove(Index)
+                    m_MacroSettingScrolledWindowSizer.Insert(Index+1,ThisFunctionPanel, 0, wx.ALL|wx.EXPAND, 5)
+                    self.m_MacroSettingScrolledWindow.FitInside()
+                    self.UpdateFunctionTooltips()
+            ThisMoveDownInMacro = partial(MoveDownInMacro,Function,FunctionPanel)
+            m_Down.Bind( wx.EVT_BUTTON, ThisMoveDownInMacro)
+
             m_FunctionTextCheck = wx.CheckBox( FunctionPanel, wx.ID_ANY, Name, wx.DefaultPosition, wx.DefaultSize, 0 )
             m_FunctionTextCheck.SetValue(Included)
 
@@ -954,7 +984,6 @@ class MyStartMacroDialog(StartMacroDialog):
                 YesOrNo = MyMessage.ShowModal()
                 if YesOrNo != wx.ID_YES:
                     return
-
             self.Parent.AddMacroToQueue(self.TheMacro,self.MacroName)
         else:
             ThisMacro = []
