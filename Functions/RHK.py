@@ -123,18 +123,26 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','ms/pixel'],Speed=2):
         Message = f"SetSWParameter, Scan Area Window, Image Navigation Speed, Image Speed"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
-        Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed}\n"
+        Message = f'GetSWParameter, Scan Area Window, Scan Area Size\n'
+        Socket.send(Message.encode())
+        Size = float(Socket.recv(BUFFER_SIZE))
+        Message = f"SetSWParameter, Scan Area Window, Scan Speed, {Size/Speed}\n"
+        # Setting the Line Time only temperorily changes the text in the software.  Doesn't actualy change the speed.
+        # Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
     if HowToSetSpeed == 'ms/pixel':
         Message = f"SetSWParameter, Scan Area Window, Image Navigation Speed, Image Speed"
         Socket.send(Message.encode())
-        time.sleep(0.5)
         data = Socket.recv(BUFFER_SIZE)
         Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
         Socket.send(Message.encode())
         NPixels = float(Socket.recv(BUFFER_SIZE))
-        Message = f"SetSWParameter, Scan Area Window, Line Time, {NPixels*Speed/1000}\n"
+        Message = f'GetSWParameter, Scan Area Window, Scan Area Size\n'
+        Socket.send(Message.encode())
+        Size = float(Socket.recv(BUFFER_SIZE))
+        Message = f"SetSWParameter, Scan Area Window, Scan Speed, {Size/(NPixels*Speed/1000)}\n"
+        # Message = f"SetSWParameter, Scan Area Window, Line Time, {NPixels*Speed/1000}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
 
@@ -170,7 +178,13 @@ def Move_To_Image_Start(Wait_Time=10):
     Message = f"StartProcedure, Move Tip\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
-    data = Socket.recv(BUFFER_SIZE)
+    while not Cancel:
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+            break
+        except Exception as e:
+            print(e)
+            pass
     time.sleep(Wait_Time)
 
 
