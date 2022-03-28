@@ -1,3 +1,5 @@
+from inspect import Parameter
+from re import M
 import SXMRemote
 import numpy as np
 import time
@@ -48,14 +50,26 @@ def Set_NPixels(NPixels=512):
 def Set_Scan_Speed(LineSpeed=2e-9):
     MySXM.SendWait(f"ScanPara('Speed',{LineSpeed});")
 
+# coarse motion: X,Y = number of steps in x and y direction
+def Course_Step(X=0,Y=0):
+    MySXM.SendWait(f"Move('CX',{X});")
+    MySXM.SendWait(f"Move('CY',{Y});")
+
+#coarse.py has different modes to approach
+def Approach(Mode= 0):
+    MySXM.SendWait(f"Move('Approach',{Mode});")
+
+#this retracts the tip with different modes (0=piezo, 1 = step approach)
+def Z_Course_Step_Out(Mode = 0):
+    MySXM.SendWait(f"Move('Retract',{Mode});")
+
+#can use -1000000 to 1000000 steps where negative is down, positive is up
+def Z_Course_Step_In(Steps = 0):
+    MySXM.SendWait(f"Move('CZ',{Steps});")
+
 def Scan():
     MySXM.execute("ScanImage")
 
-'''find motion
-coarse motion for x,y,z (different command for z)
-approach 
-spectra
-'''
 def Scan(Filename="Scan"):
     # Set the filename
     MySXM.execute("ScanImage", 1000)
@@ -64,3 +78,6 @@ def Scan(Filename="Scan"):
     if Cancel:
         # Is there a way to make it stop scanning?
         pass
+
+'''things to add
+spectra'''
