@@ -105,8 +105,8 @@ def Set_NPixels(NPixels=512):
     data = Socket.recv(BUFFER_SIZE)
 
 # HowToSetSpeed=Choose how the Image Speed is set
-# Speed=The speed the tip moves in nm/s, s/line, or s/pixel
-def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
+# Speed=The speed the tip moves in nm/s, s/line, or ms/pixel
+def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','ms/pixel'],Speed=2):
     try:
         data = Socket.recv(BUFFER_SIZE)
     except:
