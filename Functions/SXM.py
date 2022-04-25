@@ -16,15 +16,15 @@ def OnClose():
         pass
 
 
-# Bias=The bias voltage in V
+# Bias=The bias voltage in V: converts to mV
 def Set_Bias(Bias= 0):
-    MySXM.SendWait(f"FeedPara('Bias',{Bias});")
+    MySXM.SendWait(f"FeedPara('Bias',{Bias*1000});")
     NewBias = MySXM.GetFeedbackPara('Bias')
 
 # Setpoint=The current setpoint in Amps
 def Set_Setpoint(Setpoint=1e-9):
-   MySXM.SendWait(f"FeedPara('ref', {Setpoint});")
-   MySXM.SendWait(f"FeedPara('Ref2', {Setpoint});") 
+   MySXM.SendWait(f"FeedPara('ref', {Setpoint*1e+9});")
+   MySXM.SendWait(f"FeedPara('Ref2', {Setpoint*1e+9});") 
 
 
 # XOffset=The X center of the image in nm
@@ -46,7 +46,7 @@ def Set_Scan_Window_Angle(Angle=0):
 def Set_NPixels(NPixels=512):
     MySXM.SendWait(f"ScanPara('Pixel',{NPixels});")
 
-# LineSpeed=The speed the tip moves in nm/s
+# LineSpeed=The speed the tip moves in nm/s (how do we change this to lines/s)
 def Set_Scan_Speed(LineSpeed=2e-9):
     MySXM.SendWait(f"ScanPara('Speed',{LineSpeed});")
 
