@@ -146,6 +146,19 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','ms/pixel'],Speed=2):
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
 
+# XOffset=nm;The X center of the image in nm
+# YOffset=nm;The Y center of the image in nm
+def Move_Tip(XOffset=0,YOffset=0):
+    Message = f"SetSWParameter, Scan Area Window, Tip X in scan coordinates, {XOffset}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    Message = f"SetSWParameter, Scan Area Window, Tip Y in scan coordinates, {YOffset}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    Message = f"StartProcedure, Move Tip\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
 # Wait_Time=s;The time to wait after the tip is moved in seconds.
 def Move_To_Image_Start(Wait_Time=10):
     try:
