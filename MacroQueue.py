@@ -51,13 +51,9 @@ IconFileName = "MacroQueueIcon.ico"
 # Function in macro twice??  (I use function name as dict key in start dialog.  Replace dict with (ordered) list)
 
 # TODO:
-# Decrease minimum y size
-# Allow the macro buttons and the Pause/Clear button to disappear when the size is smaller
-# Allow for changes in functions when reading a old macro file.  Start with default.
+# After edit macro, text on wrong side
 # Show number of items in queue in status bar
 
-# Pause after disconnect
-# Autoadd connect after disconnect
 # Remove Status bar 3 when scan is canceled.
 
 # np arange stop responding when len > ~100,000
@@ -70,9 +66,6 @@ IconFileName = "MacroQueueIcon.ico"
 # Set position option (absolute or relative)
 # Set default save folder
 
-
-# Createc
-# Function to change recorded channels.  No longer change it during scan or dIdV scan
 
 
 # ETC
@@ -116,17 +109,13 @@ class MainFrame(GUIDesign.MyFrame):
     AddToQueue = []
     Paused = True
     Running = False
+    Software = None
 
     def __init__(self):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
 
-        mp.set_start_method('spawn')
-        self.OutgoingQueue = mp.Queue()
-        self.IncomingQueue = mp.Queue()
-        self.Process = threading.Thread(target=Thread, args=(self,self.IncomingQueue,self.OutgoingQueue))
-        self.Process.start()
         # Starts Thread with Incoming & Outgoing Queue.  Any time-consuming calculations/measurements should be made on this thread.
 
         # The GUIDesign is defined in GUIDesign.py as the class MyFrame. It was made with wxFormBuilder
@@ -136,6 +125,9 @@ class MainFrame(GUIDesign.MyFrame):
             icon = wx.Icon(icon_file)
             self.SetIcon(icon)
 
+        mp.set_start_method('spawn')
+        self.OutgoingQueue = mp.Queue()
+        self.IncomingQueue = mp.Queue()
         # Read the saved settings file here
         if os.path.exists(self.SavedSettingsFile):
             SettingsSeries = pd.read_csv(self.SavedSettingsFile,names=['key','value'])
@@ -146,8 +138,13 @@ class MainFrame(GUIDesign.MyFrame):
         else:
             ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
             ThisChooseSoftwareDialog.ShowModal()
-
+        if self.Software is None:
+            self.OnClose()
+            return
         
+        self.Process = threading.Thread(target=Thread, args=(self,self.IncomingQueue,self.OutgoingQueue))
+        self.Process.start()
+
         YBitmapSize = 20
         self.DownBitmap = wx.Bitmap( u"Bitmaps/DownArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
         self.UpBitmap = wx.Bitmap( u"Bitmaps/UpArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
@@ -218,10 +215,11 @@ class MainFrame(GUIDesign.MyFrame):
                 MacroName,Macro = self.AddToQueue.pop(0)
                 self.AddSingleMacroToQueue(MacroName,Macro)
             self.m_QueueWindow.FitInside()
-    def OnClose(self,event):
-        self.ClearQueue()
-        self.IncomingQueue.put(['OnClose'])
-        self.Process.join()
+    def OnClose(self,event=None):
+        if self.Software is not None:
+            self.ClearQueue()
+            self.IncomingQueue.put(['OnClose'])
+            self.Process.join()
         self.Destroy()
     def MakeFunctionButtons(self):
         for child in self.m_FunctionButtonWindow.GetChildren():
@@ -834,6 +832,7 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                 OutgoingQueue.put(("FunctionFinished",None))
                 Functions[Software].Cancel = False
                 Functions["General"].Cancel = False
+                OutgoingQueue.put(("SetStatus",(f"",1)))
 
 
             except Exception as e:

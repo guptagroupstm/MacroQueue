@@ -1011,21 +1011,23 @@ class MyChooseSoftwareDialog(ChooseSoftware):
         self.SetSoftware("CreaTec")
     def OnSXM(self, event=None):
         self.SetSoftware("SXM")
-    def SetSoftware(self,software):
+    def SetSoftware(self,software=None):
         self.Parent.m_RHKmenuItem.Check(False)
         self.Parent.m_CreaTecmenuItem.Check(False)
         self.Parent.m_SXMmenuItem.Check(False)
-        if software == "RHK":
-            self.Parent.m_RHKmenuItem.Check(True)
-        if software == "CreaTec":
-            self.Parent.m_CreaTecmenuItem.Check(True)
-        if software == "SXM":
-            self.Parent.m_SXMmenuItem.Check(True)
-        self.Parent.Software = software
-        self.Parent.MacroPath = self.Parent.MacroPaths[software]
-        self.Parent.MakeFunctionButtons()
-        SettingsDict = {"Software":software}
-        pd.Series(SettingsDict).to_csv(self.SavedSettingsFile,header=False)
-        self.Parent.MakeFunctionButtons()
-        self.Parent.IncomingQueue.put(["SoftwareChange",software])
+        if software is not None:
+            if software == "RHK":
+                self.Parent.m_RHKmenuItem.Check(True)
+            if software == "CreaTec":
+                self.Parent.m_CreaTecmenuItem.Check(True)
+            if software == "SXM":
+                self.Parent.m_SXMmenuItem.Check(True)
+            self.Parent.Software = software
+            self.Parent.MacroPath = self.Parent.MacroPaths[software]
+            self.Parent.MakeFunctionButtons()
+            SettingsDict = {"Software":software}
+            pd.Series(SettingsDict).to_csv(self.SavedSettingsFile,header=False)
+            self.Parent.MakeFunctionButtons()
+            self.Parent.IncomingQueue.put(["SoftwareChange",software])
+            
         self.Destroy()
