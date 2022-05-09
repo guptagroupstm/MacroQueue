@@ -5,6 +5,7 @@
    {
     "NPixels": {
      "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column",
      "Frozen": false,
      "ValueType": "Numerical"
     }
@@ -16,6 +17,7 @@
    {
     "HowToSetSize": {
      "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
      "Frozen": false,
      "ValueType": "Choice",
      "DefaultList": [
@@ -25,8 +27,10 @@
     },
     "ImageSize": {
      "DefaultValue": "1000",
+     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "\u00c5"
     }
    },
    false
@@ -34,8 +38,20 @@
   [
    "Set Scan Speed",
    {
+    "HowToSetSpeed": {
+     "DefaultValue": "nm/s",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
     "Speed": {
      "DefaultValue": "100",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
      "Frozen": false,
      "ValueType": "Numerical"
     }
@@ -47,6 +63,7 @@
    {
     "HowToSetPosition": {
      "DefaultValue": "nm",
+     "Tooltip": "",
      "Frozen": false,
      "ValueType": "Choice",
      "DefaultList": [
@@ -57,11 +74,13 @@
     },
     "XOffset": {
      "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
      "Frozen": false,
      "ValueType": "Numerical"
     },
     "YOffset": {
      "DefaultValue": "0",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
      "Frozen": false,
      "ValueType": "Numerical"
     }
@@ -73,8 +92,10 @@
    {
     "Setpoint": {
      "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "pA"
     }
    },
    false
@@ -84,11 +105,37 @@
    {
     "Bias": {
      "DefaultValue": "1",
+     "Tooltip": "The bias voltage in V",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "Units": "V"
     }
    },
    false
+  ],
+  [
+   "Set Recorded Channels",
+   {
+    "Topography": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean"
+    },
+    "Current": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean"
+    },
+    "LockInX": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean"
+    }
+   },
+   true
   ],
   [
    "Scan",
@@ -135,6 +182,17 @@
   [
    "Set Scan Speed",
    {
+    "HowToSetSpeed": {
+     "DefaultValue": "nm/s",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
     "Speed": {
      "DefaultValue": "100",
      "Tooltip": "The speed the tip moves in nm/s",
@@ -199,6 +257,30 @@
     }
    },
    false
+  ],
+  [
+   "Set Recorded Channels",
+   {
+    "Topography": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean"
+    },
+    "Current": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean"
+    },
+    "LockInX": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean"
+    }
+   },
+   true
   ],
   [
    "dIdV Scan",

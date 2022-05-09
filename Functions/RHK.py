@@ -7,6 +7,8 @@ Socket = None
 BUFFER_SIZE = None
 Cancel = False
 OutgoingQueue = None
+CourseX = 0
+CourseY = 0
 
 def Initialize():
     global Socket, BUFFER_SIZE
@@ -25,6 +27,32 @@ def OnClose():
         Socket.close()
 
 # def Approach(Parameter1= 0):
+#     Message = f'GetHWSubParameter, Z PI Controller 1, Upper Bound, Value\n'
+#     Socket.send(Message.encode())
+#     UpperBound = float(Socket.recv(BUFFER_SIZE))
+#     Message = f'GetHWSubParameter, Z PI Controller 1, Lower Bound, Value\n'
+#     Socket.send(Message.encode())
+#     LowerBound = float(Socket.recv(BUFFER_SIZE))
+    
+#     Message = f'SetHWParameter, Z PI Controller 1, Tip Control, Unlimit\n'
+#     Socket.send(Message.encode())
+#     data = Socket.recv(BUFFER_SIZE)
+
+#     time.sleep(0.01)
+    
+#     Message = f'ReadChannelValue, z0-src\n'
+#     Socket.send(Message.encode())
+#     ZPosition = float(Socket.recv(BUFFER_SIZE))
+
+#     while ZPosition == UpperBound:
+#         Message = f"StartProcedure, Pan Single Step In\n"
+#         Socket.send(Message.encode())
+#         data = Socket.recv(BUFFER_SIZE)
+#         # data = Socket.recv(BUFFER_SIZE)
+#         # time.sleep(0.1)
+#         Message = f'ReadChannelValue, z0-src\n'
+#         Socket.send(Message.encode())
+#         ZPosition = float(Socket.recv(BUFFER_SIZE))
 #     pass
 # def Z_Course_Step_Out(Parameter1= 0):
 #     pass
@@ -187,6 +215,57 @@ def Move_To_Image_Start(Wait_Time=10):
             pass
     time.sleep(Wait_Time)
 
+# def dIdV_Spectra():
+#     pass
+
+# def PixelScan():
+#     pass
+def PixelScan():
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
+    Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Alternate Slow Scan, Top Down Only\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
+    Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Scan Count Mode, Single\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
+
+    Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
+    Socket.send(Message.encode())
+    Lines = float(Socket.recv(BUFFER_SIZE))
+    Message = f"GetSWParameter, Scan Area Window, Line Time\n"
+    Socket.send(Message.encode())
+    LineTime = float(Socket.recv(BUFFER_SIZE))
+    Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Over Scan Count\n"
+    Socket.send(Message.encode())
+    OverScanCount = float(Socket.recv(BUFFER_SIZE))
+    ScanTime = 2*(Lines+OverScanCount)*LineTime
+
+    Message = "StartProcedure, Pixel Scan\n"
+    Socket.send(Message.encode())
+    
+    data = Socket.recv(BUFFER_SIZE)
+    # data = Socket.recv(BUFFER_SIZE)
+
+    StartTime = timer()
+    while not Cancel:
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+            print(f"Scan Data: {data}")
+            break
+        except Exception as e:
+            print(e)
+            pass
+        Percent = round(100*((timer() - StartTime)/ScanTime),1)
+        OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
+    if Cancel:
+        Message = "StopProcedure, Comb Scan\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
 
 def Scan():
     try:

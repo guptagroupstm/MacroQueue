@@ -2,6 +2,10 @@ import wx
 import os
 import sys
 import pandas as pd
+import pyvisa
+import SXMRemote
+import time
+import socket
 # from shutil import copytree,rmtree
 # from functools import partial
 # import win32com.client
@@ -30,6 +34,7 @@ from Macros import *
 
 # from GUIDesign import MacroDialog
 from inspect import getmembers, isfunction
+
 
 import Functions.RHK as RHKFunctions
 import Functions.CreaTec as CreaTecFunctions
@@ -64,6 +69,10 @@ IconFileName = "MacroQueueIcon.ico"
 # Set Speed (nm/s, line time, pixel time)
 # Set position option (absolute or relative)
 # Set default save folder
+
+
+# Createc
+# Function to change recorded channels.  No longer change it during scan or dIdV scan
 
 
 # ETC
@@ -110,14 +119,13 @@ class MainFrame(GUIDesign.MyFrame):
 
     def __init__(self):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
-        print(application_path)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
 
         mp.set_start_method('spawn')
         self.OutgoingQueue = mp.Queue()
         self.IncomingQueue = mp.Queue()
-        self.Process = threading.Thread(target=Thread, args=(self.IncomingQueue,self.OutgoingQueue))
+        self.Process = threading.Thread(target=Thread, args=(self,self.IncomingQueue,self.OutgoingQueue))
         self.Process.start()
         # Starts Thread with Incoming & Outgoing Queue.  Any time-consuming calculations/measurements should be made on this thread.
 
@@ -233,7 +241,7 @@ class MainFrame(GUIDesign.MyFrame):
 
         # for FunctionName in self.Functions[self.SettingsDict['Software']].keys():
         for FunctionName in AllTheMacros.keys():
-            FunctionButton = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 100,40 ), 0 )
+            FunctionButton = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 100,30 ), 0 )
             FunctionButton.Bind( wx.EVT_BUTTON, self.OnFunctionButton )
             FunctionButtonSizer.Add(FunctionButton,0, wx.ALL, 5)
             def FunctionRightClick(event):
@@ -688,9 +696,10 @@ class MainFrame(GUIDesign.MyFrame):
         MyStartMacroDialog.AddToQueue()
         return
     def AddDisconnectToQueue(self, event=None):
-        OnClose = [['OnClose',{},True]]
+        OnClose = [['OnClose',{},True],['Pause',{},True]]
         MyStartMacroDialog = StartMacroDialog(self,"Disconnect",OnClose)
         MyStartMacroDialog.AddToQueue()
+        self.AddConnectToQueue()
         return
     def OnRHKSoftware(self, event):
         ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
@@ -792,8 +801,9 @@ class MyPanelDropTarget(wx.DropTarget):
 
         return d
 
-def Thread(IncomingQueue,OutgoingQueue):
+def Thread(self,IncomingQueue,OutgoingQueue):
     Functions = {"RHK":RHKFunctions,"CreaTec":CreaTecFunctions,"SXM":SXMFunctions,"General":GeneralFunctions}
+    Functions["General"].MacroQueueSelf = self
     while True:
         Message = IncomingQueue.get() # Blocks until there's a message
         if Message[0] == "SoftwareChange":

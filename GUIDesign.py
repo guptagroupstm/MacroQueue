@@ -19,7 +19,7 @@ class MyFrame ( wx.Frame ):
 	def __init__( self, parent ):
 		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MacroQueue", pos = wx.DefaultPosition, size = wx.Size( 800,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
-		self.SetSizeHints( wx.Size( 600,300 ), wx.DefaultSize )
+		self.SetSizeHints( wx.Size( 270,135 ), wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE ) )
 
 		self.m_menubar1 = wx.MenuBar( 0|wx.TRANSPARENT_WINDOW )
@@ -85,39 +85,42 @@ class MyFrame ( wx.Frame ):
 		self.m_CheckQueueTimer.Start( 500 )
 
 		MainSizer = wx.FlexGridSizer( 0, 3, 0, 0 )
-		MainSizer.AddGrowableCol( 2 )
+		MainSizer.AddGrowableCol( 0 )
 		MainSizer.AddGrowableRow( 0 )
 		MainSizer.SetFlexibleDirection( wx.BOTH )
 		MainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		self.m_QueueWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+		self.m_QueueWindow.SetScrollRate( 5, 5 )
+		self.m_QueueWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+		self.m_QueueWindow.SetMinSize( wx.Size( 275,-1 ) )
+
+		MainSizer.Add( self.m_QueueWindow, 1, wx.ALL|wx.EXPAND, 5 )
 
 		self.m_FunctionButtonWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 220,-1 ), wx.HSCROLL|wx.VSCROLL )
 		self.m_FunctionButtonWindow.SetScrollRate( 5, 5 )
 		MainSizer.Add( self.m_FunctionButtonWindow, 1, wx.EXPAND |wx.ALL, 5 )
 
+		self.m_panel12 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.TAB_TRAVERSAL )
+		self.m_panel12.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVEBORDER ) )
+
 		OptionButtonsSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
+		OptionButtonsSizer.AddGrowableCol( 0 )
 		OptionButtonsSizer.SetFlexibleDirection( wx.BOTH )
 		OptionButtonsSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		self.m_PauseASAPButton = wx.Button( self, wx.ID_ANY, u"Pause ASAP", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
-		self.m_PauseASAPButton.Hide()
+		OptionButtonsSizer.SetMinSize( wx.Size( 140,-1 ) )
+		self.m_PauseAfterButton = wx.Button( self.m_panel12, wx.ID_ANY, u"Start", wx.DefaultPosition, wx.Size( 120,30 ), 0 )
+		OptionButtonsSizer.Add( self.m_PauseAfterButton, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 
-		OptionButtonsSizer.Add( self.m_PauseASAPButton, 0, wx.ALL, 5 )
-
-		self.m_PauseAfterButton = wx.Button( self, wx.ID_ANY, u"Start", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
-		OptionButtonsSizer.Add( self.m_PauseAfterButton, 0, wx.ALL, 5 )
-
-		self.m_button1 = wx.Button( self, wx.ID_ANY, u"Clear Queue", wx.DefaultPosition, wx.Size( 120,40 ), 0 )
-		OptionButtonsSizer.Add( self.m_button1, 0, wx.ALL, 5 )
+		self.m_button1 = wx.Button( self.m_panel12, wx.ID_ANY, u"Clear Queue", wx.DefaultPosition, wx.Size( 120,30 ), 0 )
+		OptionButtonsSizer.Add( self.m_button1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 
 
-		MainSizer.Add( OptionButtonsSizer, 1, wx.ALIGN_BOTTOM|wx.EXPAND, 5 )
-
-		self.m_QueueWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
-		self.m_QueueWindow.SetScrollRate( 5, 5 )
-		self.m_QueueWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
-		self.m_QueueWindow.SetMinSize( wx.Size( 200,-1 ) )
-
-		MainSizer.Add( self.m_QueueWindow, 1, wx.ALL|wx.EXPAND, 5 )
+		self.m_panel12.SetSizer( OptionButtonsSizer )
+		self.m_panel12.Layout()
+		OptionButtonsSizer.Fit( self.m_panel12 )
+		MainSizer.Add( self.m_panel12, 1, wx.EXPAND |wx.ALL, 5 )
 
 
 		self.SetSizer( MainSizer )
@@ -142,7 +145,6 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.MakeAMacroHelp, id = self.m_menuItem11.GetId() )
 		self.Bind( wx.EVT_MENU, self.WriteANewFunctionHelp, id = self.m_menuItem12.GetId() )
 		self.Bind( wx.EVT_TIMER, self.CheckQueue, id=wx.ID_ANY )
-		self.m_PauseASAPButton.Bind( wx.EVT_BUTTON, self.PauseASAP )
 		self.m_PauseAfterButton.Bind( wx.EVT_BUTTON, self.Pause )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.ClearQueue )
 
@@ -195,9 +197,6 @@ class MyFrame ( wx.Frame ):
 		event.Skip()
 
 	def CheckQueue( self, event ):
-		event.Skip()
-
-	def PauseASAP( self, event ):
 		event.Skip()
 
 	def Pause( self, event ):

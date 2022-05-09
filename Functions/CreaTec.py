@@ -129,6 +129,17 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
         Speed = Size/(Speed*Pixels)
     STM.setp('SCAN.SPEED.NM/SEC',Speed)
 
+
+def Set_Recorded_Channels(Topography=True,Current=True,LockInX=True):
+    Channels = []
+    if Topography:
+        Channels.append('TOPOGRAPHY')
+    if Current:
+        Channels.append('TOPOGRAPHY')
+    if LockInX:
+        Channels.append('Lock-in X')
+    Channels = list(Channels)
+    STM.setp('SCAN.CHANNELS',Channels)
 def Scan():
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
     Lines = float(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
@@ -137,7 +148,7 @@ def Scan():
     CheckTime = int(np.ceil(ScanTime/500))
     # Time = 0 if Time <= 0 else Time
 
-    STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT'))
+    # STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT'))
     time.sleep(1)
     STM.setp('STMAFM.BTN.START' ,'')
     StartTime = timer()
@@ -151,6 +162,7 @@ def Scan():
             time.sleep(0.5)
     if Cancel:
         STM.setp('STMAFM.BTN.STOP',"")
+        OutgoingQueue.put(("SetStatus",(f"",2)))
 
 def dIdV_Scan():
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
@@ -160,7 +172,7 @@ def dIdV_Scan():
     Time = 0 if Time <= 0 else Time
     # STM.setp('LOCK-IN.CHANNEL','ADC0')
     STM.setp('LOCK-IN.MODE','Internal ')
-    STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT','Lock-in X'))
+    # STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT','Lock-in X'))
     time.sleep(1)
     STM.setp('STMAFM.BTN.START' ,'')
     Status = STM.getp('STMAFM.SCANSTATUS','')

@@ -1,5 +1,3 @@
-from inspect import Parameter
-from re import M
 import SXMRemote
 import numpy as np
 import time

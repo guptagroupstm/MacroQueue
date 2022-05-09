@@ -1,7 +1,7 @@
 from time import sleep
 
 Cancel = False
-
+MacroQueueSelf = None
 
 # WaitTime=s;The time to wait in seconds
 def Wait(WaitTime=1):
@@ -10,6 +10,9 @@ def Wait(WaitTime=1):
 # Index=This has no impact.  It's solely used to repeat the functions.
 def Null(Index=0):
     pass
+
+def Pause():
+    MacroQueueSelf.Pause()
 
 # def Print(Number=0):
 #     global Cancel
