@@ -126,6 +126,19 @@ def Set_Scan_Window_Angle(Angle=0):
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
 
+# IntegralGain=um/s;The integral gain of the z piezo.
+def Set_Integral_Gain(IntegralGain=1):
+    IntegralGain*=1e-6
+    Message = f"SetHWSubParameter, Z PI Controller 1, Integral Gain, {IntegralGain}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    
+# ProportionalGain=The proportional gain.
+def Set_Proportional_Gain(ProportionalGain=1e-17):
+    Message = f"SetHWSubParameter, Z PI Controller 1, Proportional Gain, {ProportionalGain}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
 # NPixels=The number of pixels in each row and each column
 def Set_NPixels(NPixels=512):
     Message = f"SetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame, {NPixels}\n"

@@ -349,5 +349,20 @@
    {},
    true
   ]
+ ],
+ "Wait": [
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "10",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   true
+  ]
  ]
 }
