@@ -48,22 +48,20 @@ IconFileName = "MacroQueueIcon.ico"
 
 
 # BUG:
-# Function in macro twice??  (I use function name as dict key in start dialog.  Replace dict with (ordered) list)
+# After edit macro, text on wrong side (Not reproducing?)
+# Dragging does not always work
 
 # TODO:
-# After edit macro, text on wrong side
 # Show number of items in queue in status bar
-
-# Remove Status bar 3 when scan is canceled.
 
 # np arange stop responding when len > ~100,000
 
 # RHK functions
-# Cancel Scan
 # Scan - Only top down
-# RHK Scan doesn't stop???
-# Set Speed (nm/s, line time, pixel time)
+# RHK Scan doesn't stop
 # Set position option (absolute or relative)
+# Start spectra
+# Set bias modulation amplitude
 # Set default save folder
 
 

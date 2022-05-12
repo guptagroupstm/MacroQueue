@@ -218,15 +218,12 @@ class MyMacroDialog ( MacroDialog ):
         if Function is None:
             FunctionLabel = event.GetEventObject().GetLabel()
             FunctionInfo = self.FunctionInfoList[FunctionLabel].copy()
+            FunctionInfo[2] ={key:value.copy() for key,value in FunctionInfo[2].items()}
         else:
             FunctionLabel, ParametersDict, Included = Function
             FunctionInfo = self.FunctionInfoList[FunctionLabel].copy()
             for ParameterName in ParametersDict.keys():
                 if FunctionInfo[2][ParameterName]["ValueType"] == "Choice":
-                    # List = FunctionInfo[2][ParameterName]['DefaultValue']
-                    # Item = ParametersDict[ParameterName]['DefaultValue']
-                    # List.remove(Item)
-                    # List.insert(0,Item)
                     FunctionInfo[2][ParameterName]["DefaultList"] = FunctionInfo[2][ParameterName]['DefaultValue']
                     FunctionInfo[2][ParameterName] = {**FunctionInfo[2][ParameterName],**ParametersDict[ParameterName]}
                 else:
@@ -317,7 +314,7 @@ class MyMacroDialog ( MacroDialog ):
         # fgSizer3.Add( self.m_FunctionWindow, 1, wx.EXPAND |wx.ALL, 2 )
 
         m_FunctionWindow.Show()
-        self.TheQueue.append([FunctionLabel,FunctionInfo[2],FunctionInfo[0],m_FunctionWindow,m_FunctionNameText,Included])
+        self.TheQueue.append([FunctionLabel,FunctionInfo[2].copy(),FunctionInfo[0],m_FunctionWindow,m_FunctionNameText,Included])
         self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
         self.m_FunctionQueueScrolledWindow.FitInside()
         
@@ -396,8 +393,8 @@ class MyMacroDialog ( MacroDialog ):
 class MyMacroSettingsDialog(MacroSettingsDialog):
     def __init__(self, parent, Name, TheMacro):
         super().__init__(parent)
-        self.TheMacro = TheMacro
-        self.TheMacroCtrls = {}
+        self.TheMacro = [macro.copy() for macro in TheMacro]
+        self.TheMacroCtrls = []
         self.m_MacroTextCtrl.SetValue(Name)
         self.SetParameterPanels()
 
@@ -407,7 +404,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
         m_MacroSettingScrolledWindowSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
 
-        for Name,Parameters,Included in self.TheMacro:
+        for i,(Name,Parameters,Included) in enumerate(self.TheMacro):
             FunctionPanel = wx.Panel( self.m_MacroSettingScrolledWindow, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL|wx.EXPAND )
             FunctionPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
 
@@ -425,7 +422,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             FunctionsParametersSizer.SetFlexibleDirection( wx.BOTH )
             FunctionsParametersSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-            self.TheMacroCtrls[Name] = {}
+            self.TheMacroCtrls.append({"Name":[Name]})
             if len(Parameters) > 0:
                 for ParameterName,ParameterInfo in Parameters.items():
                     Tooltip = ParameterInfo["Tooltip"]
@@ -485,8 +482,8 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                     ParameterSizer.Fit( self.ParameterPanel )
                     FunctionsParametersSizer.Add( self.ParameterPanel, 1, wx.EXPAND |wx.ALL, 5 )
 
-                    self.TheMacroCtrls[Name][ParameterName] = [ParameterDefaultValueText,FreezeParameterCheck] 
-            self.TheMacroCtrls[Name]["__Included__"] = m_FunctionTextCheck 
+                    self.TheMacroCtrls[i][ParameterName] = [ParameterDefaultValueText,FreezeParameterCheck] 
+            self.TheMacroCtrls[i]["__Included__"] = m_FunctionTextCheck 
 
 
             FunctionSizer.Add( FunctionsParametersSizer, 1, wx.EXPAND, 5 )
@@ -512,7 +509,6 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
     def SaveMacro(self, event):
         self.UpdateTheMacro()
         MacroName = self.m_MacroTextCtrl.GetValue()
-
         if len(MacroName) == 0:
             MyMessage = wx.MessageDialog(self,message=f"Macro Name cannot be empty.",caption="Warning - Invalid Macro Name")
             MyMessage.ShowModal()
@@ -551,11 +547,11 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             if len(Parameters) > 0:
                 for ParameterName,ParameterInfo in Parameters.items():
                     if ParameterInfo['ValueType'] == "Choice":
-                        Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[Name][ParameterName][0].GetStringSelection()
+                        Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[i][ParameterName][0].GetStringSelection()
                     else:
-                        Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[Name][ParameterName][0].GetValue()
-                    Parameters[ParameterName]['Frozen'] = self.TheMacroCtrls[Name][ParameterName][1].GetValue()
-            self.TheMacro[i][2] = self.TheMacroCtrls[Name]["__Included__"].GetValue()
+                        Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[i][ParameterName][0].GetValue()
+                    Parameters[ParameterName]['Frozen'] = self.TheMacroCtrls[i][ParameterName][1].GetValue()
+            self.TheMacro[i][2] = self.TheMacroCtrls[i]["__Included__"].GetValue()
 
 class MyStartMacroDialog(StartMacroDialog):
     def __init__(self, parent,MacroLabel,TheDefaultMacro,EdittingMode = False,Index=None):
