@@ -1,6 +1,18 @@
 {
  "Scan": [
   [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
    "Set NPixels",
    {
     "NPixels": {
@@ -72,7 +84,7 @@
    "Set Scan Speed",
    {
     "HowToSetSpeed": {
-     "DefaultValue": "nm/s",
+     "DefaultValue": "s/line",
      "Tooltip": "Choose how the Image Speed is set",
      "Frozen": false,
      "ValueType": "Choice",
@@ -85,6 +97,31 @@
     "Speed": {
      "DefaultValue": "0.5",
      "Tooltip": "The speed the tip moves in nm/s, s/line, or ms/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Integral Gain",
+   {
+    "IntegralGain": {
+     "DefaultValue": "1",
+     "Tooltip": "The integral gain of the z piezo.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "um/s"
+    }
+   },
+   false
+  ],
+  [
+   "Set Proportional Gain",
+   {
+    "ProportionalGain": {
+     "DefaultValue": "1e-17",
+     "Tooltip": "The proportional gain.",
      "Frozen": false,
      "ValueType": "Numerical"
     }
@@ -216,6 +253,31 @@
    false
   ],
   [
+   "Set Integral Gain",
+   {
+    "IntegralGain": {
+     "DefaultValue": "1",
+     "Tooltip": "The integral gain of the z piezo.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "um/s"
+    }
+   },
+   false
+  ],
+  [
+   "Set Proportional Gain",
+   {
+    "ProportionalGain": {
+     "DefaultValue": "1e-17",
+     "Tooltip": "The proportional gain.",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
    "Set Setpoint",
    {
     "Setpoint": {
@@ -252,11 +314,198 @@
    "Wait",
    {
     "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   true
+  ]
+ ],
+ "Move Tip": [
+  [
+   "Move Tip",
+   {
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
      "DefaultValue": "10",
      "Tooltip": "The time to wait in seconds",
      "Frozen": false,
      "ValueType": "Numerical",
      "Units": "s"
+    }
+   },
+   false
+  ]
+ ],
+ "dIdV Spectra": [
+  [
+   "Move Tip",
+   {
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "10",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "dIdV Spectra",
+   {},
+   true
+  ]
+ ],
+ "Tip Pulse": [
+  [
+   "Move Tip",
+   {
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "RampZandPulseV",
+   {},
+   true
+  ]
+ ],
+ "AutoPhase": [
+  [
+   "Z Course Steps Out",
+   {
+    "NSteps": {
+     "DefaultValue": "3",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "WaitBetween": {
+     "DefaultValue": "2",
+     "Tooltip": "The time to wait between steps",
+     "Frozen": true,
+     "ValueType": "Numerical",
+     "Units": "S"
+    }
+   },
+   true
+  ],
+  [
+   "AutoPhase",
+   {},
+   true
+  ],
+  [
+   "Approach",
+   {},
+   true
+  ]
+ ],
+ "Approach": [
+  [
+   "Approach",
+   {},
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "600",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   true
+  ]
+ ],
+ "Step Out": [
+  [
+   "Z Course Steps Out",
+   {
+    "NSteps": {
+     "DefaultValue": "3",
+     "Tooltip": "The number of steps out to take",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "WaitBetween": {
+     "DefaultValue": "2",
+     "Tooltip": "The time to wait between steps",
+     "Frozen": true,
+     "ValueType": "Numerical",
+     "Units": "S"
     }
    },
    true

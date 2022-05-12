@@ -539,7 +539,10 @@ class MainFrame(GUIDesign.MyFrame):
         m_FunctionWindow.Show()
 
         # self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
+
+        # Sometimes works:
         m_FunctionWindow.Bind(wx.EVT_MOTION, self.OnStartDrag)
+
         Color = wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) if (not self.Paused or self.m_PauseAfterButton.GetLabel() == "Start") else wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE)
         m_FunctionWindow.SetBackgroundColour(Color)
         m_FunctionWindow.Bind( wx.EVT_RIGHT_DOWN, self.OnRFunctionClick )
