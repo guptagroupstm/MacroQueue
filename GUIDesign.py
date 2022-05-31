@@ -17,7 +17,7 @@ import wx.xrc
 class MyFrame ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MacroQueue", pos = wx.DefaultPosition, size = wx.Size( 800,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MacroQueue", pos = wx.DefaultPosition, size = wx.Size( 800,210 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
 		self.SetSizeHints( wx.Size( 270,135 ), wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE ) )
@@ -90,14 +90,14 @@ class MyFrame ( wx.Frame ):
 		MainSizer.SetFlexibleDirection( wx.BOTH )
 		MainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		self.m_QueueWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+		self.m_QueueWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.VSCROLL )
 		self.m_QueueWindow.SetScrollRate( 5, 5 )
 		self.m_QueueWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
 		self.m_QueueWindow.SetMinSize( wx.Size( 275,-1 ) )
 
 		MainSizer.Add( self.m_QueueWindow, 1, wx.ALL|wx.EXPAND, 5 )
 
-		self.m_FunctionButtonWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 220,-1 ), wx.HSCROLL|wx.VSCROLL )
+		self.m_FunctionButtonWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 240,-1 ), wx.VSCROLL )
 		self.m_FunctionButtonWindow.SetScrollRate( 5, 5 )
 		MainSizer.Add( self.m_FunctionButtonWindow, 1, wx.EXPAND |wx.ALL, 5 )
 

@@ -3,12 +3,17 @@ import time
 import win32com.client
 from time import time as timer
 import pyvisa
+import wx
+import threading
 
 STM = None
 CurrentMacro = None
 OutgoingQueue = None
 Cancel = False
 BField = None
+BFieldControlThread = None
+BFieldPowerControl = None
+MacroQueueSelf = None
 
 OnCloseFunctions = []
 
@@ -20,39 +25,125 @@ def Initialize():
 
 
 def OnClose():
+    # STM.release()
     # global OnCloseFunctions
     # for f in OnCloseFunctions:
     #     f()
+    
+    if BField is not None:
+        OutgoingQueue.put(("DontClose","The Magnetic Field is not off.  Run the function 'Turn B Field Off'."))
+        MacroQueueSelf.Closing=False
+
     if STM is not None:
         pass
 
-    if BField is not None:
-        pass
 
 
-def Set_BField(B=1,ramp_spped=0.1):
-    global BField
-    if BField is not None:
-        # ConnectMagneticFieldController()
-        pass
+# B=T;The magnetic field strength in T
+def Set_B_Field(B=1):
+    global BField, BFieldPowerControl, BFieldControlThread
+    # Ramp_speed and Ramp_amount used to be parameters.
+    # Ramp_speed=s;How often steps are taken in seconds
+    # Ramp_amount=mV;How much the voltage is changed for a single step
+    Ramp_speed=0.1
+    Ramp_amount=1
     # Make sure current stays below +/- 10 A
     # Hard limit on ramp speed
 
     # 10 Amps is 1 T
-    # Amps or T input parameter
 
-    # Add BField to memo
-    pass
+    # if np.abs(Ramp_speed*Ramp_amount) > 0.105:
+    #     raise Exception(f"The magnetic field is ramping too much, too fast.  {Ramp_speed*Ramp_amount} > 0.105.")
+    Ramp_amount = np.abs(Ramp_amount)/1000 # so ramp amount is in V
 
-# def Turn_BField_Off():
+    # Test if connected to the power supply
+    if BFieldPowerControl is not None:
+        try:
+            CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
+        except:
+            BFieldPowerControl=None
+    if BFieldPowerControl is None:
+        rm = pyvisa.ResourceManager()
+        GPIBaddress = 6
+        instName = f'GPIB0::{GPIBaddress}::INSTR'
+        BFieldPowerControl = rm.open_resource(instName)
+
+        BFieldPowerControl.read_termination = '\n'
+        BFieldPowerControl.write_termination = '\n'
+        if eval(BFieldPowerControl.query('OUTPUT?'))==True:
+            BFieldPowerControl.write('OUTPUT OFF')
+
+        BFieldPowerControl.write('FUNC:MODE VOLT')
+        BFieldPowerControl.write('VOLT 0')
+        BFieldPowerControl.write('CURR 10.1')
+        BFieldPowerControl.write('OUTPUT ON')
+
+
+    if BFieldControlThread is None:
+        def BFieldControlThreadFunction():
+            pass
+        # BFieldControlThread = 
+    FinalCurrent = B*10
+    CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
+    CurrentVoltage = float(BFieldPowerControl.query('MEAS:VOLT?'))
+    InitialCurrent = CurrentCurrent
+    BField = CurrentCurrent/10
+    Increasing = 1 if FinalCurrent > CurrentCurrent else -1
+
+    # CurrentCurrent + Ramp_amount is a somewhat reasonable approximation for the next step
+    StartTime = timer()
+    while Increasing*round(CurrentCurrent,3) < Increasing*FinalCurrent - Ramp_amount and not Cancel: 
+        CurrentVoltage += Increasing*Ramp_amount
+        CurrentVoltage = round(CurrentVoltage,3)
+        BFieldPowerControl.write(f'VOLT {CurrentVoltage}')
+        StartTime = timer()
+        CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
+        MeasuredVoltage = float(BFieldPowerControl.query('MEAS:VOLT?'))
+        if Ramp_speed > (timer() - StartTime):
+            time.sleep(Ramp_speed - (timer() - StartTime))
+        BField = CurrentCurrent/10
+        Percent = (CurrentCurrent-InitialCurrent)*100/(FinalCurrent-InitialCurrent)
+        # print(CurrentVoltage,MeasuredVoltage,CurrentCurrent,round(Percent,2))
+        OutgoingQueue.put(("SetStatus",(f"Ramp {round(Percent,1)}% Complete",2)))
+
+
+
+    # # TODO:
+    # # Make a thread that keeps it at this current value
+
+    if Cancel:
+        OutgoingQueue.put(("SetStatus",(f"",2)))
+    if STM is not None:
+        STM.setp('MEMO.SET', f"B = {BField} T")
+
+# Ramp_speed=s;How often steps are taken in seconds
+# Ramp_amount=mV;How much the voltage is changed for a single step
+def Turn_B_Field_Off():
+    global BField, BFieldPowerControl
+    Set_B_Field(0)
+    BFieldPowerControl.write('OUTPUT OFF')
+    BField = None
+    memo = 'B = 0T; Output Off.'
+    STM.setp('MEMO.SET', memo)
+
+# # Ramp_speed=s;How often steps are taken in seconds
+# # Ramp_amount=mV;How much the voltage is changed for a single step
+# def BField_Spectra(Final_BField=-1,Ramp_speed=0.1,Ramp_amount=1):
+#     # OriginalTable = np.array(STM.getp('VERTMAN.IVTABLE',''))
+#     # NewTable = OriginalTable.copy()
+#     # NewTable[1,2] = 2000
+#     # STM.setp('VERTMAN.IVTABLE',tuple(map(tuple,NewTable)))
 #     pass
 
 # def Approach(Parameter1= 0):
 #     pass
+
 # def Z_Course_Step_Out(Parameter1= 0):
 #     pass
+
 # def Z_Course_Step_In(Parameter1= 0):
 #     pass
+
 # def Course_Step(X=0,Y=0):
 #     pass
 
@@ -72,6 +163,9 @@ def Set_Setpoint(Setpoint=100):
 # YOffset=The Y top of the image in nm, or Image Coordinate, or V
 def Set_Scan_Window_Position(HowToSetPosition=['nm','Image Coord','Voltage'],XOffset=0,YOffset=0):
     if HowToSetPosition == 'nm':
+        XOffset *= 10
+        YOffset *= 10
+        # CreaTec doesn't know what NM means...
         STM.setp('STMAFM.CMD.SETXYOFF.NM',(XOffset,YOffset))
     elif HowToSetPosition == 'Image Coord':
         STM.setp('STMAFM.CMD.SETXYOFF.IMAGECOORD',(XOffset,YOffset))
@@ -82,6 +176,9 @@ def Set_Scan_Window_Position(HowToSetPosition=['nm','Image Coord','Voltage'],XOf
 # YOffset=The Y X position of the tip in nm, or Image Coordinate, or V
 def Fine_Move_Tip(HowToSetPosition=['nm','Image Coord','Voltage'],XOffset=0,YOffset=0):
     if HowToSetPosition == 'nm':
+        # XOffset *= 10
+        # YOffset *= 10
+        # Not sure if this command actually uses nm
         STM.setp('STMAFM.CMD.SETXYOFF.NM',(XOffset,YOffset))
     elif HowToSetPosition == 'Image Coord':
         STM.setp('STMAFM.CMD.SETXYOFF.IMAGECOORD',(XOffset,YOffset))
@@ -188,6 +285,20 @@ def dIdV_Scan():
     STM.setp('LOCK-IN.MODE','Internal + Spectrum only')
 
 
+# # Initial_Voltage=V;The starting voltage in V
+# # Final_Voltage=V;The final voltage in V
+# # Stabilize_Time=s;The time to wait before starting a spectrum.
+# # Total_Spectrum_Time=s;The time a single spectrum will take.
+# # NDatapoints;The number of datapoints to record
+# def Set_Spectrum_Voltage(Initial_Voltage=1,Final_Voltage=-1,Stabilize_Time=1,Total_Spectrum_Time=60,NDatapoints=1000):
+#     pass
+
+# # Spectrum_Backwards;  *****
+# # Spectrum_Repeat;The number of times to repeat the spectrum.
+# # SpectrumAverage;The number of spectra to take and average to reduce noise.
+# def Set_Spectrum_Settings(Spectrum_Backwards=1,Spectrum_Repeat=1,SpectrumAverage=1):
+#     pass
+
 def Spectrum():
     Status = STM.getp('STMAFM.SCANSTATUS','')
     print(Status)
@@ -218,7 +329,9 @@ def Spectrum():
 
 if __name__ == "__main__":
     pass
-    Initialize()
-    Scan()
+    # Set_BField(0.1)
+    # Set_BField(0)
+    # Initialize()
+    # Scan()
     # Set_Scan_Image_Size('Resolution',1)
     # Set_Scan_Window_Position(XOffset=0,YOffset=0)

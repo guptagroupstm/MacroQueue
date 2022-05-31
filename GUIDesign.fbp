@@ -47,7 +47,7 @@
             <property name="minimum_size">270,135</property>
             <property name="name">MyFrame</property>
             <property name="pos"></property>
-            <property name="size">800,300</property>
+            <property name="size">800,210</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
             <property name="title">MacroQueue</property>
@@ -375,7 +375,7 @@
                         <property name="tooltip"></property>
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
-                        <property name="window_style">wxHSCROLL|wxVSCROLL</property>
+                        <property name="window_style">wxVSCROLL</property>
                     </object>
                 </object>
                 <object class="sizeritem" expanded="0">
@@ -428,13 +428,13 @@
                         <property name="scroll_rate_x">5</property>
                         <property name="scroll_rate_y">5</property>
                         <property name="show">1</property>
-                        <property name="size">220,-1</property>
+                        <property name="size">240,-1</property>
                         <property name="subclass">; ; forward_declare</property>
                         <property name="toolbar_pane">0</property>
                         <property name="tooltip"></property>
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
-                        <property name="window_style">wxHSCROLL|wxVSCROLL</property>
+                        <property name="window_style">wxVSCROLL</property>
                     </object>
                 </object>
                 <object class="sizeritem" expanded="1">

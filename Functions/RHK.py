@@ -27,7 +27,7 @@ def OnClose():
         Socket.shutdown(2)
         Socket.close()
 
-def Approach():
+def Approach(ApproachToHalfway=True):
     Message = f'GetHWSubParameter, Z PI Controller 1, Upper Bound, Value\n'
     Socket.send(Message.encode())
     UpperBound = float(Socket.recv(BUFFER_SIZE))
@@ -50,7 +50,6 @@ def Approach():
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
         data = Socket.recv(BUFFER_SIZE)
-        # data = Socket.recv(BUFFER_SIZE)
         Message = f'ReadChannelValue, z0-src\n'
         Socket.send(Message.encode())
         ZPosition0 = float(Socket.recv(BUFFER_SIZE))
@@ -62,7 +61,35 @@ def Approach():
             if np.abs(ZPosition1 - ZPosition0) < 1e-9:
                 break
             ZPosition0 = ZPosition1
-    pass
+
+    DriftWaitTime = 5
+    if ApproachToHalfway:
+        if ZPosition1 < LowerBound + (UpperBound - LowerBound)/4 and not Cancel:
+            Message = f'ReadChannelValue, z0-src\n'
+            Socket.send(Message.encode())
+            ZPosition0 = float(Socket.recv(BUFFER_SIZE))
+            Message = f"StartProcedure, Pan Single Step In\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+            time.sleep(DriftWaitTime)
+            Message = f'ReadChannelValue, z0-src\n'
+            Socket.send(Message.encode())
+            ZPosition1 = float(Socket.recv(BUFFER_SIZE))
+            StepSize = ZPosition1 - ZPosition0
+            while ZPosition1 + StepSize < LowerBound + (UpperBound - LowerBound)/2 and not Cancel:
+                Message = f"StartProcedure, Pan Single Step In\n"
+                Socket.send(Message.encode())
+                data = Socket.recv(BUFFER_SIZE)
+                data = Socket.recv(BUFFER_SIZE)
+                time.sleep(DriftWaitTime)
+                Message = f'ReadChannelValue, z0-src\n'
+                Socket.send(Message.encode())
+                ZPosition0 = float(Socket.recv(BUFFER_SIZE))
+                StepSize = ZPosition0 - ZPosition1
+                ZPosition1 = ZPosition0
+                    
+
 
 
 # NSteps=The number of steps out to take
@@ -274,7 +301,12 @@ def Move_To_Image_Start(Wait_Time=10):
         except Exception as e:
             print(e)
             pass
-    time.sleep(Wait_Time)
+
+    while Wait_Time > 1 and not Cancel:
+        Wait_Time-=1
+        time.sleep(1)
+    if not Cancel:
+        time.sleep(Wait_Time)
 
 def AutoPhase():
     try:

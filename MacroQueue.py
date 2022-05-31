@@ -50,9 +50,18 @@ IconFileName = "MacroQueueIcon.ico"
 # BUG:
 # After edit macro, text on wrong side (Not reproducing?)
 # Dragging does not always work
+# Canceled during move to image start of a dIdV scan and it stopped responding.
 
 # TODO:
+# Expand numerical inputs like: 10,1,-1 :10,9,8,7,6...
 # Show number of items in queue in status bar
+
+# Add limits - Make the function comment have dict format
+
+# If a macro failed, copy it and put it and the top of the queue
+# Show time left of current scan
+
+# Write the help dialog
 
 # np arange stop responding when len > ~100,000
 
@@ -60,7 +69,6 @@ IconFileName = "MacroQueueIcon.ico"
 # Scan - Only top down
 # RHK Scan doesn't stop
 # Set position option (absolute or relative)
-# Start spectra
 # Set bias modulation amplitude
 # Set default save folder
 
@@ -78,14 +86,11 @@ IconFileName = "MacroQueueIcon.ico"
 
 # Have a log dialog that can be opened (but doesn't have to be).  The log dialog shows whatever is printed (or the equivlant)
 
-# SciT notation
 # Ramping & scanning : set status bar 3
 # Progress bar: https://stackoverflow.com/questions/1883528/wxpython-progress-bar
 
-# Createc Scan time wrong.  Factor of 2.  Forward and back?
+# RHK Scan time wrong
 
-
-# Write the help dialog
 
 
 # Check dialog when opening souce when frozen   #  What did I mean when I wrote this???
@@ -108,6 +113,7 @@ class MainFrame(GUIDesign.MyFrame):
     Paused = True
     Running = False
     Software = None
+    Closing = False
 
     def __init__(self):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
@@ -172,6 +178,10 @@ class MainFrame(GUIDesign.MyFrame):
                     Macro,FunctionPanel,FunctionText = self.TheQueue.pop(0)
                     FunctionPanel.Destroy()
                     self.m_QueueWindow.FitInside()
+                if Message[0] == "DontClose":
+                    MyMessage = wx.MessageDialog(self,message=Message[1],caption="Do not close!",style=wx.OK)
+                    MyMessage.ShowModal()
+                    pass
                 if Message[0] == "ExceptionThrown":
                     if not self.Paused:
                         Macro,FunctionPanel,FunctionText = self.TheQueue.pop(0)
@@ -214,11 +224,14 @@ class MainFrame(GUIDesign.MyFrame):
                 self.AddSingleMacroToQueue(MacroName,Macro)
             self.m_QueueWindow.FitInside()
     def OnClose(self,event=None):
+        self.Closing = True
         if self.Software is not None:
             self.ClearQueue()
             self.IncomingQueue.put(['OnClose'])
-            self.Process.join()
-        self.Destroy()
+            while self.Closing and self.Process.is_alive():
+                self.Process.join(timeout=0.5)
+        if self.Closing:
+            self.Destroy()
     def MakeFunctionButtons(self):
         for child in self.m_FunctionButtonWindow.GetChildren():
             child.Destroy()
@@ -807,6 +820,7 @@ def Thread(self,IncomingQueue,OutgoingQueue):
         Message = IncomingQueue.get() # Blocks until there's a message
         if Message[0] == "SoftwareChange":
             Software = Message[1]
+            Functions[Software].MacroQueueSelf = self
             FunctionDict = {Name.replace("_"," "):Function for Name,Function in (getmembers(Functions[Software], isfunction) + getmembers(Functions["General"], isfunction))}
             Functions[Software].OutgoingQueue = OutgoingQueue
             Functions["General"].OutgoingQueue = OutgoingQueue
