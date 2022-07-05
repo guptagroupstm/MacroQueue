@@ -417,7 +417,6 @@ class MainFrame(GUIDesign.MyFrame):
                 self.TheQueue = self.TheQueue[:1]
                 self.TheQueue[0][1].SetBackgroundColour('red')
                 self.TheQueue[0][1].Refresh()
-                # self.IncomingQueue.put(("Cancel",))
                 self.Cancel()
             else:
                 for Function,RemovePanel,Text in self.TheQueue:
@@ -726,20 +725,76 @@ class MainFrame(GUIDesign.MyFrame):
         ThisChooseSoftwareDialog.OnSXM()
         return
     def BasicUseageHelp(self, event):
-        HelpMessage = "Not yet written.\n"
-        HelpMessage += "Saving for last.\n"
+        HelpMessage = "Left click on your choosen macro from the list on the main page.\n"
+        HelpMessage += "Each function in the macro has a checkbox on the left side of the function's panel.  You may check/uncheck it.  If it is checked it will be run.  If it is unchecked it will not run.\n"
+        HelpMessage += "Each parameter of each function may be changed to the value that you want.  If you input an unreasonable value, the function will be added to the queue but an error will pop-up and the queue will be paused when it attempts to run.  \n"
+        HelpMessage += "After inputing your chosen values, press add to queue.\n\n"
+        HelpMessage += "The 'Connect' macro needs to run for MacroQueue to connect to the STM's software.  It will stay connected unless the software is closed or the 'Disconnect' macro is run.  \n\n"
+        HelpMessage += "You may right click a function in the queue to edit the parameters as long as the function is not currently running.  \n\n"
+        HelpMessage += "You may pause the queue by pressing 'Pause after Function'.  It will finish the current function and then pause. \n\n"
+        HelpMessage += "Clear Queue will cancel the current function, remove all the functions in the queue, and pause the queue incase you place anything else in the queue.\n\n\n\n\n"
+        HelpMessage += "\n\n\n"
+        HelpMessage += "When inputing numerical parameters, you may simultaneously add several items to the queue in two ways. \n"
+        HelpMessage += "You may input either 1,3,7,9 or 1;3;7;9 and 4 macros will be added to the queue, each with a different value of the parameter. \n"
+        HelpMessage += "If you want the values to be evenly spaced, you may also input -1,1,0.1.  This will add 21 parameters to the queue, from -1 to 1 with a step size of 0.1. The format is (Start, End, Step size).  Writing -1,1,0.1 is identical to writing -1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1\n"
+        HelpMessage += "If you want to input only 3 values, you may use semicolons ;.  -1;1;0.1 will not be expanded.\n\n"
+        HelpMessage += "It is important to note that in the macros after the first, only the functions after the expanded function are included.  \n"
+        HelpMessage += "For example, if there was a macro to (1) Set a BField, (2) wait some time, (3) set the bias, and (4) scan,\n"
+        HelpMessage += "and we wanted to take two scans with a BField = 1T and biases -0.8 and 0.8, you can input -0.8,0.8 to the bias.\n"
+        HelpMessage += "There will be 2 macros added to the queue.  The first will have all 4 functions.  It will set the bias to -0.8.  \n"
+        HelpMessage += "The second macro will only set the bias to 0.8 and scan.  \n"
+        HelpMessage += "If you wanted 4 scans, with BField = -1,1 and biases=-0.8,0.8,\n"
+        HelpMessage += "you may input all the parameters and 4 macros will be added to the queue.\n"
+        HelpMessage += "The first and third macro will (1) set the BField, (2) wait some time, (3) set the bias to -0.8, and scan.  The second and fourth will only set the set the bias to 0.8 and scan.\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Basic Usage")
         MyMessage.ShowModal()
         return 
     def MakeAMacroHelp(self, event):
-        HelpMessage = "Not yet written.\n"
-        HelpMessage += "Saving for last.\n"
+        HelpMessage = "Go to Macro -> Make New Macro\n"
+        HelpMessage += "    Or right click an existing macro, and choose Edit from the menu.\n"
+        HelpMessage += "Choose the functions that you would like to be in the macro.\n"
+        HelpMessage += "    You may change the order or remove a function in the macro in the panel on the right.\n"
+        HelpMessage += "Choose a name for your macro.  If it's a pre-existing macro and you do not change the name, the original macro will be overwriten.\n"
+        HelpMessage += "Press Next to choose the default parameters of your macro.\n\n\n"
+        HelpMessage += "Each function has a checkbox that indicates whether the function is included by default in the macro.\n"
+        HelpMessage += "You may uncheck the box if you do not want the function to be included by default.  This is useful for functions that you only occasionally want to use in the macro.\n\n"
+        HelpMessage += "You may choose the default value for each parameter of each function. \n"
+        HelpMessage += "You may choose to freeze the parameter.  This will remove the option to change the parameter when adding it to the queue.  It simplifies the macro in exchange for less control.\n"
+        HelpMessage += "\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Make a Macro")
         MyMessage.ShowModal()
         return
     def WriteANewFunctionHelp(self, event):
-        HelpMessage = "Not yet written.\n"
-        HelpMessage += "Saving for last.\n"
+        HelpMessage = '''Go to File -> Open Source Folder.
+Add the function to the .py file that corresponds to the software you want it to work with.
+Open and close MacroQueue.  Your function can now be added to a macro.
+
+
+The parameters of your function must have default values so that MacroQueue knows what the datatype to allow.
+    MacroQueue works with floats, booleans, and strings. 
+    If you only want the user to choose from a finite number of options, you may also put a list as the default parameter.  
+    The user will be able to choose a single list entry to be used.
+
+As of 6/1/2022, you may place comments directly above the function to give MacroQueue info on the parameters.
+    The comments have to be directly above the relavent function with no spaces inbetween.
+    The format has to be exactly:
+        # Name=UNIT; this is the tool tip for a parameter called Name that has the unit "UNIT" 
+        # Name; this is the tool tip for a parameter called Name that has the unit "UNIT" 
+# Speed=The speed the tip moves in nm/s, s/line, or ms/pixel
+
+
+
+
+Here is an example from RHK.py:
+
+# Setpoint=pA;The current setpoint in pA
+def Set_Setpoint(Setpoint=100):
+    Setpoint *= 1e-12 #Convert from pA to A (RHK uses A)
+    Message = f"SetHWSubParameter, Z PI Controller 1, Set Point, Value, {Setpoint}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
+'''
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Write a new function")
         MyMessage.ShowModal()
         return
@@ -830,7 +885,8 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                     FunctionDict["OnClose"]()
                 except:
                     pass
-            break
+            if self.Closing:
+                break
         if Message[0] == 'StartFunction':
             Name = None
             try:

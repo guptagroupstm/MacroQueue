@@ -3,6 +3,7 @@ import time
 import win32com.client
 from time import time as timer
 import pyvisa
+import pythoncom
 import wx
 import threading
 
@@ -14,11 +15,11 @@ BField = None
 BFieldControlThread = None
 BFieldPowerControl = None
 MacroQueueSelf = None
-
 OnCloseFunctions = []
 
 def Initialize():
     global STM, OnCloseFunctions
+    pythoncom.CoInitialize()
     STM = win32com.client.Dispatch("pstmafm.stmafmrem")
     time.sleep(0.1)
     # OnCloseFunctions.append()
@@ -38,9 +39,10 @@ def OnClose():
         pass
 
 
-
 # B=T;The magnetic field strength in T
 def Set_B_Field(B=1):
+    # Kepco BOP 400W bipolar power supply
+    # https://www.kepcopower.com/support/bop-operator-r7.pdf
     global BField, BFieldPowerControl, BFieldControlThread
     # Ramp_speed and Ramp_amount used to be parameters.
     # Ramp_speed=s;How often steps are taken in seconds
@@ -70,29 +72,31 @@ def Set_B_Field(B=1):
 
         BFieldPowerControl.read_termination = '\n'
         BFieldPowerControl.write_termination = '\n'
-        if eval(BFieldPowerControl.query('OUTPUT?'))==True:
-            BFieldPowerControl.write('OUTPUT OFF')
+        BFieldPowerControl.write('OUTPUT OFF')
 
+    if eval(BFieldPowerControl.query('OUTPUT?'))==False:
         BFieldPowerControl.write('FUNC:MODE VOLT')
         BFieldPowerControl.write('VOLT 0')
         BFieldPowerControl.write('CURR 10.1')
         BFieldPowerControl.write('OUTPUT ON')
 
 
-    if BFieldControlThread is None:
-        def BFieldControlThreadFunction():
-            pass
-        # BFieldControlThread = 
+    # if BFieldControlThread is None:
+    #     def BFieldControlThreadFunction():
+    #         pass
+    #     # BFieldControlThread = 
     FinalCurrent = B*10
-    CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
     CurrentVoltage = float(BFieldPowerControl.query('MEAS:VOLT?'))
+    BFieldPowerControl.write(f'VOLT {CurrentVoltage}')
+    CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
     InitialCurrent = CurrentCurrent
     BField = CurrentCurrent/10
     Increasing = 1 if FinalCurrent > CurrentCurrent else -1
 
     # CurrentCurrent + Ramp_amount is a somewhat reasonable approximation for the next step
     StartTime = timer()
-    while Increasing*round(CurrentCurrent,3) < Increasing*FinalCurrent - Ramp_amount and not Cancel: 
+    # OutgoingQueue.put(("SetStatus",(f"{CurrentCurrent},{FinalCurrent},{Increasing}",4)))
+    while ((Increasing*round(CurrentCurrent,3) < Increasing*FinalCurrent - Ramp_amount) or (CurrentVoltage <=  -0.02 and CurrentVoltage >= -0.03)) and not Cancel: 
         CurrentVoltage += Increasing*Ramp_amount
         CurrentVoltage = round(CurrentVoltage,3)
         BFieldPowerControl.write(f'VOLT {CurrentVoltage}')
@@ -103,28 +107,47 @@ def Set_B_Field(B=1):
             time.sleep(Ramp_speed - (timer() - StartTime))
         BField = CurrentCurrent/10
         Percent = (CurrentCurrent-InitialCurrent)*100/(FinalCurrent-InitialCurrent)
-        # print(CurrentVoltage,MeasuredVoltage,CurrentCurrent,round(Percent,2))
         OutgoingQueue.put(("SetStatus",(f"Ramp {round(Percent,1)}% Complete",2)))
 
 
+    # Ramp_amount /= 2
+    # NOverShoots = 0
+    # Increasing = 1 if FinalCurrent > CurrentCurrent else -1
+    # while (Increasing*round(CurrentCurrent,5) < Increasing*FinalCurrent - Ramp_amount) and not Cancel and NOverShoots < 5: 
+    #     CurrentVoltage += Increasing*Ramp_amount
+    #     CurrentVoltage = round(CurrentVoltage,6)
+    #     BFieldPowerControl.write(f'VOLT {CurrentVoltage}')
+    #     StartTime = timer()
+    #     CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
+    #     MeasuredVoltage = float(BFieldPowerControl.query('MEAS:VOLT?'))
+    #     if Ramp_speed > (timer() - StartTime):
+    #         time.sleep(Ramp_speed - (timer() - StartTime))
+    #     BField = CurrentCurrent/10
 
-    # # TODO:
-    # # Make a thread that keeps it at this current value
+    #     OldIncreasing = Increasing
+    #     Increasing = 1 if FinalCurrent > CurrentCurrent else -1
+    #     if Increasing != OldIncreasing:
+    #         Ramp_amount /= 2
+    #         NOverShoots += 1
+
+
 
     if Cancel:
         OutgoingQueue.put(("SetStatus",(f"",2)))
+    else:
+        OutgoingQueue.put(("SetStatus",(f"Ramp 100% Complete",2)))
     if STM is not None:
-        STM.setp('MEMO.SET', f"B = {BField} T")
+        STM.setp('MEMO.SET', f"B = {round(BField,1)} T")
 
 # Ramp_speed=s;How often steps are taken in seconds
 # Ramp_amount=mV;How much the voltage is changed for a single step
 def Turn_B_Field_Off():
-    global BField, BFieldPowerControl
     Set_B_Field(0)
+    global BField, BFieldPowerControl
     BFieldPowerControl.write('OUTPUT OFF')
     BField = None
-    memo = 'B = 0T; Output Off.'
-    STM.setp('MEMO.SET', memo)
+    if STM is not None:
+        STM.setp('MEMO.SET', 'B = 0T; Output Off.')
 
 # # Ramp_speed=s;How often steps are taken in seconds
 # # Ramp_amount=mV;How much the voltage is changed for a single step
@@ -135,17 +158,120 @@ def Turn_B_Field_Off():
 #     # STM.setp('VERTMAN.IVTABLE',tuple(map(tuple,NewTable)))
 #     pass
 
-# def Approach(Parameter1= 0):
-#     pass
+ChannelDict = {'Y':0,'X':1,'Z':2}
+DirDict = {'p':0,'n':1}
 
-# def Z_Course_Step_Out(Parameter1= 0):
-#     pass
+
+def Approach():
+    STM.setp('HVAMPCOARSE.CHK.BURST.Z','OFF')
+
+
+    STM.setp('HVAMPCOARSE.APPROACH.START','ON')
+    while not STM.getp('HVAMPCOARSE.APPROACH.Finished','') and not Cancel:
+        time.sleep(0.01)
+        pass
+    if Cancel:
+        STM.setp('HVAMPCOARSE.APPROACH.STOP','ON')
+    if not Cancel:
+        time.sleep(1)
+    if not Cancel:
+        ZVoltage = STM.signals1data(2,0.1,5)
+        if ZVoltage > 300:
+            STM.slider(ChannelDict['Z'],DirDict['n'],0)
+            ZVoltage = STM.signals1data(2,0.1,5)
+
+    
+# NBursts=Number of Z steps to retract
+def Z_Course_Steps_Out(NBursts = 3):
+    STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
+    for i in range(NBursts):
+        STM.slider(ChannelDict['Z'],DirDict['p'],0)
 
 # def Z_Course_Step_In(Parameter1= 0):
 #     pass
 
-# def Course_Step(X=0,Y=0):
-#     pass
+
+# Burst_XY=Check Burst XY in the Course Positioning Form
+def Burst_XY(Burst_XY=True):    
+    if Burst_XY:
+        STM.setp('HVAMPCOARSE.CHK.BURST.XY','ON')
+    else:
+        STM.setp('HVAMPCOARSE.CHK.BURST.XY','OFF')
+
+# Burst_XY=Check Burst Z in the Course Positioning Form
+def Burst_Z(Burst_Z=True):
+    if Burst_Z:
+        STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
+    else:
+        STM.setp('HVAMPCOARSE.CHK.BURST.Z','OFF')
+
+
+CourseX = 0
+CourseY = 0
+def Define_as_Course_Origin():
+    global CourseX,CourseY
+    CourseX = 0
+    CourseY = 0
+
+# X_Position=The X position to course move to.
+# NSteps_Out=The number of Z steps to retract before course moving in X
+def XCourse_Step(X_Position=0,NSteps_Out=3):
+    STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
+    for i in range(NSteps_Out):
+        STM.slider(ChannelDict['Z'],DirDict['p'],0)
+    XSteps = int(X_Position - CourseX)
+    if XSteps == 0:
+        pass
+    elif XSteps > 0:
+        for i in range(np.abs(XSteps)):
+            STM.slider(ChannelDict['X'],DirDict['p'],0)
+    elif XSteps < 0:
+        for i in range(np.abs(XSteps)):
+            STM.slider(ChannelDict['X'],DirDict['n'],0)
+
+# Y_Position=The Y position to course move to.
+# NSteps_Out=The number of Z steps to retract before course moving in Y
+def YCourse_Step(Y_Position=0,NSteps_Out=0):
+    STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
+    for i in range(NSteps_Out):
+        STM.slider(ChannelDict['Z'],DirDict['p'],0)
+    YSteps = int(Y_Position - CourseY)
+    if YSteps == 0:
+        pass
+    elif YSteps > 0:
+        for i in range(np.abs(YSteps)):
+            STM.slider(ChannelDict['Y'],DirDict['p'],0)
+    elif YSteps < 0:
+        for i in range(np.abs(YSteps)):
+            STM.slider(ChannelDict['Y'],DirDict['n'],0)
+
+
+def AutoPhase():
+    Bias = STM.getp('SCAN.BIASVOLTAGE.VOLT','')
+    STM.setp('LOCK-IN.MODE','Internal ')
+    STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
+    time.sleep(3)
+    STM.setp('LOCK-IN.BTN.AUTOPHASE','ON')
+    time.sleep(1)
+    STM.setp('LOCK-IN.MODE','Internal + Spectrum only')
+    STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
+
+# Lockin_Freq=Hz;The lock-in frequency in Hz
+def Set_LockIn_Frequency(Lockin_Freq=877):
+    STM.setp('LOCK-IN.FREQ.HZ',Lockin_Freq)
+
+
+# Lockin_RC=Hz;The lock-in time constant in Hz
+def Set_LockIn_TimeConstant(Lockin_RC=100):
+    STM.setp('LOCK-IN.RC.HZ',Lockin_RC)
+
+# Lockin_Amp=mV;The lock-in voltage amplitude in mV
+def Set_LockIn_Amplitude(Lockin_Amp=100):
+    STM.setp('LOCK-IN.AMPLITUDE.MVPP',Lockin_Amp)
+
+# Lockin_RefA=mV;The lock-in reference voltage amplitude in mV
+def Set_LockIn_RefAmplitude(Lockin_RefA=2000):
+    STM.setp('LOCK-IN.REFAMPLITUDE.MVPP',Lockin_RefA)
 
 # Bias=V;The bias voltage in V
 def Set_Bias(Bias= 0):
@@ -176,8 +302,8 @@ def Set_Scan_Window_Position(HowToSetPosition=['nm','Image Coord','Voltage'],XOf
 # YOffset=The Y X position of the tip in nm, or Image Coordinate, or V
 def Fine_Move_Tip(HowToSetPosition=['nm','Image Coord','Voltage'],XOffset=0,YOffset=0):
     if HowToSetPosition == 'nm':
-        # XOffset *= 10
-        # YOffset *= 10
+        XOffset *= 10
+        YOffset *= 10
         # Not sure if this command actually uses nm
         STM.setp('STMAFM.CMD.SETXYOFF.NM',(XOffset,YOffset))
     elif HowToSetPosition == 'Image Coord':
@@ -232,7 +358,7 @@ def Set_Recorded_Channels(Topography=True,Current=True,LockInX=True):
     if Topography:
         Channels.append('TOPOGRAPHY')
     if Current:
-        Channels.append('TOPOGRAPHY')
+        Channels.append('CURRENT')
     if LockInX:
         Channels.append('Lock-in X')
     Channels = list(Channels)
@@ -256,33 +382,42 @@ def Scan():
         while not Cancel and timer() - StartCheckTime < CheckTime:
             Percent = round(100*((timer() - StartTime)/ScanTime),1)
             OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
-            time.sleep(0.5)
+            time.sleep(1)
     if Cancel:
         STM.setp('STMAFM.BTN.STOP',"")
         OutgoingQueue.put(("SetStatus",(f"",2)))
+        while Status != 0:
+            Status = STM.getp('STMAFM.SCANSTATUS','')
 
 def dIdV_Scan():
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
     Lines = float(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
     Speed = float(STM.getp('SCAN.SPEED.NM/SEC',""))
-    Time = (np.floor(Lines * Size/Speed)-5)/10
-    Time = 0 if Time <= 0 else Time
+    ScanTime = 2*Lines * Size/Speed
+    CheckTime = int(np.ceil(ScanTime/500))
     # STM.setp('LOCK-IN.CHANNEL','ADC0')
     STM.setp('LOCK-IN.MODE','Internal ')
     # STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT','Lock-in X'))
     time.sleep(1)
     STM.setp('STMAFM.BTN.START' ,'')
+    StartTime = timer()
     Status = STM.getp('STMAFM.SCANSTATUS','')
     while Status == 2 and not Cancel:
         Status = STM.getp('STMAFM.SCANSTATUS','')
-        time.sleep(1)
-        i = 0
-        while not Cancel and i < Time:
-            i+=1
+        StartCheckTime = timer()
+        while not Cancel and timer() - StartCheckTime < CheckTime:
+            Percent = round(100*((timer() - StartTime)/ScanTime),1)
+            OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
             time.sleep(1)
     if Cancel:
         STM.setp('STMAFM.BTN.STOP','')
+        OutgoingQueue.put(("SetStatus",(f"",2)))
+        while Status != 0:
+            Status = STM.getp('STMAFM.SCANSTATUS','')
+    
+    Bias = STM.getp('SCAN.BIASVOLTAGE.VOLT','')
     STM.setp('LOCK-IN.MODE','Internal + Spectrum only')
+    STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
 
 
 # # Initial_Voltage=V;The starting voltage in V
@@ -300,38 +435,16 @@ def dIdV_Scan():
 #     pass
 
 def Spectrum():
-    Status = STM.getp('STMAFM.SCANSTATUS','')
-    print(Status)
+    # Status = STM.getp('STMAFM.SCANSTATUS','')
+    # print(Status)
     STM.vertspectrum()
     # STM.Setp('VERTMAN.BTN.SINGLE_SPECTRUM','')
-    Status = STM.getp('STMAFM.SCANSTATUS','')
-    print(Status)
+    # Status = STM.getp('STMAFM.SCANSTATUS','')
+    # print(Status)
 
-
-# # B=The magnetic field strength in mT
-# def Set_B_Field(B):
-#     rm=pyvisa.ResourceManager()
-#     instName = 'GPIB0::' + GPIBaddress + '::INSTR'
-#     inst=rm.open_resource(instName)
-#     inst.read_termination = '\n'
-#     inst.write_termination = '\n'
-#     if eval(inst.query('OUTPUT?'))==True:
-#         inst.query('OUTPUT OFF')
-
-#     inst.write('FUNC:MODE VOLT')
-#     inst.write('VOLT 0')
-#     inst.write('CURR 10.1')
-#     time.sleep(0.1)
-#     inst.write('OUTPUT ON')
-#     inputString = 'VOLT '+ setValue
-#     inst.write(inputString)
 
 
 if __name__ == "__main__":
     pass
-    # Set_BField(0.1)
-    # Set_BField(0)
-    # Initialize()
-    # Scan()
-    # Set_Scan_Image_Size('Resolution',1)
-    # Set_Scan_Window_Position(XOffset=0,YOffset=0)
+    Initialize()
+    Scan()

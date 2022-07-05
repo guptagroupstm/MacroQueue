@@ -27,7 +27,7 @@ def OnClose():
         Socket.shutdown(2)
         Socket.close()
 
-def Approach(ApproachToHalfway=True):
+def Approach():
     Message = f'GetHWSubParameter, Z PI Controller 1, Upper Bound, Value\n'
     Socket.send(Message.encode())
     UpperBound = float(Socket.recv(BUFFER_SIZE))
@@ -62,7 +62,10 @@ def Approach(ApproachToHalfway=True):
                 break
             ZPosition0 = ZPosition1
 
+
+    # This part hasn't been tested yet:
     DriftWaitTime = 5
+    ApproachToHalfway=False
     if ApproachToHalfway:
         if ZPosition1 < LowerBound + (UpperBound - LowerBound)/4 and not Cancel:
             Message = f'ReadChannelValue, z0-src\n'
@@ -116,8 +119,8 @@ def Z_Course_Steps_Out(NSteps = 3, WaitBetween=2):
                 Message = "StopProcedure, Pan Single Step Out\n"
                 Socket.send(Message.encode())
                 data = Socket.recv(BUFFER_SIZE)
-def Z_Course_Step_In():
-    pass
+# def Z_Course_Step_In():
+#     pass
 # def Course_Step(X=0,Y=0):
 #     pass
 
@@ -228,8 +231,6 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','ms/pixel'],Speed=2):
         Socket.send(Message.encode())
         Size = float(Socket.recv(BUFFER_SIZE))
         Message = f"SetSWParameter, Scan Area Window, Scan Speed, {Size/Speed}\n"
-        # Setting the Line Time only temperorily changes the text in the software.  Doesn't actualy change the speed.
-        # Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
     if HowToSetSpeed == 'ms/pixel':
@@ -243,7 +244,6 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','ms/pixel'],Speed=2):
         Socket.send(Message.encode())
         Size = float(Socket.recv(BUFFER_SIZE))
         Message = f"SetSWParameter, Scan Area Window, Scan Speed, {Size/(NPixels*Speed/1000)}\n"
-        # Message = f"SetSWParameter, Scan Area Window, Line Time, {NPixels*Speed/1000}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
 
@@ -330,6 +330,7 @@ def AutoPhase():
         data = Socket.recv(BUFFER_SIZE)
 
 def RampZandPulseV():
+    # This function hasn't been tested yet:
     try:
         data = Socket.recv(BUFFER_SIZE)
     except:

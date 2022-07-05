@@ -104,31 +104,6 @@
    false
   ],
   [
-   "Set Integral Gain",
-   {
-    "IntegralGain": {
-     "DefaultValue": "1",
-     "Tooltip": "The integral gain of the z piezo.",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "um/s"
-    }
-   },
-   false
-  ],
-  [
-   "Set Proportional Gain",
-   {
-    "ProportionalGain": {
-     "DefaultValue": "1e-17",
-     "Tooltip": "The proportional gain.",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    }
-   },
-   false
-  ],
-  [
    "Set Setpoint",
    {
     "Setpoint": {
@@ -253,31 +228,6 @@
    false
   ],
   [
-   "Set Integral Gain",
-   {
-    "IntegralGain": {
-     "DefaultValue": "1",
-     "Tooltip": "The integral gain of the z piezo.",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "um/s"
-    }
-   },
-   false
-  ],
-  [
-   "Set Proportional Gain",
-   {
-    "ProportionalGain": {
-     "DefaultValue": "1e-17",
-     "Tooltip": "The proportional gain.",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    }
-   },
-   false
-  ],
-  [
    "Set Setpoint",
    {
     "Setpoint": {
@@ -395,46 +345,6 @@
   ],
   [
    "dIdV Spectra",
-   {},
-   true
-  ]
- ],
- "Tip Pulse": [
-  [
-   "Move Tip",
-   {
-    "XOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The X center of the image in nm",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "nm"
-    },
-    "YOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The Y center of the image in nm",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "nm"
-    }
-   },
-   false
-  ],
-  [
-   "Wait",
-   {
-    "WaitTime": {
-     "DefaultValue": "1",
-     "Tooltip": "The time to wait in seconds",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "s"
-    }
-   },
-   false
-  ],
-  [
-   "RampZandPulseV",
    {},
    true
   ]
