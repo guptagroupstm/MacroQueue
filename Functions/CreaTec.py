@@ -164,6 +164,7 @@ DirDict = {'p':0,'n':1}
 
 def Approach():
     STM.setp('HVAMPCOARSE.CHK.BURST.Z','OFF')
+    STM.setp('HVAMPCOARSE.CHK.RETRACT_TIP_AFTER_APPROACH','OFF')
 
 
     STM.setp('HVAMPCOARSE.APPROACH.START','ON')
@@ -175,12 +176,19 @@ def Approach():
     if not Cancel:
         time.sleep(1)
     if not Cancel:
+        # PulseHeight = STM.getp('HVAMPCOARSE.PULSEHEIGHT.VOLT','')
+        # PulseDuration = STM.getp('HVAMPCOARSE.PULSEDURATION.SEC','')
+        # STM.setp('HVAMPCOARSE.PULSEHEIGHT.VOLT',35)
+        # STM.setp('HVAMPCOARSE.PULSEDURATION.SEC',0.001)
         ZVoltage = STM.signals1data(2,0.1,5)
         if ZVoltage > 300:
             STM.slider(ChannelDict['Z'],DirDict['n'],0)
             ZVoltage = STM.signals1data(2,0.1,5)
+        # STM.setp('HVAMPCOARSE.PULSEHEIGHT.VOLT',PulseHeight)
+        # STM.setp('HVAMPCOARSE.PULSEDURATION.SEC',PulseDuration)
 
     
+
 # NBursts=Number of Z steps to retract
 def Z_Course_Steps_Out(NBursts = 3):
     STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
@@ -214,8 +222,9 @@ def Define_as_Course_Origin():
     CourseY = 0
 
 # X_Position=The X position to course move to.
-# NSteps_Out=The number of Z steps to retract before course moving in X
-def XCourse_Step(X_Position=0,NSteps_Out=3):
+# Y_Position=The Y position to course move to.
+# NSteps_Out=The number of Z steps to retract before course moving in X and Y
+def XYCourse_Step(NSteps_Out=3,X_Position=0,Y_Position=0):
     STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
     for i in range(NSteps_Out):
         STM.slider(ChannelDict['Z'],DirDict['p'],0)
@@ -229,12 +238,7 @@ def XCourse_Step(X_Position=0,NSteps_Out=3):
         for i in range(np.abs(XSteps)):
             STM.slider(ChannelDict['X'],DirDict['n'],0)
 
-# Y_Position=The Y position to course move to.
-# NSteps_Out=The number of Z steps to retract before course moving in Y
-def YCourse_Step(Y_Position=0,NSteps_Out=0):
-    STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
-    for i in range(NSteps_Out):
-        STM.slider(ChannelDict['Z'],DirDict['p'],0)
+    
     YSteps = int(Y_Position - CourseY)
     if YSteps == 0:
         pass
@@ -246,12 +250,17 @@ def YCourse_Step(Y_Position=0,NSteps_Out=0):
             STM.slider(ChannelDict['Y'],DirDict['n'],0)
 
 
+
 def AutoPhase():
     Bias = STM.getp('SCAN.BIASVOLTAGE.VOLT','')
     STM.setp('LOCK-IN.MODE','Internal ')
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
     time.sleep(3)
     STM.setp('LOCK-IN.BTN.AUTOPHASE','ON')
+    time.sleep(1)
+    Phase = STM.getp('LOCK-IN.PHASE1.DEG','')
+    STM.setp('LOCK-IN.PHASE1.DEG',float(Phase)-90)
+
     time.sleep(1)
     STM.setp('LOCK-IN.MODE','Internal + Spectrum only')
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
@@ -446,5 +455,5 @@ def Spectrum():
 
 if __name__ == "__main__":
     pass
-    Initialize()
-    Scan()
+    # Initialize()
+    # Scan()

@@ -121,9 +121,78 @@ def Z_Course_Steps_Out(NSteps = 3, WaitBetween=2):
                 data = Socket.recv(BUFFER_SIZE)
 # def Z_Course_Step_In():
 #     pass
-# def Course_Step(X=0,Y=0):
-#     pass
+# X_Position=The X position to course move to.
+# Y_Position=The Y position to course move to.
+# NSteps_Out=The number of Z steps to retract before course moving in X and Y
+def XYCourse_Step(NSteps_Out=3,X_Position=0,Y_Position=0):
+    WaitBetween = 2
+    for i in range(NSteps_Out):
+        if not Cancel:
+            Message = "StartProcedure, Pan Single Step Out\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            time.sleep(WaitBetween)
+            while not Cancel:
+                try:
+                    data = Socket.recv(BUFFER_SIZE)
+                    print(f"Course Step Out Response: {data}")
+                    break
+                except Exception as e:
+                    print(e)
+            if Cancel:
+                Message = "StopProcedure, Pan Single Step Out\n"
+                Socket.send(Message.encode())
+                data = Socket.recv(BUFFER_SIZE)
 
+    XSteps = int(X_Position - CourseX)
+    if XSteps == 0:
+        pass
+    elif XSteps > 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, + X\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(XSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+            pass
+    elif XSteps < 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, - X\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(XSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+
+
+
+    YSteps = int(Y_Position - CourseY)
+    if YSteps == 0:
+        pass
+    elif YSteps > 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, + Y\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(YSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+            pass
+    elif YSteps < 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, - Y\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(YSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+
+        
 # Bias=V;The bias voltage in Volts
 def Set_Bias(Bias= 1):
     Message = f"SetSWParameter, STM Bias, Value, {Bias}\n"

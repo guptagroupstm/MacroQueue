@@ -250,8 +250,9 @@ class MainFrame(GUIDesign.MyFrame):
 
         # for FunctionName in self.Functions[self.SettingsDict['Software']].keys():
         for FunctionName in AllTheMacros.keys():
-            FunctionButton = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 100,30 ), 0 )
+            FunctionButton = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 120,30 ), 0 )
             FunctionButton.Bind( wx.EVT_BUTTON, self.OnFunctionButton )
+            FunctionButton.SetToolTip(FunctionName)
             FunctionButtonSizer.Add(FunctionButton,0, wx.ALL, 5)
             def FunctionRightClick(event):
                 ThisButton = event.GetEventObject()
@@ -536,7 +537,6 @@ class MainFrame(GUIDesign.MyFrame):
             self.AddToQueue.append([MacroName,Macro])
             # self.AddSingleMacroToQueue(MacroName,Macro)
     def AddSingleMacroToQueue(self,MacroName,Macro):
-        StartTime = timer()
         thisSettingString = ""
         for Function,Included in Macro:
             if Included:
