@@ -5,20 +5,23 @@ MacroQueueSelf = None
 
 # WaitTime=s;The time to wait in seconds
 def Wait(WaitTime=1):
-    sleep(WaitTime)
+    while WaitTime > 1 and not Cancel:
+        WaitTime-=1
+        sleep(1)
+    if not Cancel:
+        sleep(WaitTime)
 
 # Index=This has no impact.  It's solely used to repeat the functions.
 def Null(Index=0):
     pass
 
+# Pauses the queue until the resume button is pressed.
 def Pause():
     MacroQueueSelf.Pause()
 
-# def Print(Number=0):
-#     global Cancel
-#     print(Number)
-#     print(Cancel)
-#     print('')
+def Print(Number=0):
+    print(Number)
+    print('')
 
 # # Boolean=Does something if it's true
 # # Choice=Make a choice

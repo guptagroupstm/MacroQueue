@@ -1,3 +1,4 @@
+from asyncio import CancelledError
 import numpy as np
 import time
 import socket
@@ -26,41 +27,172 @@ def OnClose():
         Socket.shutdown(2)
         Socket.close()
 
-# def Approach(Parameter1= 0):
-#     Message = f'GetHWSubParameter, Z PI Controller 1, Upper Bound, Value\n'
-#     Socket.send(Message.encode())
-#     UpperBound = float(Socket.recv(BUFFER_SIZE))
-#     Message = f'GetHWSubParameter, Z PI Controller 1, Lower Bound, Value\n'
-#     Socket.send(Message.encode())
-#     LowerBound = float(Socket.recv(BUFFER_SIZE))
+def Approach():
+    Message = f'GetHWSubParameter, Z PI Controller 1, Upper Bound, Value\n'
+    Socket.send(Message.encode())
+    UpperBound = float(Socket.recv(BUFFER_SIZE))
+    Message = f'GetHWSubParameter, Z PI Controller 1, Lower Bound, Value\n'
+    Socket.send(Message.encode())
+    LowerBound = float(Socket.recv(BUFFER_SIZE))
     
-#     Message = f'SetHWParameter, Z PI Controller 1, Tip Control, Unlimit\n'
-#     Socket.send(Message.encode())
-#     data = Socket.recv(BUFFER_SIZE)
+    Message = f'SetHWParameter, Z PI Controller 1, Tip Control, Unlimit\n'
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
 
-#     time.sleep(0.01)
+    time.sleep(0.01)
     
-#     Message = f'ReadChannelValue, z0-src\n'
-#     Socket.send(Message.encode())
-#     ZPosition = float(Socket.recv(BUFFER_SIZE))
+    Message = f'ReadChannelValue, z0-src\n'
+    Socket.send(Message.encode())
+    ZPosition1 = float(Socket.recv(BUFFER_SIZE))
 
-#     while ZPosition == UpperBound:
-#         Message = f"StartProcedure, Pan Single Step In\n"
-#         Socket.send(Message.encode())
-#         data = Socket.recv(BUFFER_SIZE)
-#         # data = Socket.recv(BUFFER_SIZE)
-#         # time.sleep(0.1)
-#         Message = f'ReadChannelValue, z0-src\n'
-#         Socket.send(Message.encode())
-#         ZPosition = float(Socket.recv(BUFFER_SIZE))
-#     pass
-# def Z_Course_Step_Out(Parameter1= 0):
-#     pass
-# def Z_Course_Step_In(Parameter1= 0):
-#     pass
-# def Course_Step(X=0,Y=0):
-#     pass
+    while np.abs(ZPosition1 - LowerBound) < 1e-9 and not Cancel:
+        Message = f"StartProcedure, Pan Single Step In\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        data = Socket.recv(BUFFER_SIZE)
+        Message = f'ReadChannelValue, z0-src\n'
+        Socket.send(Message.encode())
+        ZPosition0 = float(Socket.recv(BUFFER_SIZE))
+        while True and not Cancel:
+            time.sleep(0.1)
+            Message = f'ReadChannelValue, z0-src\n'
+            Socket.send(Message.encode())
+            ZPosition1 = float(Socket.recv(BUFFER_SIZE))
+            if np.abs(ZPosition1 - ZPosition0) < 1e-9:
+                break
+            ZPosition0 = ZPosition1
 
+
+    # This part hasn't been tested yet:
+    DriftWaitTime = 5
+    ApproachToHalfway=False
+    if ApproachToHalfway:
+        if ZPosition1 < LowerBound + (UpperBound - LowerBound)/4 and not Cancel:
+            Message = f'ReadChannelValue, z0-src\n'
+            Socket.send(Message.encode())
+            ZPosition0 = float(Socket.recv(BUFFER_SIZE))
+            Message = f"StartProcedure, Pan Single Step In\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+            time.sleep(DriftWaitTime)
+            Message = f'ReadChannelValue, z0-src\n'
+            Socket.send(Message.encode())
+            ZPosition1 = float(Socket.recv(BUFFER_SIZE))
+            StepSize = ZPosition1 - ZPosition0
+            while ZPosition1 + StepSize < LowerBound + (UpperBound - LowerBound)/2 and not Cancel:
+                Message = f"StartProcedure, Pan Single Step In\n"
+                Socket.send(Message.encode())
+                data = Socket.recv(BUFFER_SIZE)
+                data = Socket.recv(BUFFER_SIZE)
+                time.sleep(DriftWaitTime)
+                Message = f'ReadChannelValue, z0-src\n'
+                Socket.send(Message.encode())
+                ZPosition0 = float(Socket.recv(BUFFER_SIZE))
+                StepSize = ZPosition0 - ZPosition1
+                ZPosition1 = ZPosition0
+                    
+
+
+
+# NSteps=The number of steps out to take
+# WaitBetween=S;The time to wait between steps
+def Z_Course_Steps_Out(NSteps = 3, WaitBetween=2):
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
+    for i in range(NSteps):
+        if not Cancel:
+            Message = "StartProcedure, Pan Single Step Out\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            time.sleep(WaitBetween)
+            while not Cancel:
+                try:
+                    data = Socket.recv(BUFFER_SIZE)
+                    print(f"Course Step Out Response: {data}")
+                    break
+                except Exception as e:
+                    print(e)
+            if Cancel:
+                Message = "StopProcedure, Pan Single Step Out\n"
+                Socket.send(Message.encode())
+                data = Socket.recv(BUFFER_SIZE)
+# def Z_Course_Step_In():
+#     pass
+# X_Position=The X position to course move to.
+# Y_Position=The Y position to course move to.
+# NSteps_Out=The number of Z steps to retract before course moving in X and Y
+def XYCourse_Step(NSteps_Out=3,X_Position=0,Y_Position=0):
+    WaitBetween = 2
+    for i in range(NSteps_Out):
+        if not Cancel:
+            Message = "StartProcedure, Pan Single Step Out\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            time.sleep(WaitBetween)
+            while not Cancel:
+                try:
+                    data = Socket.recv(BUFFER_SIZE)
+                    print(f"Course Step Out Response: {data}")
+                    break
+                except Exception as e:
+                    print(e)
+            if Cancel:
+                Message = "StopProcedure, Pan Single Step Out\n"
+                Socket.send(Message.encode())
+                data = Socket.recv(BUFFER_SIZE)
+
+    XSteps = int(X_Position - CourseX)
+    if XSteps == 0:
+        pass
+    elif XSteps > 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, + X\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(XSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+            pass
+    elif XSteps < 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, - X\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(XSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+
+
+
+    YSteps = int(Y_Position - CourseY)
+    if YSteps == 0:
+        pass
+    elif YSteps > 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, + Y\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(YSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+            pass
+    elif YSteps < 0:
+        Message = "SetProcParameter, WalkPMC, Move Direction, - Y\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+        for i in range(np.abs(YSteps)):
+            Message = f"StartProcedure, WalkPMC\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            data = Socket.recv(BUFFER_SIZE)
+
+        
 # Bias=V;The bias voltage in Volts
 def Set_Bias(Bias= 1):
     Message = f"SetSWParameter, STM Bias, Value, {Bias}\n"
@@ -126,6 +258,19 @@ def Set_Scan_Window_Angle(Angle=0):
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
 
+# IntegralGain=um/s;The integral gain of the z piezo.
+def Set_Integral_Gain(IntegralGain=1):
+    IntegralGain*=1e-6
+    Message = f"SetHWSubParameter, Z PI Controller 1, Integral Gain, {IntegralGain}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    
+# ProportionalGain=The proportional gain.
+def Set_Proportional_Gain(ProportionalGain=1e-17):
+    Message = f"SetHWSubParameter, Z PI Controller 1, Proportional Gain, {ProportionalGain}\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
 # NPixels=The number of pixels in each row and each column
 def Set_NPixels(NPixels=512):
     Message = f"SetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame, {NPixels}\n"
@@ -155,8 +300,6 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','ms/pixel'],Speed=2):
         Socket.send(Message.encode())
         Size = float(Socket.recv(BUFFER_SIZE))
         Message = f"SetSWParameter, Scan Area Window, Scan Speed, {Size/Speed}\n"
-        # Setting the Line Time only temperorily changes the text in the software.  Doesn't actualy change the speed.
-        # Message = f"SetSWParameter, Scan Area Window, Line Time, {Speed}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
     if HowToSetSpeed == 'ms/pixel':
@@ -170,13 +313,14 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','ms/pixel'],Speed=2):
         Socket.send(Message.encode())
         Size = float(Socket.recv(BUFFER_SIZE))
         Message = f"SetSWParameter, Scan Area Window, Scan Speed, {Size/(NPixels*Speed/1000)}\n"
-        # Message = f"SetSWParameter, Scan Area Window, Line Time, {NPixels*Speed/1000}\n"
         Socket.send(Message.encode())
         data = Socket.recv(BUFFER_SIZE)
 
 # XOffset=nm;The X center of the image in nm
 # YOffset=nm;The Y center of the image in nm
 def Move_Tip(XOffset=0,YOffset=0):
+    XOffset *= 1e-9
+    YOffset *= 1e-9
     Message = f"SetSWParameter, Scan Area Window, Tip X in scan coordinates, {XOffset}\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
@@ -226,18 +370,88 @@ def Move_To_Image_Start(Wait_Time=10):
         except Exception as e:
             print(e)
             pass
-    time.sleep(Wait_Time)
 
-# def dIdV_Spectra():
-#     pass
+    while Wait_Time > 1 and not Cancel:
+        Wait_Time-=1
+        time.sleep(1)
+    if not Cancel:
+        time.sleep(Wait_Time)
 
-# def PixelScan():
-#     pass
+def AutoPhase():
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
+    Message = "StartProcedure, Phase Rotate (dI-dV)\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+
+    while not Cancel:
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+            print(f"Scan Data: {data}")
+            break
+        except Exception as e:
+            print(e)
+    if Cancel:
+        Message = "StopProcedure, Phase Rotate (dI-dV)\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+
+def RampZandPulseV():
+    # This function hasn't been tested yet:
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
+    # Message = f"GetSWSubItemParameter, Scan Area Window, Scan Settings, Lines Per Frame\n"
+    # Socket.send(Message.encode())
+    # Lines = float(Socket.recv(BUFFER_SIZE))
+
+    Message = "StartProcedure, Ramp Z and Pulse V\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    while not Cancel:
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+            print(f"Scan Data: {data}")
+            break
+        except Exception as e:
+            print(e)
+    if Cancel:
+        Message = "StopProcedure, Ramp Z and Pulse V\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+
+def dIdV_Spectra():
+    try:
+        data = Socket.recv(BUFFER_SIZE)
+    except:
+        pass
+    
+    Message = "StartProcedure, dI-dV Spectroscopy\n"
+    Socket.send(Message.encode())
+    data = Socket.recv(BUFFER_SIZE)
+    while not Cancel:
+        try:
+            data = Socket.recv(BUFFER_SIZE)
+            print(f"Scan Data: {data}")
+            break
+        except Exception as e:
+            print(e)
+            pass
+    if Cancel:
+        Message = "StopProcedure, dI-dV Spectroscopy\n"
+        Socket.send(Message.encode())
+        data = Socket.recv(BUFFER_SIZE)
+
+
 def PixelScan():
     try:
         data = Socket.recv(BUFFER_SIZE)
     except:
         pass
+    Move_To_Image_Start(0)
     Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Alternate Slow Scan, Top Down Only\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
@@ -285,6 +499,7 @@ def Scan():
         data = Socket.recv(BUFFER_SIZE)
     except:
         pass
+    Move_To_Image_Start(0)
     Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Alternate Slow Scan, Top Down Only\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
@@ -332,6 +547,7 @@ def dIdV_Scan():
         data = Socket.recv(BUFFER_SIZE)
     except:
         pass
+    Move_To_Image_Start(0)
     Message = "SetSWSubItemParameter, Scan Area Window, Scan Settings, Alternate Slow Scan, Top Down Only\n"
     Socket.send(Message.encode())
     data = Socket.recv(BUFFER_SIZE)
