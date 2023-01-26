@@ -135,7 +135,7 @@
      "ValueType": "Boolean"
     }
    },
-   true
+   false
   ],
   [
    "Scan",
@@ -280,7 +280,7 @@
      "ValueType": "Boolean"
     }
    },
-   true
+   false
   ],
   [
    "dIdV Scan",
@@ -346,6 +346,61 @@
   ],
   [
    "Scan",
+   {},
+   true
+  ]
+ ],
+ "Connect To RF Generator": [
+  [
+   "Connect To RF Generator",
+   {},
+   true
+  ]
+ ],
+ "set rf pow": [
+  [
+   "Set RF Power",
+   {
+    "Pow": {
+     "DefaultValue": "0",
+     "Tooltip": "The amount of power for the RF generator in dBm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "dBm"
+    }
+   },
+   true
+  ]
+ ],
+ "set rf pow + spec": [
+  [
+   "Set RF Power",
+   {
+    "Pow": {
+     "DefaultValue": "0",
+     "Tooltip": "The amount of power for the RF generator in dBm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "dBm"
+    }
+   },
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   true
+  ],
+  [
+   "Spectrum",
    {},
    true
   ]
