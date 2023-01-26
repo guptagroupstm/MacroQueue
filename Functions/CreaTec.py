@@ -495,8 +495,12 @@ def dIdV_Scan():
 def Spectrum():
     # Status = STM.getp('STMAFM.SCANSTATUS','')
     # print(Status)
-    STM.vertspectrum()
+    # STM.vertspectrum()
+    # STM.btn_vertspec(0,0)
+    Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
+    STM.btn_vertspec(int(Pixels//2)+1,0)
     # STM.Setp('VERTMAN.BTN.SINGLE_SPECTRUM','')
+    # STM.Setp('VERTMAN.BTN.SPEC_OLD_PLACE','')
     # Status = STM.getp('STMAFM.SCANSTATUS','')
     # print(Status)
 
@@ -505,4 +509,5 @@ def Spectrum():
 if __name__ == "__main__":
     pass
     # Initialize()
+    # Spectrum()
     # Scan()
