@@ -32,6 +32,13 @@ class MyFrame ( wx.Frame ):
 
 		self.m_menubar1.Append( self.m_FileMenu, u"File" )
 
+		self.m_OptionsMenu = wx.Menu()
+		self.m_PauseAfterCancel = wx.MenuItem( self.m_OptionsMenu, wx.ID_ANY, u"Pause After Cancel", wx.EmptyString, wx.ITEM_CHECK )
+		self.m_OptionsMenu.Append( self.m_PauseAfterCancel )
+		self.m_PauseAfterCancel.Check( True )
+
+		self.m_menubar1.Append( self.m_OptionsMenu, u"Options" )
+
 		self.m_MacroMenu = wx.Menu()
 		self.m_MakeMacroMenuItem = wx.MenuItem( self.m_MacroMenu, wx.ID_ANY, u"Make New Macro", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_MacroMenu.Append( self.m_MakeMacroMenuItem )

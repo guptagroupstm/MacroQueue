@@ -554,10 +554,10 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             self.TheMacro[i][2] = self.TheMacroCtrls[i]["__Included__"].GetValue()
 
 class MyStartMacroDialog(StartMacroDialog):
-    def __init__(self, parent,MacroLabel,TheDefaultMacro,EdittingMode = False,Index=None):
+    def __init__(self, parent,MacroLabel,TheDefaultMacro,EdittingMode = False,QueueObject=None):
         super().__init__(parent)
         self.SetTitle(MacroLabel)
-        self.QueueIndex = Index
+        self.QueueObject = QueueObject
         self.MacroName = MacroLabel
         self.EdittingMode = EdittingMode
         self.TheStartMacroCtrls = {}
@@ -989,8 +989,8 @@ class MyStartMacroDialog(StartMacroDialog):
                 ThisMacro.append([FunctionInfo,Function['Included']])
             
 
-            ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.Parent.TheQueue[self.QueueIndex][0]]
-            self.Parent.TheQueue[self.QueueIndex][0] = ThisMacro
+            ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.QueueObject[0]]
+            self.QueueObject[0] = ThisMacro
         self.Destroy()
         pass
     def OnCancel(self, event):

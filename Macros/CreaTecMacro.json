@@ -175,23 +175,23 @@
     "Topography": {
      "DefaultValue": true,
      "Tooltip": "",
-     "Frozen": false,
+     "Frozen": true,
      "ValueType": "Boolean"
     },
     "Current": {
      "DefaultValue": true,
      "Tooltip": "",
-     "Frozen": false,
+     "Frozen": true,
      "ValueType": "Boolean"
     },
     "LockInX": {
      "DefaultValue": true,
      "Tooltip": "",
-     "Frozen": false,
+     "Frozen": true,
      "ValueType": "Boolean"
     }
    },
-   false
+   true
   ],
   [
    "Null",

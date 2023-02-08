@@ -441,7 +441,7 @@ class MainFrame(GUIDesign.MyFrame):
                     Macro[1].Refresh()
         return
     def Cancel(self):
-        if not self.Paused:
+        if not self.Paused and self.m_PauseAfterCancel.IsChecked():
             self.Pause()
         self.Functions[self.Software].Cancel = True
         self.Functions["General"].Cancel = True
@@ -536,7 +536,7 @@ class MainFrame(GUIDesign.MyFrame):
         for Macro in TheExpandedMacros:
             self.AddToQueue.append([MacroName,Macro])
             # self.AddSingleMacroToQueue(MacroName,Macro)
-    def AddSingleMacroToQueue(self,MacroName,Macro):
+    def AddSingleMacroToQueue(self,MacroName,Macro,InsertIndex=None):
         thisSettingString = ""
         for Function,Included in Macro:
             if Included:
@@ -553,7 +553,7 @@ class MainFrame(GUIDesign.MyFrame):
         # self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
 
         # Sometimes works:
-        m_FunctionWindow.Bind(wx.EVT_MOTION, self.OnStartDrag)
+        # m_FunctionWindow.Bind(wx.EVT_MOTION, self.OnStartDrag)
 
         Color = wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) if (not self.Paused or self.m_PauseAfterButton.GetLabel() == "Start") else wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE)
         m_FunctionWindow.SetBackgroundColour(Color)
@@ -607,9 +607,12 @@ class MainFrame(GUIDesign.MyFrame):
         m_FunctionWindow.SetSizer( bSizer1 )
         # m_FunctionWindow.Layout()
         bSizer1.Fit( m_FunctionWindow )
-        Index = len(self.TheQueue)
-        self.TheQueue.append([Macro,m_FunctionWindow,m_FunctionNameText])
-        self.m_FunctionNameSizer.Add( m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 )
+        if InsertIndex is None:
+            Index = len(self.TheQueue)
+        else:
+            Index = InsertIndex
+        self.TheQueue.insert(Index,[Macro,m_FunctionWindow,m_FunctionNameText])
+        self.m_FunctionNameSizer.Insert( Index,m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5 ,)
         # self.m_FunctionNameSizer.Insert(Index,m_FunctionWindow, 0, wx.ALL|wx.EXPAND, 5)
         # gauge = wx.Gauge(m_FunctionWindow, range = 20, size = m_FunctionWindow.GetSize(), style = wx.GA_HORIZONTAL)
         # self.m_FunctionNameSizer.Add( gauge, 0, wx.ALL|wx.EXPAND, 5 )
@@ -673,19 +676,20 @@ class MainFrame(GUIDesign.MyFrame):
             self.Paused = True
             MacroLabel = self.TheQueue[Index][2].GetLabel()
             ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.TheQueue[Index][0]]
-            MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,Index=Index)
+            QueueObject=self.TheQueue[Index]
+            MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,QueueObject=QueueObject)
             MyStartMacroDialog.ShowModal()
             self.Paused = OriginallyPaused
             thisSettingString = ""
-            ThisMacro = self.TheQueue[Index][0]
+            ThisMacro = QueueObject[0]
             for Function, Included in ThisMacro:
                 if Included:
                     for key, value in Function['Parameters'].items():
                         thisSettingString+=f"{key} = {value}, "
             thisSettingString = thisSettingString[:-2]
-            for child in self.TheQueue[Index][1].GetChildren():
+            for child in QueueObject[1].GetChildren():
                 child.SetToolTip(thisSettingString)
-            self.TheQueue[Index][1].GetChildren()[-1].SetLabel(thisSettingString)
+            QueueObject[1].GetChildren()[-1].SetLabel(thisSettingString)
             self.Layout()
     def OnStartDrag(self, event):
         if event.Dragging():
