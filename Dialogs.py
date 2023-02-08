@@ -773,10 +773,11 @@ class MyStartMacroDialog(StartMacroDialog):
                         def RemoveNonNumbers(Name,DefaultValue,ThisFunction,ParameterName,FunctionTextCheck,event):
                             ThisTextCtrl =event.GetEventObject()
                             Text = ThisTextCtrl.GetValue()
-                            if not  self.EdittingMode:
-                                AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
-                            else:
-                                AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.','e','E','-']
+                            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
+                            # if not  self.EdittingMode:
+                            #     AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
+                            # else:
+                            #     AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.','e','E','-']
                             NewText = ''.join([digit for digit in Text if digit in AcceptableList])
                             if NewText != Text:
                                 ThisTextCtrl.SetValue(NewText)
@@ -804,6 +805,27 @@ class MyStartMacroDialog(StartMacroDialog):
                             for ParameterName,ParameterInfo in Parameters.items():
                                 self.TheStartMacroCtrls[Name][2][ParameterName][1].Enable(True)
                             self.UpdateFunctionTooltips()
+                        def block_non_numbers(event):
+                            # text_ctrl.Bind(wx.EVT_CHAR, block_non_numbers)
+                            key_code = event.GetKeyCode()
+                            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
+                            # if not  self.EdittingMode:
+                            #     AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
+                            # else:
+                            #     AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.','e','E','-']
+                            for char in AcceptableList:
+                                if key_code == ord(char):
+                                    event.Skip()
+                            # Allow tabs, for tab navigation between TextCtrls
+                            if key_code == ord('\t'):
+                                event.Skip()
+                                return
+                            # Allow backspaces
+                            if key_code == ord('\b'):
+                                event.Skip()
+                                return
+                            # Block everything else
+                            return
                         def UpdateParameters(Name,ThisFunction,ParameterName,FunctionTextCheck,event):
                             Value = event.GetEventObject().GetValue()
                             ThisPanel = event.GetEventObject().GetParent()
@@ -851,6 +873,7 @@ class MyStartMacroDialog(StartMacroDialog):
                         if ParameterInfo['ValueType'] == 'Numerical':
                             ParameterValueText = wx.TextCtrl( ParameterPanel, wx.ID_ANY, f"{ParameterInfo['DefaultValue']}", wx.DefaultPosition, wx.DefaultSize, 0 )
                             ThisRemoveNonNumbers = partial(RemoveNonNumbers,Name,f"{ParameterInfo['DefaultValue']}",Function,ParameterName,m_FunctionTextCheck)
+                            ParameterValueText.Bind( wx.EVT_CHAR, block_non_numbers)
                             ParameterValueText.Bind( wx.EVT_TEXT, ThisRemoveNonNumbers)
                         elif ParameterInfo['ValueType'] == 'Choice':
                             ParameterValueText = wx.Choice( ParameterPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.TheFunctionInfos[Name][1][ParameterName]['DefaultValue'])
@@ -915,10 +938,12 @@ class MyStartMacroDialog(StartMacroDialog):
     def TranslateNumerical(self,OldString,DefaultValue):
         def ScrubNumber(String):
             
-            AcceptableChar = [',',';','e','E'] if not self.EdittingMode else ['e','E']
+            AcceptableChar = [',',';','e','E']
+            # AcceptableChar = [',',';','e','E'] if not self.EdittingMode else ['e','E']
             while len(String) > 0 and String[0] in AcceptableChar:
                 String = String[1:]
-            AcceptableChar = [',',';','e','E','-'] if not self.EdittingMode else ['e','E','-']
+            AcceptableChar = [',',';','e','E','-']
+            # AcceptableChar = [',',';','e','E','-'] if not self.EdittingMode else ['e','E','-']
             while len(String) > 0 and String[-1] in ['.',',',';','e','E','-']:
                 String = String[:-1]
             return String
@@ -987,10 +1012,21 @@ class MyStartMacroDialog(StartMacroDialog):
                 Parameters = {key:value['Value'][0] if value['ValueType'] == 'Numerical' else value['Value'] for key,value in Function['Parameters'].items()}
                 FunctionInfo = {'Name':Function['Name'],'Parameters':Parameters}
                 ThisMacro.append([FunctionInfo,Function['Included']])
-            
+            Function,Panel,t = self.QueueObject
+            for ThisIndex,(Function,thisPanel,t) in enumerate(self.Parent.TheQueue):
+                Index = ThisIndex
+                if Panel.GetId() == thisPanel.GetId():
+                    break
+            # print(Index)
 
-            ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.QueueObject[0]]
-            self.QueueObject[0] = ThisMacro
+            # ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.QueueObject[0]]
+            # print(self.TheMacro,self.MacroName)
+            # self.QueueObject[0] = ThisMacro
+            #Remove the macro here
+            self.Parent.TheQueue.pop(Index)
+            thisPanel.Destroy()
+            self.Parent.m_QueueWindow.FitInside()
+            self.Parent.AddMacroToQueue(self.TheMacro,self.MacroName,Index=Index)
         self.Destroy()
         pass
     def OnCancel(self, event):

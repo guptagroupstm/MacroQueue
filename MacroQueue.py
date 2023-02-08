@@ -465,7 +465,7 @@ class MainFrame(GUIDesign.MyFrame):
     def DefineMacroSettings(self,Name,TheMacro):
         MyMacroSettingsDialog = MacroSettingsDialog(self,Name,TheMacro)
         MyMacroSettingsDialog.ShowModal()
-    def AddMacroToQueue(self,TheMacro,MacroName):
+    def AddMacroToQueue(self,TheMacro,MacroName,Index=None):
         TheExpandedMacros = []
         for Function in TheMacro:
             Included = Function['Included']
@@ -533,9 +533,13 @@ class MainFrame(GUIDesign.MyFrame):
                             ExpandedMacroFunction['Parameters'][ParameterName] = ParameterValue
                         Macro.append([ExpandedMacroFunction,False])
                         TheUpdatedExpandedMacros.append(Macro)
+        i=0
         for Macro in TheExpandedMacros:
-            self.AddToQueue.append([MacroName,Macro])
-            # self.AddSingleMacroToQueue(MacroName,Macro)
+            if Index is None:
+                self.AddToQueue.append([MacroName,Macro])
+            else:
+                self.AddSingleMacroToQueue(MacroName,Macro,Index+i)
+                i+=1
     def AddSingleMacroToQueue(self,MacroName,Macro,InsertIndex=None):
         thisSettingString = ""
         for Function,Included in Macro:
@@ -680,17 +684,17 @@ class MainFrame(GUIDesign.MyFrame):
             MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,QueueObject=QueueObject)
             MyStartMacroDialog.ShowModal()
             self.Paused = OriginallyPaused
-            thisSettingString = ""
-            ThisMacro = QueueObject[0]
-            for Function, Included in ThisMacro:
-                if Included:
-                    for key, value in Function['Parameters'].items():
-                        thisSettingString+=f"{key} = {value}, "
-            thisSettingString = thisSettingString[:-2]
-            for child in QueueObject[1].GetChildren():
-                child.SetToolTip(thisSettingString)
-            QueueObject[1].GetChildren()[-1].SetLabel(thisSettingString)
-            self.Layout()
+            # thisSettingString = ""
+            # ThisMacro = QueueObject[0]
+            # for Function, Included in ThisMacro:
+            #     if Included:
+            #         for key, value in Function['Parameters'].items():
+            #             thisSettingString+=f"{key} = {value}, "
+            # thisSettingString = thisSettingString[:-2]
+            # for child in QueueObject[1].GetChildren():
+            #     child.SetToolTip(thisSettingString)
+            # QueueObject[1].GetChildren()[-1].SetLabel(thisSettingString)
+            # self.Layout()
     def OnStartDrag(self, event):
         if event.Dragging():
             ThisPanel = event.GetEventObject()
