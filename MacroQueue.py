@@ -53,7 +53,6 @@ IconFileName = "MacroQueueIcon.ico"
 # Canceled during move to image start of a dIdV scan and it stopped responding.
 
 # TODO:
-# Expand numerical inputs like: 10,1,-1 :10,9,8,7,6...
 # Show number of items in queue in status bar
 
 # Add limits - Make the function comment have dict format
@@ -102,7 +101,7 @@ IconFileName = "MacroQueueIcon.ico"
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
 
-
+VersionNumber = "v1.2.1"
 class MainFrame(GUIDesign.MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
@@ -770,6 +769,14 @@ class MainFrame(GUIDesign.MyFrame):
         HelpMessage += "You may choose to freeze the parameter.  This will remove the option to change the parameter when adding it to the queue.  It simplifies the macro in exchange for less control.\n"
         HelpMessage += "\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Make a Macro")
+        MyMessage.ShowModal()
+        return
+    def InfoHelp(self, event):
+        HelpMessage = f"MacroQueue {VersionNumber}\n"
+        HelpMessage += "Written by Brad Goff in Jay Gupta's CME Group at the Ohio State University\n"
+        HelpMessage += "3/2023\n"
+        HelpMessage += "\n"
+        MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Info")
         MyMessage.ShowModal()
         return
     def WriteANewFunctionHelp(self, event):

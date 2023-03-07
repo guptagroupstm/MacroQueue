@@ -88,15 +88,20 @@ def StartRFListSweep(Path=""):
         Connect_To_RF_Generator()
     pass
 
+DAC_BField_Output = None
+
+
 # B=T;The magnetic field strength in T
 def Set_B_Field(B=1):
+    if B < -1 or B > 1:
+        raise Exception(f"Bfield, {B}, out of range. Must be between -1 and 1 T.")
     # Kepco BOP 400W bipolar power supply
     # https://www.kepcopower.com/support/bop-operator-r7.pdf
-    global BField, BFieldPowerControl, BFieldControlThread
+    global BField, BFieldPowerControl, BFieldControlThread, DAC_BField_Output
     # Ramp_speed and Ramp_amount used to be parameters.
     # Ramp_speed=s;How often steps are taken in seconds
     # Ramp_amount=mV;How much the voltage is changed for a single step
-    Ramp_speed=0.1
+    Ramp_Interval=0.1
     Ramp_amount=1
     # Make sure current stays below +/- 10 A
     # Hard limit on ramp speed
@@ -104,7 +109,7 @@ def Set_B_Field(B=1):
     # 10 Amps is 1 T
 
     # if np.abs(Ramp_speed*Ramp_amount) > 0.105:
-    #     raise Exception(f"The magnetic field is ramping too much, too fast.  {Ramp_speed*Ramp_amount} > 0.105.")
+    #     raise Exception(f"The magnetic field is ramping too much, too fast.  {Ramp_Interval*Ramp_amount} > 0.105.")
     Ramp_amount = np.abs(Ramp_amount)/1000 # so ramp amount is in V
 
     # Test if connected to the power supply
@@ -152,8 +157,10 @@ def Set_B_Field(B=1):
         StartTime = timer()
         CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
         MeasuredVoltage = float(BFieldPowerControl.query('MEAS:VOLT?'))
-        if Ramp_speed > (timer() - StartTime):
-            time.sleep(Ramp_speed - (timer() - StartTime))
+        if DAC_BField_Output is not None:
+                STM.setdacvalf(1,DAC_BField_Output,CurrentCurrent)
+        if Ramp_Interval > (timer() - StartTime):
+            time.sleep(Ramp_Interval - (timer() - StartTime))
         BField = CurrentCurrent/10
         Percent = (CurrentCurrent-InitialCurrent)*100/(FinalCurrent-InitialCurrent)
         OutgoingQueue.put(("SetStatus",(f"Ramp {round(Percent,1)}% Complete",2)))
@@ -197,6 +204,48 @@ def Turn_B_Field_Off():
     BField = None
     if STM is not None:
         STM.setp('MEMO.SET', 'B = 0T; Output Off.')
+
+# # DAC_Channel;The channel that will output the BField
+# # ADC_Channel;The channel that will read the BField
+# # BField_End=T;The final magnetic field strength
+# # N_Datapoints;The number of datapoints in a single direction of the spectrum
+# # Backwards;Scan the BField back to it's inital value.
+# # N_Repeat; The number of times the spectrum will repeat.  Only if Backwards is checked.  Must be an integer.
+# def BField_Spectrum(DAC_Channel=5,ADC_Channel=3,BField_End=-1, N_Datapoints=1024, Backwards=True,N_Repeat=0):
+#     global BField, DAC_BField_Output
+#     DAC_BField_Output = int(np.floor(DAC_Channel))
+#     StartingBField =  BField
+#     Time_Single_Direction = np.abs(BField_End-StartingBField)*1020/1 # Changing 1 T takes 17 minutes (1020 seconds)
+
+#     TotalSpectrumTime = Time_Single_Direction
+#     TotalN_Datapoints = N_Datapoints
+#     N_Repeat = int(np.floor(N_Repeat))
+#     if Backwards:
+#         TotalSpectrumTime*=2
+#         TotalSpectrumTime+=TotalSpectrumTime*N_Repeat
+
+#         TotalN_Datapoints*=2
+#         TotalN_Datapoints+=TotalN_Datapoints*N_Repeat
+
+#     # SetBeforeSpectraTable
+#     # SetNewSpectraTable
+#     # Read values ADC_Channel
+#     Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
+#     STM.btn_vertspec(int(Pixels//2)+1,0)
+
+#     memo = f'BField Spectrum from {StartingBField} T to {BField_End} T'
+#     STM.setp('MEMO.SET', memo)
+#     Set_B_Field(BField_End)
+#     if Backwards:
+#         Set_B_Field(StartingBField)
+#         for i in range(N_Repeat):
+#             Set_B_Field(BField_End)
+#             Set_B_Field(StartingBField)
+            
+
+#     DAC_BField_Output = None
+#     # SetBeforeSpectraTable
+
 
 # # Ramp_speed=s;How often steps are taken in seconds
 # # Ramp_amount=mV;How much the voltage is changed for a single step
@@ -492,17 +541,10 @@ def dIdV_Scan():
 # def Set_Spectrum_Settings(Spectrum_Backwards=1,Spectrum_Repeat=1,SpectrumAverage=1):
 #     pass
 
+
 def Spectrum():
-    # Status = STM.getp('STMAFM.SCANSTATUS','')
-    # print(Status)
-    # STM.vertspectrum()
-    # STM.btn_vertspec(0,0)
     Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
     STM.btn_vertspec(int(Pixels//2)+1,0)
-    # STM.Setp('VERTMAN.BTN.SINGLE_SPECTRUM','')
-    # STM.Setp('VERTMAN.BTN.SPEC_OLD_PLACE','')
-    # Status = STM.getp('STMAFM.SCANSTATUS','')
-    # print(Status)
 
 
 
