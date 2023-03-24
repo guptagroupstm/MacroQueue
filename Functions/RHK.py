@@ -192,7 +192,31 @@ def XYCourse_Step(NSteps_Out=3,X_Position=0,Y_Position=0):
             data = Socket.recv(BUFFER_SIZE)
             data = Socket.recv(BUFFER_SIZE)
 
-        
+# or write xy coarse motion using procedure written by Zhihan
+#walkPMC100 parameter can be changed by 'SetExtHWSubParmeter, walkPMC100, step count, #\n'
+'''def XYCourse_Step(NSteps_Out=3):
+    WaitBetween = 2
+    for i in range(NSteps_Out):
+        if not Cancel:
+            Message = "StartProcedure, Pan Single Step Out\n"
+            Socket.send(Message.encode())
+            data = Socket.recv(BUFFER_SIZE)
+            time.sleep(WaitBetween)
+            while not Cancel:
+                try:
+                    data = Socket.recv(BUFFER_SIZE)
+                    print(f"Course Step Out Response: {data}")
+                    break
+                except Exception as e:
+                    print(e)
+            if Cancel:
+                Message = "StopProcedure, Pan Single Step Out\n"
+                Socket.send(Message.encode())
+                data = Socket.recv(BUFFER_SIZE)
+
+     Message = "StartProcedure, walkPMC100\n"
+     Socket.send(Message.encode())
+     data = Socket.recv(BUFFER_SIZE)    '''
 # Bias=V;The bias voltage in Volts
 def Set_Bias(Bias= 1):
     Message = f"SetSWParameter, STM Bias, Value, {Bias}\n"
