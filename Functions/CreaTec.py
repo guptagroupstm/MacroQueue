@@ -23,7 +23,7 @@ def Initialize():
     global STM, OnCloseFunctions
     pythoncom.CoInitialize()
     STM = win32com.client.Dispatch("pstmafm.stmafmrem")
-    time.sleep(0.1)
+    time.sleep(0.3)
     # OnCloseFunctions.append()
 
 
@@ -88,7 +88,6 @@ def StartRFListSweep(Path=""):
         Connect_To_RF_Generator()
     pass
 
-DAC_BField_Output = None
 
 
 # B=T;The magnetic field strength in T
@@ -97,7 +96,7 @@ def Set_B_Field(B=1):
         raise Exception(f"Bfield, {B}, out of range. Must be between -1 and 1 T.")
     # Kepco BOP 400W bipolar power supply
     # https://www.kepcopower.com/support/bop-operator-r7.pdf
-    global BField, BFieldPowerControl, BFieldControlThread, DAC_BField_Output
+    global BField, BFieldPowerControl, BFieldControlThread
     # Ramp_speed and Ramp_amount used to be parameters.
     # Ramp_speed=s;How often steps are taken in seconds
     # Ramp_amount=mV;How much the voltage is changed for a single step
@@ -145,6 +144,7 @@ def Set_B_Field(B=1):
     CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
     InitialCurrent = CurrentCurrent
     BField = CurrentCurrent/10
+    STM.setp('VERTMAN.MARKER',f'{BField}')
     Increasing = 1 if FinalCurrent > CurrentCurrent else -1
 
     # CurrentCurrent + Ramp_amount is a somewhat reasonable approximation for the next step
@@ -157,11 +157,10 @@ def Set_B_Field(B=1):
         StartTime = timer()
         CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
         MeasuredVoltage = float(BFieldPowerControl.query('MEAS:VOLT?'))
-        if DAC_BField_Output is not None:
-                STM.setdacvalf(1,DAC_BField_Output,CurrentCurrent)
+        BField = CurrentCurrent/10
+        STM.setp('VERTMAN.MARKER',f'{BField}')
         if Ramp_Interval > (timer() - StartTime):
             time.sleep(Ramp_Interval - (timer() - StartTime))
-        BField = CurrentCurrent/10
         Percent = (CurrentCurrent-InitialCurrent)*100/(FinalCurrent-InitialCurrent)
         OutgoingQueue.put(("SetStatus",(f"Ramp {round(Percent,1)}% Complete",2)))
 
@@ -205,46 +204,69 @@ def Turn_B_Field_Off():
     if STM is not None:
         STM.setp('MEMO.SET', 'B = 0T; Output Off.')
 
-# # DAC_Channel;The channel that will output the BField
-# # ADC_Channel;The channel that will read the BField
-# # BField_End=T;The final magnetic field strength
-# # N_Datapoints;The number of datapoints in a single direction of the spectrum
-# # Backwards;Scan the BField back to it's inital value.
-# # N_Repeat; The number of times the spectrum will repeat.  Only if Backwards is checked.  Must be an integer.
-# def BField_Spectrum(DAC_Channel=5,ADC_Channel=3,BField_End=-1, N_Datapoints=1024, Backwards=True,N_Repeat=0):
-#     global BField, DAC_BField_Output
-#     DAC_BField_Output = int(np.floor(DAC_Channel))
-#     StartingBField =  BField
-#     Time_Single_Direction = np.abs(BField_End-StartingBField)*1020/1 # Changing 1 T takes 17 minutes (1020 seconds)
+# BField_End=T;The final magnetic field strength
+# N_Datapoints=The number of datapoints in a single direction of the spectrum
+# Backwards=Scan the BField back to it's inital value.
+# N_Repeat=The number of times the spectrum will repeat.  Only if Backwards is checked.  Must be an integer.
+def BField_Spectrum(BField_End=-1, N_Datapoints=1024, Backwards=True,N_Repeat=0):
+    global BField
+    if BField is not None:
+        StartingBField =  BField
+        Time_Single_Direction = np.abs(BField_End-StartingBField)*1020/1 # Changing 1 T takes 17 minutes (1020 seconds)
+    else:
+        StartingBField =  0
+        Time_Single_Direction = np.abs(BField_End)*1020/1 # Changing 1 T takes 17 minutes (1020 seconds)
 
-#     TotalSpectrumTime = Time_Single_Direction
-#     TotalN_Datapoints = N_Datapoints
-#     N_Repeat = int(np.floor(N_Repeat))
-#     if Backwards:
-#         TotalSpectrumTime*=2
-#         TotalSpectrumTime+=TotalSpectrumTime*N_Repeat
+    TotalSpectrumTime = Time_Single_Direction
+    TotalN_Datapoints = N_Datapoints
+    N_Repeat = int(np.floor(N_Repeat))
+    if Backwards:
+        TotalSpectrumTime*=2
+        TotalSpectrumTime+=TotalSpectrumTime*N_Repeat
 
-#         TotalN_Datapoints*=2
-#         TotalN_Datapoints+=TotalN_Datapoints*N_Repeat
+        TotalN_Datapoints*=2
+        TotalN_Datapoints+=TotalN_Datapoints*N_Repeat
 
-#     # SetBeforeSpectraTable
-#     # SetNewSpectraTable
-#     # Read values ADC_Channel
-#     Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
-#     STM.btn_vertspec(int(Pixels//2)+1,0)
+    OriginalSpectraTable = STM.getp('VERTMAN.IVTABLE','')    
+    SpecListGrid = list(map(list,OriginalSpectraTable))
+    TableLength = len(SpecListGrid[0])
+    for i in range(5):
+        SpecListGrid[i] = [0 for j in range(TableLength)]
+    SpecListGrid[0][1] = TotalN_Datapoints
+    NewSpecGrid = tuple(map(tuple,SpecListGrid))
+    STM.setp('VERTMAN.IVTABLE',NewSpecGrid)    
+    OriginalLength = STM.getp('VERTMAN.SPECLENGTH.SEC','')
+    STM.setp('VERTMAN.SPECLENGTH.SEC',TotalSpectrumTime)
+    OriginalVFBMode = STM.getp('VERTMAN.VFB_MODE','')
+    STM.setp('VERTMAN.VFB_MODE',"z(V)")
+    OriginalVFBCurrent = STM.getp('VERTMAN.VFB_CURRENT.NAMP' ,'')
+    Setpoint = float(STM.getp('SCAN.SETPOINT.AMPERE',''))
+    STM.setp('VERTMAN.VFB_CURRENT.NAMP',Setpoint*1e9)
+ 
 
-#     memo = f'BField Spectrum from {StartingBField} T to {BField_End} T'
-#     STM.setp('MEMO.SET', memo)
-#     Set_B_Field(BField_End)
-#     if Backwards:
-#         Set_B_Field(StartingBField)
-#         for i in range(N_Repeat):
-#             Set_B_Field(BField_End)
-#             Set_B_Field(StartingBField)
-            
+    OriginalChannels = STM.getp('VERTMAN.CHANNELS','')
+    NewChannels = [channel for channel in OriginalChannels] + ['Lock-in X','Marker']
+    STM.setp('VERTMAN.CHANNELS',NewChannels)
 
-#     DAC_BField_Output = None
-#     # SetBeforeSpectraTable
+
+    Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
+    STM.btn_vertspec(int(Pixels//2)+1,0)
+
+    memo = f'BField Spectrum from {StartingBField} T to {BField_End} T'
+    STM.setp('MEMO.SET', memo)
+    Set_B_Field(BField_End)
+    if Backwards:
+        Set_B_Field(StartingBField)
+        for i in range(N_Repeat):
+            Set_B_Field(BField_End)
+            Set_B_Field(StartingBField)
+
+    STM.setp('VERTMAN.IVTABLE',OriginalSpectraTable)    
+    STM.setp('VERTMAN.CHANNELS',OriginalChannels)
+    STM.setp('VERTMAN.SPECLENGTH.SEC',OriginalLength)
+    STM.setp('VERTMAN.VFB_MODE',OriginalVFBMode)
+    STM.setp('VERTMAN.VFB_CURRENT.NAMP',OriginalVFBCurrent)
+
 
 
 # # Ramp_speed=s;How often steps are taken in seconds
@@ -262,15 +284,19 @@ DirDict = {'p':0,'n':1}
 
 def Approach():
     STM.setp('HVAMPCOARSE.CHK.BURST.Z','OFF')
+    time.sleep(0.1)
     STM.setp('HVAMPCOARSE.CHK.RETRACT_TIP_AFTER_APPROACH','OFF')
+    time.sleep(0.1)
 
 
     STM.setp('HVAMPCOARSE.APPROACH.START','ON')
+    time.sleep(0.1)
     while not STM.getp('HVAMPCOARSE.APPROACH.Finished','') and not Cancel:
         time.sleep(0.01)
         pass
     if Cancel:
         STM.setp('HVAMPCOARSE.APPROACH.STOP','ON')
+        time.sleep(0.1)
     if not Cancel:
         time.sleep(1)
     if not Cancel:
@@ -290,8 +316,10 @@ def Approach():
 # NBursts=Number of Z steps to retract
 def Z_Course_Steps_Out(NBursts = 3):
     STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
+    time.sleep(0.1)
     for i in range(NBursts):
         STM.slider(ChannelDict['Z'],DirDict['p'],0)
+        time.sleep(0.2)
 
 # def Z_Course_Step_In(Parameter1= 0):
 #     pass
@@ -301,15 +329,19 @@ def Z_Course_Steps_Out(NBursts = 3):
 def Burst_XY(Burst_XY=True):    
     if Burst_XY:
         STM.setp('HVAMPCOARSE.CHK.BURST.XY','ON')
+        time.sleep(0.1)
     else:
         STM.setp('HVAMPCOARSE.CHK.BURST.XY','OFF')
+        time.sleep(0.1)
 
 # Burst_XY=Check Burst Z in the Course Positioning Form
 def Burst_Z(Burst_Z=True):
     if Burst_Z:
         STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
+        time.sleep(0.1)
     else:
         STM.setp('HVAMPCOARSE.CHK.BURST.Z','OFF')
+        time.sleep(0.1)
 
 
 CourseX = 0
@@ -324,17 +356,21 @@ def Define_as_Course_Origin():
 # NSteps_Out=The number of Z steps to retract before course moving in X and Y
 def XYCourse_Step(NSteps_Out=3,X_Position=0,Y_Position=0):
     STM.setp('HVAMPCOARSE.CHK.BURST.Z','ON')
+    time.sleep(0.1)
     for i in range(NSteps_Out):
         STM.slider(ChannelDict['Z'],DirDict['p'],0)
+        time.sleep(0.1)
     XSteps = int(X_Position - CourseX)
     if XSteps == 0:
         pass
     elif XSteps > 0:
         for i in range(np.abs(XSteps)):
             STM.slider(ChannelDict['X'],DirDict['p'],0)
+            time.sleep(0.1)
     elif XSteps < 0:
         for i in range(np.abs(XSteps)):
             STM.slider(ChannelDict['X'],DirDict['n'],0)
+            time.sleep(0.1)
 
     
     YSteps = int(Y_Position - CourseY)
@@ -343,46 +379,57 @@ def XYCourse_Step(NSteps_Out=3,X_Position=0,Y_Position=0):
     elif YSteps > 0:
         for i in range(np.abs(YSteps)):
             STM.slider(ChannelDict['Y'],DirDict['p'],0)
+            time.sleep(0.1)
     elif YSteps < 0:
         for i in range(np.abs(YSteps)):
             STM.slider(ChannelDict['Y'],DirDict['n'],0)
+            time.sleep(0.1)
 
 
 
 def AutoPhase():
     Bias = STM.getp('SCAN.BIASVOLTAGE.VOLT','')
     STM.setp('LOCK-IN.MODE','Internal ')
+    time.sleep(0.1)
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
     time.sleep(3)
     STM.setp('LOCK-IN.BTN.AUTOPHASE','ON')
     time.sleep(1)
     Phase = STM.getp('LOCK-IN.PHASE1.DEG','')
     STM.setp('LOCK-IN.PHASE1.DEG',float(Phase)-90)
+    time.sleep(0.1)
 
     time.sleep(1)
     STM.setp('LOCK-IN.MODE','Internal + Spectrum only')
+    time.sleep(0.1)
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
+    time.sleep(0.1)
 
 # Lockin_Freq=Hz;The lock-in frequency in Hz
 def Set_LockIn_Frequency(Lockin_Freq=877):
     STM.setp('LOCK-IN.FREQ.HZ',Lockin_Freq)
+    time.sleep(0.1)
 
 
 # Lockin_RC=Hz;The lock-in time constant in Hz
 def Set_LockIn_TimeConstant(Lockin_RC=100):
     STM.setp('LOCK-IN.RC.HZ',Lockin_RC)
+    time.sleep(0.1)
 
 # Lockin_Amp=mV;The lock-in voltage amplitude in mV
 def Set_LockIn_Amplitude(Lockin_Amp=100):
     STM.setp('LOCK-IN.AMPLITUDE.MVPP',Lockin_Amp)
+    time.sleep(0.1)
 
 # Lockin_RefA=mV;The lock-in reference voltage amplitude in mV
 def Set_LockIn_RefAmplitude(Lockin_RefA=2000):
     STM.setp('LOCK-IN.REFAMPLITUDE.MVPP',Lockin_RefA)
+    time.sleep(0.1)
 
 # Bias=V;The bias voltage in V
 def Set_Bias(Bias= 0):
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
+    time.sleep(0.1)
 
 
 
@@ -390,6 +437,7 @@ def Set_Bias(Bias= 0):
 def Set_Setpoint(Setpoint=100):
     Setpoint *= 1e-12 #Convert from pA to A
     STM.setp('SCAN.SETPOINT.AMPERE',Setpoint)
+    time.sleep(0.1)
 
 
 # XOffset=The X center of the image in nm, or Image Coordinate, or V
@@ -400,10 +448,13 @@ def Set_Scan_Window_Position(HowToSetPosition=['nm','Image Coord','Voltage'],XOf
         YOffset *= 10
         # CreaTec doesn't know what NM means...
         STM.setp('STMAFM.CMD.SETXYOFF.NM',(XOffset,YOffset))
+        time.sleep(0.1)
     elif HowToSetPosition == 'Image Coord':
         STM.setp('STMAFM.CMD.SETXYOFF.IMAGECOORD',(XOffset,YOffset))
+        time.sleep(0.1)
     elif HowToSetPosition == 'Voltage':
         STM.setp('STMAFM.CMD.SETXYOFF.VOLT',(XOffset,YOffset))
+        time.sleep(0.1)
 
 # XOffset=The X position of the tip in nm, or Image Coordinate, or V
 # YOffset=The Y X position of the tip in nm, or Image Coordinate, or V
@@ -413,10 +464,13 @@ def Fine_Move_Tip(HowToSetPosition=['nm','Image Coord','Voltage'],XOffset=0,YOff
         YOffset *= 10
         # Not sure if this command actually uses nm
         STM.setp('STMAFM.CMD.SETXYOFF.NM',(XOffset,YOffset))
+        time.sleep(0.1)
     elif HowToSetPosition == 'Image Coord':
         STM.setp('STMAFM.CMD.SETXYOFF.IMAGECOORD',(XOffset,YOffset))
+        time.sleep(0.1)
     elif HowToSetPosition == 'Voltage':
         STM.setp('STMAFM.CMD.SETXYOFF.VOLT',(XOffset,YOffset))
+        time.sleep(0.1)
 
     
     
@@ -432,15 +486,18 @@ def Set_Scan_Image_Size(HowToSetSize=['Image Size','Resolution'],ImageSize=100):
         Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
         ImageSize *= Pixels
     STM.setp('SCAN.IMAGESIZE.NM.X',ImageSize)
+    time.sleep(0.1)
 
 
 # Angle=degrees;The angle on the scan in degrees
 def Set_Scan_Window_Angle(Angle=0):
     STM.setp('SCAN.ROTATION.DEG',Angle)
+    time.sleep(0.1)
 
 # NPixels=The number of pixels in each row and each column
 def Set_NPixels(NPixels=512):
     STM.setp('SCAN.IMAGESIZE.PIXEL', (NPixels, NPixels))
+    time.sleep(0.1)
 
 # LineSpeed=nm/s;The speed the tip moves in nm/s
 # def Set_Scan_Speed(Speed=2):
@@ -458,6 +515,7 @@ def Set_Scan_Speed(HowToSetSpeed=['nm/s','s/line','s/pixel'],Speed=2):
         Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
         Speed = Size/(Speed*Pixels)
     STM.setp('SCAN.SPEED.NM/SEC',Speed)
+    time.sleep(0.1)
 
 
 def Set_Recorded_Channels(Topography=True,Current=True,LockInX=True):
@@ -470,6 +528,8 @@ def Set_Recorded_Channels(Topography=True,Current=True,LockInX=True):
         Channels.append('Lock-in X')
     Channels = list(Channels)
     STM.setp('SCAN.CHANNELS',Channels)
+    time.sleep(0.1)
+
 def Scan():
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
     Lines = float(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
@@ -481,6 +541,7 @@ def Scan():
     # STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT'))
     time.sleep(1)
     STM.setp('STMAFM.BTN.START' ,'')
+    time.sleep(0.1)
     StartTime = timer()
     Status = STM.getp('STMAFM.SCANSTATUS','')
     while Status == 2 and not Cancel:
@@ -492,6 +553,7 @@ def Scan():
             time.sleep(1)
     if Cancel:
         STM.setp('STMAFM.BTN.STOP',"")
+        time.sleep(0.1)
         OutgoingQueue.put(("SetStatus",(f"",2)))
         while Status != 0:
             Status = STM.getp('STMAFM.SCANSTATUS','')
@@ -507,6 +569,7 @@ def dIdV_Scan():
     # STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT','Lock-in X'))
     time.sleep(1)
     STM.setp('STMAFM.BTN.START' ,'')
+    time.sleep(0.1)
     StartTime = timer()
     Status = STM.getp('STMAFM.SCANSTATUS','')
     while Status == 2 and not Cancel:
@@ -518,33 +581,43 @@ def dIdV_Scan():
             time.sleep(1)
     if Cancel:
         STM.setp('STMAFM.BTN.STOP','')
+        time.sleep(0.1)
         OutgoingQueue.put(("SetStatus",(f"",2)))
         while Status != 0:
             Status = STM.getp('STMAFM.SCANSTATUS','')
     
     Bias = STM.getp('SCAN.BIASVOLTAGE.VOLT','')
     STM.setp('LOCK-IN.MODE','Internal + Spectrum only')
+    time.sleep(0.1)
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
+    time.sleep(0.1)
 
-
-# # Initial_Voltage=V;The starting voltage in V
-# # Final_Voltage=V;The final voltage in V
-# # Stabilize_Time=s;The time to wait before starting a spectrum.
-# # Total_Spectrum_Time=s;The time a single spectrum will take.
-# # NDatapoints;The number of datapoints to record
-# def Set_Spectrum_Voltage(Initial_Voltage=1,Final_Voltage=-1,Stabilize_Time=1,Total_Spectrum_Time=60,NDatapoints=1000):
-#     pass
-
-# # Spectrum_Backwards;  *****
-# # Spectrum_Repeat;The number of times to repeat the spectrum.
-# # SpectrumAverage;The number of spectra to take and average to reduce noise.
-# def Set_Spectrum_Settings(Spectrum_Backwards=1,Spectrum_Repeat=1,SpectrumAverage=1):
-#     pass
+# FinalBias=V;The final bias for the spectrum.  
+# N_Datapoints=The number of data points for a single direction
+# Time=s;The duration of the spectrum for a single direction
+def Set_Spectrum_Table(Final_Bias=1, N_Datapoints=1024, Time=60):
+    OriginalSpectraTable = STM.getp('VERTMAN.IVTABLE','')    
+    SpecListGrid = list(map(list,OriginalSpectraTable))
+    TableLength = len(SpecListGrid[0])
+    for i in range(5):
+        SpecListGrid[i] = [0 for j in range(TableLength)]
+    SpecListGrid[0][1] = N_Datapoints
+    Inital_Bias = STM.getp('SCAN.BIASVOLTAGE.VOLT','')
+    SpecListGrid[1][0] = Inital_Bias
+    SpecListGrid[1][1] = Final_Bias
+    NewSpecGrid = tuple(map(tuple,SpecListGrid))
+    STM.setp('VERTMAN.IVTABLE',NewSpecGrid)    
+    OriginalLength = STM.getp('VERTMAN.SPECLENGTH.SEC','')
+    STM.setp('VERTMAN.SPECLENGTH.SEC',Time)
 
 
 def Spectrum():
     Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
     STM.btn_vertspec(int(Pixels//2)+1,0)
+    Status = STM.getp('STMAFM.SCANSTATUS','')
+    print(Status)
+    # while Status == 2 and not Cancel:
+        # Status = STM.getp('STMAFM.SCANSTATUS','')
 
 
 
