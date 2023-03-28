@@ -175,6 +175,7 @@ class MyMacroDialog ( MacroDialog ):
                 AddFunctionButtonSizer.Add( FunctionButton, 0, wx.ALL, 5 )
                 Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","Frozen":False,"ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
                 for ParameterName in Parameters.keys():
+                    Parameters[ParameterName]["InRange"] = True
                     if Parameters[ParameterName]["ValueType"] == "Choice":
                         Parameters[ParameterName]["DefaultList"] = Parameters[ParameterName]['DefaultValue']
                         Parameters[ParameterName]["DefaultValue"] = Parameters[ParameterName]['DefaultValue'][0]
@@ -182,16 +183,29 @@ class MyMacroDialog ( MacroDialog ):
                 Comments = getcomments(Function)
                 if Comments is not None:
                     for line in Comments.splitlines():
-                        for parameter in Parameters.keys():
-                            ParameterIndex = line.find(parameter)
-                            if ParameterIndex != -1:
-                                EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
-                                SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
-                                if SemiColonIndex != -1:
-                                    Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
-                                    Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
-                                else:
-                                    Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:] 
+                        CurlyBracketIndex = line.find("{")
+                        if CurlyBracketIndex != -1:
+                            ParameterDict = json.loads(line[1:])
+                            parameter = ParameterDict["Name"]
+                            if parameter in Parameters.keys():
+                                Parameters[parameter] = {**Parameters[parameter],**ParameterDict}
+                                if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                    Parameters[parameter]['Tooltip'] += f"\nAcceptable range: ({ParameterDict['Min']},{ParameterDict['Max']})"
+                                if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
+                                    Parameters[parameter]['Tooltip'] += f"\nMaximum value: {ParameterDict['Max']}"
+                                if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                    Parameters[parameter]['Tooltip'] += f"\nMinimum value: {ParameterDict['Min']}"
+                        else:
+                            for parameter in Parameters.keys():
+                                ParameterIndex = line.find(parameter)
+                                if ParameterIndex != -1:
+                                    EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
+                                    SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
+                                    if SemiColonIndex != -1:
+                                        Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
+                                        Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
+                                    else:
+                                        Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:] 
                 FunctionButton.Bind(wx.EVT_BUTTON, self.AddFunctionToQueue)
 
 
@@ -368,8 +382,6 @@ class MyMacroDialog ( MacroDialog ):
                     RemovePanel.Destroy()
             self.TheQueue = self.TheQueue[:Index+1]
             self.m_FunctionQueueScrolledWindow.FitInside()
-            # print(self.m_FunctionNameSizer.GetChildren())
-            # print(len(self.m_FunctionNameSizer.GetChildren()))
         self.Bind(wx.EVT_MENU, RemoveBelow, menuItem)
         if Index == len(self.TheQueue)-1:
             menuItem.Enable(False)
@@ -591,20 +603,35 @@ class MyStartMacroDialog(StartMacroDialog):
             Comments = getcomments(Function)
             if Comments is not None:
                 for line in Comments.splitlines():
-                    for parameter in Parameters.keys():
-                        ParameterIndex = line.find(parameter)
-                        if ParameterIndex != -1:
-                            EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
-                            SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
-                            if SemiColonIndex != -1:
-                                Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
-                                Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
-                            else:
-                                Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
+                    CurlyBracketIndex = line.find("{")
+                    if CurlyBracketIndex != -1:
+                        ParameterDict = json.loads(line[1:])
+                        parameter = ParameterDict["Name"]
+                        if parameter in Parameters.keys():
+                            Parameters[parameter] = {**Parameters[parameter],**ParameterDict}
+                            if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                Parameters[parameter]['Tooltip'] += f"\nAcceptable range: ({ParameterDict['Min']},{ParameterDict['Max']})"
+                            if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
+                                Parameters[parameter]['Tooltip'] += f"\nMaximum value: {ParameterDict['Max']}"
+                            if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                Parameters[parameter]['Tooltip'] += f"\nMinimum value: {ParameterDict['Min']}"
+                    else:
+                        for parameter in Parameters.keys():
+                            ParameterIndex = line.find(parameter)
+                            if ParameterIndex != -1:
+                                EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
+                                SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
+                                if SemiColonIndex != -1:
+                                    Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
+                                    Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
+                                else:
+                                    Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:]
             self.TheFunctionInfos[FunctionName] = [Function,Parameters.copy()]
+            
         self.TheMacro = []
         for Name,Parameters,Included in DefaultMacro:
             for ParameterName, Info in Parameters.items():
+                Parameters[ParameterName]["InRange"] = True
                 Info["DefaultToolTip"] =  self.TheFunctionInfos[Name][1][ParameterName]["Tooltip"]
                 Info["ValueType"] =  self.TheFunctionInfos[Name][1][ParameterName]["ValueType"]
                 Info["NCalls"] = 1
@@ -770,7 +797,7 @@ class MyStartMacroDialog(StartMacroDialog):
                         ParameterNameText.SetMinSize( wx.Size( 120,15 ) )
                         DefaultValueSizer.Add( ParameterNameText, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
 
-                        def RemoveNonNumbers(Name,DefaultValue,ThisFunction,ParameterName,FunctionTextCheck,event):
+                        def RemoveNonNumbers(Name,DefaultValue,ThisFunction,ParameterName,FunctionTextCheck,ParameterDict,event):
                             ThisTextCtrl =event.GetEventObject()
                             Text = ThisTextCtrl.GetValue()
                             AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
@@ -784,12 +811,24 @@ class MyStartMacroDialog(StartMacroDialog):
                             else:
                                 ThisPanel = event.GetEventObject().GetParent()
                                 OldToolTip = ThisTextCtrl.GetToolTip().GetTip()
-                                if '\n' in OldToolTip:
-                                    FirstLine = OldToolTip[:OldToolTip.find("\n")]
-                                    FirstLine += "\n"
-                                else:
-                                    FirstLine = ""
+                                FirstLine = ParameterDict['Tooltip']
+                                FirstLine += "\n"
                                 TranslatedText,Numbers, NCalls = self.TranslateNumerical(Text,DefaultValue)
+                                MaxNumber = np.max(Numbers)
+                                MinNumber = np.min(Numbers)
+                                def AcceptableNumber(Acceptable):
+                                    ThisFunction['Parameters'][ParameterName]['InRange'] = Acceptable
+                                    if Acceptable:
+                                        ThisTextCtrl.SetBackgroundColour(wx.Colour("White"))
+                                    else:
+                                        ThisTextCtrl.SetBackgroundColour(wx.Colour("Yellow"))
+                                if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                    AcceptableNumber(ParameterDict['Max'] >= MaxNumber and ParameterDict['Min'] <= MinNumber)
+                                if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
+                                    AcceptableNumber(ParameterDict['Max'] >= MaxNumber)
+                                if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                    AcceptableNumber(ParameterDict['Min'] <= MinNumber)
+                                wx.Window.Refresh(ThisTextCtrl)
                                 ThisFunction['Parameters'][ParameterName]['Value'] = Numbers
                                 ThisFunction['Parameters'][ParameterName]['NCalls'] = NCalls
                                 if len(TranslatedText) > 400:
@@ -822,6 +861,10 @@ class MyStartMacroDialog(StartMacroDialog):
                                 return
                             # Allow backspaces
                             if key_code == ord('\b'):
+                                event.Skip()
+                                return
+                            # Allow arrowkeys
+                            if key_code in [314,315,316,317]:
                                 event.Skip()
                                 return
                             # Block everything else
@@ -872,7 +915,7 @@ class MyStartMacroDialog(StartMacroDialog):
                             self.UpdateFunctionTooltips()
                         if ParameterInfo['ValueType'] == 'Numerical':
                             ParameterValueText = wx.TextCtrl( ParameterPanel, wx.ID_ANY, f"{ParameterInfo['DefaultValue']}", wx.DefaultPosition, wx.DefaultSize, 0 )
-                            ThisRemoveNonNumbers = partial(RemoveNonNumbers,Name,f"{ParameterInfo['DefaultValue']}",Function,ParameterName,m_FunctionTextCheck)
+                            ThisRemoveNonNumbers = partial(RemoveNonNumbers,Name,f"{ParameterInfo['DefaultValue']}",Function,ParameterName,m_FunctionTextCheck,ParameterInfo)
                             ParameterValueText.Bind( wx.EVT_CHAR, block_non_numbers)
                             ParameterValueText.Bind( wx.EVT_TEXT, ThisRemoveNonNumbers)
                         elif ParameterInfo['ValueType'] == 'Choice':
@@ -998,6 +1041,23 @@ class MyStartMacroDialog(StartMacroDialog):
         return NewString,Numbers,NCalls
 
     def AddToQueue(self, event=None):
+        InRange = True
+        ParameterName = None
+        for Parameters in self.TheMacro:
+            for key,item in Parameters["Parameters"].items():
+                if not item['InRange']:
+                    InRange = False
+                    ParameterName = key
+                    break
+            if not InRange:
+                break
+
+        if not InRange:
+            MyMessage = wx.MessageDialog(self,message=f"{ParameterName} is not a reasonable value.\nWould you like to continue anyways?",caption="Warning - Parameter out of range",style=wx.YES_NO)
+            YesOrNo = MyMessage.ShowModal()
+            if YesOrNo != wx.ID_YES:
+                return
+            
         if not self.EdittingMode:
             if self.NTotalCalls > 100:
                 if self.NTotalCalls >= 500:
@@ -1019,10 +1079,8 @@ class MyStartMacroDialog(StartMacroDialog):
                 Index = ThisIndex
                 if Panel.GetId() == thisPanel.GetId():
                     break
-            # print(Index)
 
             # ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.QueueObject[0]]
-            # print(self.TheMacro,self.MacroName)
             # self.QueueObject[0] = ThisMacro
             #Remove the macro here
             self.Parent.TheQueue.pop(Index)

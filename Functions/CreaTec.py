@@ -19,6 +19,9 @@ BFieldPowerControl = None
 MacroQueueSelf = None
 OnCloseFunctions = []
 
+
+
+
 def Initialize():
     global STM, OnCloseFunctions
     pythoncom.CoInitialize()
@@ -26,6 +29,12 @@ def Initialize():
     time.sleep(0.3)
     # OnCloseFunctions.append()
 
+
+# {"Name":"Parameter","Units":"s","Max":10,"Min":-10,"Tooltip":"Example Tooltip"}
+# {"Name":"Parameter2","Units":"m","Max":13,"Tooltip":"Example Tooltip"}
+# {"Name":"Parameter3","Units":"m","Min":-12,"Tooltip":"Example Tooltip"}
+def Test(Parameter=5,Parameter2=3,Parameter3=-2):
+    pass
 
 def OnClose():
     # STM.release()
@@ -90,7 +99,7 @@ def StartRFListSweep(Path=""):
 
 
 
-# B=T;The magnetic field strength in T
+# {"Name":"B","Units":"T","Min":-1,"Max":1,"Tooltip":"The magnetic field strength in T"}
 def Set_B_Field(B=1):
     if B < -1 or B > 1:
         raise Exception(f"Bfield, {B}, out of range. Must be between -1 and 1 T.")
@@ -426,14 +435,15 @@ def Set_LockIn_RefAmplitude(Lockin_RefA=2000):
     STM.setp('LOCK-IN.REFAMPLITUDE.MVPP',Lockin_RefA)
     time.sleep(0.1)
 
-# Bias=V;The bias voltage in V
+
+# {"Name":"Bias","Units":"V","Min":-10,"Max":10,"Tooltip":"The bias voltage in V"}
 def Set_Bias(Bias= 0):
     STM.setp('SCAN.BIASVOLTAGE.VOLT',Bias)
     time.sleep(0.1)
 
 
 
-# Setpoint=pA;The current setpoint in pA
+# {"Name":"Setpoint","Units":"pA","Min":0,"Max":1e6,"Tooltip":"The current setpoint in pA"}
 def Set_Setpoint(Setpoint=100):
     Setpoint *= 1e-12 #Convert from pA to A
     STM.setp('SCAN.SETPOINT.AMPERE',Setpoint)
