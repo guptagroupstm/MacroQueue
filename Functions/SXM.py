@@ -99,14 +99,87 @@ def Scan(FolderPath="C:\\Users\\Supervisor\\Desktop\\Data"):
         MySXM.SendWait("ScanPara('Scan',0);") #=0 = stop
 
 
-# def Scan(Filename="Scan"):
-#     # Set the filename
-#     MySXM.execute("ScanImage", 1000)
-#     while MySXM.NotGotAnswer and not Cancel:
-#         SXMRemote.loop()
-#     if Cancel:
-#         # Is there a way to make it stop scanning?
-#         pass
 
-'''things to add
-spectra'''
+
+# X(z) = 0                      X(t) U-step = 5
+# X(U,z) = 1                    X(t) U-step CL = 6
+# X(U) CL = 2                   cmAFM X(U) = 7
+# X(t) z-step = 3               X(t) noise = 8
+# X(t) z-step CL = 4            X(x,y) = 9
+# Mode=The spectra mode
+def Set_Spectra_Mode(Mode=["X(z)","X(U)","Feenstra","X(U) CL","X(t) z-step","X(t) z-step CL","X(t) U-step","X(t) U-step CL","cmAFM X(U)","X(t) noise","X(x,y)"]):
+    ModeList=["X(z)","X(U)","Feenstra","X(U) CL","X(t) z-step","X(t) z-step CL","X(t) U-step","X(t) U-step CL","cmAFM X(U)","X(t) noise","X(x,y)"]
+    ModeIndex = 0
+    for i,thisMode in enumerate(ModeList):
+        if thisMode == Mode:
+            ModeIndex = i
+    MySXM.SendWait("SpectPara(0, "+str(ModeIndex)+");") 
+    time.sleep(0.1)
+
+# X=nm;The X position of the spectra
+def Set_Spectra_XPosition(X=0):
+    MySXM.SendWait("SpectPara(1, "+str(X)+");") 
+    time.sleep(0.1)
+
+# Y=nm;The Y position of the spectra
+def Set_Spectra_YPosition(Y=0):
+    MySXM.SendWait("SpectPara(2, "+str(Y)+");") 
+    time.sleep(0.1)
+
+    
+# Delay1=ms;The delay after the tip has arrived in position
+def Set_Spectra_Delay(Delay1=100):
+    MySXM.SendWait("SpectPara(3, "+str(Delay1)+");") 
+    time.sleep(0.1)
+    
+# AquT=ms;The time for one data point
+def Set_Spectra_Delay(AquT=50):
+    MySXM.SendWait("SpectPara(4, "+str(AquT)+");") 
+    time.sleep(0.1)
+
+# dz=nm;The amount to retract before starting the spectra relative to the position that was stablized during the delay1
+def Set_Spectra_Starting_Height(dz=0):
+    MySXM.SendWait("SpectPara(5, "+str(dz)+");") 
+    time.sleep(0.1)
+
+# dz=nm;The position to ramp to during spectra relative to the position that was stablized during the delay1
+def Set_Spectra_Final_Height(dz=0):
+    MySXM.SendWait("SpectPara(6, "+str(dz)+");") 
+    time.sleep(0.1)
+
+# U1=mV;The inital bias for the spectra
+def Set_Spectra_Inital_Bias(U1=1000):
+    MySXM.SendWait("SpectPara(7, "+str(U1)+");")
+    time.sleep(0.1)
+
+# U2=mV;The final bias for the spectra
+def Set_Spectra_Final_Bias(U2=-1000):
+    MySXM.SendWait("SpectPara(8, "+str(U2)+");")
+    time.sleep(0.1)
+
+# NDataPoints=The number of datapoints in a spectrum
+def Set_Spectra_NDataPoints(NDataPoints=1024):
+    MySXM.SendWait("SpectPara('Points', "+str(NDataPoints)+");")
+    time.sleep(0.1)
+
+def Start_Spectra(FolderPath="C:\\Users\\Supervisor\\Desktop\\Data"):
+    MySXM.SendWait("SpectPara('AUTOSAVE', 1);")
+    time.sleep(0.1)
+    MySXM.SendWait("SpectPara('Repeat', 0);")
+    time.sleep(0.1)
+    MySXM.SendWait("SpectStart;")
+    time.sleep(0.1)
+    OutgoingQueue.put(("SetStatus",(f"The Spectrum has started",2)))  
+    time.sleep(1)
+
+    NFiles = 0
+    for root, dirs, files in os.walk(FolderPath):
+        NFiles += len(files)
+    NFilesNow = NFiles
+    while not Cancel and NFiles == NFilesNow:
+        NFilesNow = 0
+        for root, dirs, files in os.walk(FolderPath):
+            NFilesNow += len(files)
+        time.sleep(1)
+    time.sleep(1)
+    
