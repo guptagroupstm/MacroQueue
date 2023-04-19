@@ -121,6 +121,12 @@ def Z_Course_Steps_Out(NSteps = 3, WaitBetween=2):
                 data = Socket.recv(BUFFER_SIZE)
 # def Z_Course_Step_In():
 #     pass
+
+
+def Define_as_Course_Origin():
+    global CourseX,CourseY
+    CourseX = 0
+    CourseY = 0
 # X_Position=The X position to course move to.
 # Y_Position=The Y position to course move to.
 # NSteps_Out=The number of Z steps to retract before course moving in X and Y
