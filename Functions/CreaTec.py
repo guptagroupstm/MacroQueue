@@ -454,8 +454,6 @@ def Set_Setpoint(Setpoint=100):
 # YOffset=The Y top of the image in nm, or Image Coordinate, or V
 def Set_Scan_Window_Position(HowToSetPosition=['nm','Image Coord','Voltage'],XOffset=0,YOffset=0):
     if HowToSetPosition == 'nm':
-        XOffset *= 10
-        YOffset *= 10
         # CreaTec doesn't know what NM means...
         STM.setp('STMAFM.CMD.SETXYOFF.NM',(XOffset,YOffset))
         time.sleep(0.1)
@@ -625,9 +623,6 @@ def Spectrum():
     Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
     STM.btn_vertspec(int(Pixels//2)+1,0)
     Status = STM.getp('STMAFM.SCANSTATUS','')
-    print(Status)
-    # while Status == 2 and not Cancel:
-        # Status = STM.getp('STMAFM.SCANSTATUS','')
 
 
 

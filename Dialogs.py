@@ -1007,10 +1007,11 @@ class MyStartMacroDialog(StartMacroDialog):
         if ';' in OldString:
             NewString = OldString.split(';')
             NewString = [CleanNumber(Item) for Item in NewString if CleanNumber(Item) is not None]
-            if (len(NewString) == 3 and float(NewString[2]) != 0 and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) > 1) and not ContainsSemicolon:
-
+            if (len(NewString) == 3 and float(NewString[2]) != 0 and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) > 1) and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) < 50000 and not ContainsSemicolon:
+            # if (len(NewString) == 3 and float(NewString[2]) != 0 and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) > 1) and not ContainsSemicolon:
             # if (len(NewString) == 3 and float(NewString[0]) < float(NewString[1]) and float(NewString[2]) != 0 and float(NewString[2]) < (float(NewString[1])-float(NewString[0])) and float(NewString[2]) > 0) and not ContainsSemicolon:
                 NewString = [float(X) for X in NewString]
+
                 NewString[1] += NewString[2]/1000
                 NewString = np.arange(*NewString)
                 def round_sig(x, sig):
@@ -1075,6 +1076,7 @@ class MyStartMacroDialog(StartMacroDialog):
                 FunctionInfo = {'Name':Function['Name'],'Parameters':Parameters}
                 ThisMacro.append([FunctionInfo,Function['Included']])
             Function,Panel,t = self.QueueObject
+
             for ThisIndex,(Function,thisPanel,t) in enumerate(self.Parent.TheQueue):
                 Index = ThisIndex
                 if Panel.GetId() == thisPanel.GetId():

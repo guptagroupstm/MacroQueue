@@ -73,12 +73,6 @@ IconFileName = "MacroQueueIcon.ico"
 
 
 
-# ETC
-    # Get scan speed / size / NLines during Initialize
-    # When the single macro is added to the queue, add a estimated time to each function (Usually zero for non-scan functions)
-    # Add to macro tooltip: "\n \n This will finish at 6:05 pm today" 
-        # \n This will finish at 6:05 pm tomorrow"
-        # \n This will finish at 6:05 pm 3/16/2022"
 
 # Don't hold m_FunctionWindow,m_FunctionNameText in self.TheQueue.  The text only needs to be MacroLabel.  The window is only used to set the tooltip
 
@@ -101,7 +95,7 @@ IconFileName = "MacroQueueIcon.ico"
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
 
-VersionNumber = "v1.2.2"
+VersionNumber = "v1.3.1"
 class MainFrame(GUIDesign.MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
@@ -113,6 +107,7 @@ class MainFrame(GUIDesign.MyFrame):
     Running = False
     Software = None
     Closing = False
+    Editting = False
 
     def __init__(self):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
@@ -196,6 +191,10 @@ class MainFrame(GUIDesign.MyFrame):
                 Message = self.OutgoingQueue.get(False)
         except queue.Empty:
             pass
+        if not self.Paused and not self.Running and len(self.TheQueue) > 0 and self.Editting is not False:
+            self.Editting -= 1
+            if self.Editting == 0:
+                self.Pause()
         if not self.Paused and not self.Running and len(self.TheQueue) > 0:
             self.Running = True
             Macro,FunctionPanel,FunctionText = self.TheQueue[0]
@@ -299,9 +298,10 @@ class MainFrame(GUIDesign.MyFrame):
         ThisText = event.GetEventObject()
         if ThisText.GetLabel() != "panel":
             ThisText = ThisText.GetParent()
-        for ThisIndex,(Function,Panel,Text) in enumerate(self.TheQueue):
+        for ThisIndex,(Function,ThisPanel,Text) in enumerate(self.TheQueue):
             Index = ThisIndex
-            if ThisText.GetId() == Panel.GetId():
+            Panel = ThisPanel
+            if ThisText.GetId() == ThisPanel.GetId():
                 break
         """Setup and Open a popup menu."""
         popupmenu = wx.Menu()
@@ -333,23 +333,8 @@ class MainFrame(GUIDesign.MyFrame):
 
         menuItem = popupmenu.Append(-1, 'Edit Parameters')
         def Edit(event):
-            OriginallyPaused = self.Paused
-            self.Paused = True
-            MacroLabel = self.TheQueue[Index][2].GetLabel()
-            ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.TheQueue[Index][0]]
-            MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,Index=Index)
-            MyStartMacroDialog.ShowModal()
-            self.Paused = OriginallyPaused
-            thisSettingString = ""
-            ThisMacro = self.TheQueue[Index][0]
-            for Function,Included in ThisMacro:
-                if Included:
-                    for key, value in Function['Parameters'].items():
-                        thisSettingString+=f"{key} = {value}, "
-            thisSettingString = thisSettingString[:-2]
-            for child in self.TheQueue[Index][1].GetChildren():
-                child.SetToolTip(thisSettingString)
-            self.TheQueue[Index][1].GetChildren()[-1].SetLabel(thisSettingString)
+            self.EditMacroInQueue(event,Panel)
+
         self.Bind(wx.EVT_MENU, Edit, menuItem)
         # menuItem.Enable(False)
         if Index == 0 and self.Running:
@@ -426,7 +411,7 @@ class MainFrame(GUIDesign.MyFrame):
     def Pause(self, event=None):
         if self.Paused:
             self.Paused = False
-            self.m_PauseAfterButton.SetLabel("Pause After Function")
+            self.m_PauseAfterButton.SetLabel("Pause After Macro")
             for i,Macro in enumerate(self.TheQueue):
                 if (i > 0 and self.Running) or not self.Running:
                     Macro[1].SetBackgroundColour(wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ))
@@ -666,8 +651,9 @@ class MainFrame(GUIDesign.MyFrame):
             self.TheQueue.pop(Index)
             ThisPanel.Destroy()
             self.m_QueueWindow.FitInside()
-    def EditMacroInQueue(self,event):
-        ThisPanel = event.GetEventObject().GetParent()
+    def EditMacroInQueue(self,event,ThisPanel=None):
+        if ThisPanel is None:
+            ThisPanel = event.GetEventObject().GetParent()
         for ThisIndex,(Function,Panel,t) in enumerate(self.TheQueue):
             Index = ThisIndex
             if ThisPanel.GetId() == Panel.GetId():
@@ -676,13 +662,18 @@ class MainFrame(GUIDesign.MyFrame):
             pass
         else:
             OriginallyPaused = self.Paused
-            self.Paused = True
+            # if not OriginallyPaused:
+            #     self.Pause()
+            self.Editting = Index
             MacroLabel = self.TheQueue[Index][2].GetLabel()
             ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.TheQueue[Index][0]]
             QueueObject=self.TheQueue[Index]
             MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,QueueObject=QueueObject)
             MyStartMacroDialog.ShowModal()
-            self.Paused = OriginallyPaused
+            self.Editting = False
+
+            if not OriginallyPaused and self.Paused:
+                self.Pause()
             # thisSettingString = ""
             # ThisMacro = QueueObject[0]
             # for Function, Included in ThisMacro:
@@ -774,7 +765,7 @@ class MainFrame(GUIDesign.MyFrame):
     def InfoHelp(self, event):
         HelpMessage = f"MacroQueue {VersionNumber}\n"
         HelpMessage += "Written by Brad Goff in Jay Gupta's CME Group at the Ohio State University\n"
-        HelpMessage += "3/2023\n"
+        HelpMessage += "9/2023\n"
         HelpMessage += "\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Info")
         MyMessage.ShowModal()
