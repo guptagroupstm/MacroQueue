@@ -1094,5 +1094,20 @@
    {},
    true
   ]
+ ],
+ "test": [
+  [
+   "BField Spectrum",
+   {
+    "BFields": {
+     "DefaultValue": "[5,1,20]",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "String",
+     "InRange": true
+    }
+   },
+   true
+  ]
  ]
 }

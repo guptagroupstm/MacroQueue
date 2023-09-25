@@ -217,7 +217,7 @@ def Turn_B_Field_Off():
 # N_Datapoints=The number of datapoints in a single direction of the spectrum
 # Backwards=Scan the BField back to it's inital value.
 # N_Repeat=The number of times the spectrum will repeat.  Only if Backwards is checked.  Must be an integer.
-def BField_Spectrum(BField_End=-1, N_Datapoints=1024, Backwards=True,N_Repeat=0):
+def BField_Spectrum(BField_End=-1, N_Datapoints=1024, Backwards=True,N_Repeat=0):    
     global BField
     if BField is not None:
         StartingBField =  BField
@@ -623,7 +623,6 @@ def Spectrum():
     Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
     STM.btn_vertspec(int(Pixels//2)+1,0)
     Status = STM.getp('STMAFM.SCANSTATUS','')
-
 
 
 if __name__ == "__main__":

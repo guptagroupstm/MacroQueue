@@ -73,6 +73,9 @@ class MyFrame ( wx.Frame ):
 		self.m_menuItem10 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Basic Usage", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu5.Append( self.m_menuItem10 )
 
+		self.m_menuItem102 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Expand Numerical Parameters", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.Append( self.m_menuItem102 )
+
 		self.m_menuItem11 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Make a Macro", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu5.Append( self.m_menuItem11 )
 
@@ -152,6 +155,7 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.OnCreaTecSoftware, id = self.m_CreaTecmenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnSXMSoftware, id = self.m_SXMmenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.BasicUseageHelp, id = self.m_menuItem10.GetId() )
+		self.Bind( wx.EVT_MENU, self.ExpandNumericalParameters, id = self.m_menuItem102.GetId() )
 		self.Bind( wx.EVT_MENU, self.MakeAMacroHelp, id = self.m_menuItem11.GetId() )
 		self.Bind( wx.EVT_MENU, self.WriteANewFunctionHelp, id = self.m_menuItem12.GetId() )
 		self.Bind( wx.EVT_MENU, self.InfoHelp, id = self.m_menuItem121.GetId() )
@@ -199,6 +203,9 @@ class MyFrame ( wx.Frame ):
 		event.Skip()
 
 	def BasicUseageHelp( self, event ):
+		event.Skip()
+
+	def ExpandNumericalParameters( self, event ):
 		event.Skip()
 
 	def MakeAMacroHelp( self, event ):

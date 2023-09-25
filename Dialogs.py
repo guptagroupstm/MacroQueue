@@ -800,7 +800,7 @@ class MyStartMacroDialog(StartMacroDialog):
                         def RemoveNonNumbers(Name,DefaultValue,ThisFunction,ParameterName,FunctionTextCheck,ParameterDict,event):
                             ThisTextCtrl =event.GetEventObject()
                             Text = ThisTextCtrl.GetValue()
-                            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
+                            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';','l','L']
                             # if not  self.EdittingMode:
                             #     AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
                             # else:
@@ -847,7 +847,7 @@ class MyStartMacroDialog(StartMacroDialog):
                         def block_non_numbers(event):
                             # text_ctrl.Bind(wx.EVT_CHAR, block_non_numbers)
                             key_code = event.GetKeyCode()
-                            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
+                            AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';','l','L']
                             # if not  self.EdittingMode:
                             #     AcceptableList = ['0','1','2','3','4','5','6','7','8','9','.',',','e','E','-',';']
                             # else:
@@ -980,12 +980,11 @@ class MyStartMacroDialog(StartMacroDialog):
         self.Center()
     def TranslateNumerical(self,OldString,DefaultValue):
         def ScrubNumber(String):
-            
-            AcceptableChar = [',',';','e','E']
+            AcceptableChar = [',',';','e','E','L','l']
             # AcceptableChar = [',',';','e','E'] if not self.EdittingMode else ['e','E']
             while len(String) > 0 and String[0] in AcceptableChar:
                 String = String[1:]
-            AcceptableChar = [',',';','e','E','-']
+            AcceptableChar = [',',';','e','E','-','L','l']
             # AcceptableChar = [',',';','e','E','-'] if not self.EdittingMode else ['e','E','-']
             while len(String) > 0 and String[-1] in ['.',',',';','e','E','-']:
                 String = String[:-1]
@@ -997,17 +996,28 @@ class MyStartMacroDialog(StartMacroDialog):
                 return String
             except:
                 return None
-        
         OldString = ScrubNumber(OldString)
         while OldString is None or len(OldString) == 0:
             OldString = ScrubNumber(DefaultValue)
 
         ContainsSemicolon = OldString.find(";") != -1
+        LogSpace = OldString[-1] == 'l' or OldString[-1] == 'L'
+        OldString = OldString.replace("L","")
+        OldString = OldString.replace("l","")
         OldString = OldString.replace(",",";")
         if ';' in OldString:
             NewString = OldString.split(';')
             NewString = [CleanNumber(Item) for Item in NewString if CleanNumber(Item) is not None]
-            if (len(NewString) == 3 and float(NewString[2]) != 0 and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) > 1) and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) < 50000 and not ContainsSemicolon:
+            if (len(NewString) == 3 and LogSpace) and int(np.floor(float(NewString[2]))) > 0 and float(NewString[0]) > 0 and float(NewString[1]) > 0:
+                Numbers = np.logspace(np.log10(float(NewString[0])),np.log10(float(NewString[1])),int(np.floor(float(NewString[2]))))
+                def round_sig(x, sig):
+                    x = round(x, sig-int(floor(log10(abs(x))))-1) if x !=0 else 0
+                    if x%1==0:
+                        x=int(x)
+                    return x
+                Numbers = [round_sig(float(X),8)for X in Numbers]
+                NewString = [f"{X}" for X in Numbers]
+            elif (len(NewString) == 3 and float(NewString[2]) != 0 and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) > 1) and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) < 50000 and not ContainsSemicolon:
             # if (len(NewString) == 3 and float(NewString[2]) != 0 and (float(NewString[1])-float(NewString[0]))/float(NewString[2]) > 1) and not ContainsSemicolon:
             # if (len(NewString) == 3 and float(NewString[0]) < float(NewString[1]) and float(NewString[2]) != 0 and float(NewString[2]) < (float(NewString[1])-float(NewString[0])) and float(NewString[2]) > 0) and not ContainsSemicolon:
                 NewString = [float(X) for X in NewString]

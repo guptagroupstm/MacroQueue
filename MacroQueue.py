@@ -731,11 +731,22 @@ class MainFrame(GUIDesign.MyFrame):
         HelpMessage += "You may right click a function in the queue to edit the parameters as long as the function is not currently running.  \n\n"
         HelpMessage += "You may pause the queue by pressing 'Pause after Function'.  It will finish the current function and then pause. \n\n"
         HelpMessage += "Clear Queue will cancel the current function, remove all the functions in the queue, and pause the queue incase you place anything else in the queue.\n\n\n\n\n"
-        HelpMessage += "\n\n\n"
-        HelpMessage += "When inputing numerical parameters, you may simultaneously add several items to the queue in two ways. \n"
-        HelpMessage += "You may input either 1,3,7,9 or 1;3;7;9 and 4 macros will be added to the queue, each with a different value of the parameter. \n"
-        HelpMessage += "If you want the values to be evenly spaced, you may also input -1,1,0.1.  This will add 21 parameters to the queue, from -1 to 1 with a step size of 0.1. The format is (Start, End, Step size).  Writing -1,1,0.1 is identical to writing -1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1\n"
+
+        MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Basic Usage")
+        MyMessage.ShowModal()
+        return 
+    def ExpandNumericalParameters(self,event):
+        HelpMessage = "When inputing numerical parameters, you may simultaneously add several items to the queue in two ways. \n"
+        HelpMessage += "You may input either 1,3,7,9 or 1;3;7;9 and 4 macros will be added to the queue, each with a different value of the parameter. \n\n"
+        HelpMessage += "If you want the values to be evenly spaced, you may also input -1,1,0.1.  This will add 21 parameters to the queue, from -1 to 1 with a step size of 0.1. The format is '{Start}, {End}, {Step size}'.  Writing -1,1,0.1 is identical to writing -1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1\n\n"
+        HelpMessage += "You may use a negative step size if you would like to have the values decrease: 0,-10,-1.\n\n"
+        
         HelpMessage += "If you want to input only 3 values, you may use semicolons ;.  -1;1;0.1 will not be expanded.\n\n"
+
+        HelpMessage += "Advance use case: You can expand on a logscale by placing an 'L' or 'l' at the end.\n"
+        HelpMessage += "The format is '{Start}, {End}, {N Points}L' \n"
+        HelpMessage += "e.g. 1,10000,5L is the same as writing 1,10,100,1000,10000 \n\n\n"
+
         HelpMessage += "It is important to note that in the macros after the first, only the functions after the expanded function are included.  \n"
         HelpMessage += "For example, if there was a macro to (1) Set a BField, (2) wait some time, (3) set the bias, and (4) scan,\n"
         HelpMessage += "and we wanted to take two scans with a BField = 1T and biases -0.8 and 0.8, you can input -0.8,0.8 to the bias.\n"
@@ -744,9 +755,10 @@ class MainFrame(GUIDesign.MyFrame):
         HelpMessage += "If you wanted 4 scans, with BField = -1,1 and biases=-0.8,0.8,\n"
         HelpMessage += "you may input all the parameters and 4 macros will be added to the queue.\n"
         HelpMessage += "The first and third macro will (1) set the BField, (2) wait some time, (3) set the bias to -0.8, and scan.  The second and fourth will only set the set the bias to 0.8 and scan.\n"
-        MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Basic Usage")
+        MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Expand Numerical Parameters")
         MyMessage.ShowModal()
         return 
+        return
     def MakeAMacroHelp(self, event):
         HelpMessage = "Go to Macro -> Make New Macro\n"
         HelpMessage += "    Or right click an existing macro, and choose Edit from the menu.\n"
