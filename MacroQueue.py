@@ -758,7 +758,6 @@ class MainFrame(GUIDesign.MyFrame):
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Help - Expand Numerical Parameters")
         MyMessage.ShowModal()
         return 
-        return
     def MakeAMacroHelp(self, event):
         HelpMessage = "Go to Macro -> Make New Macro\n"
         HelpMessage += "    Or right click an existing macro, and choose Edit from the menu.\n"
@@ -775,9 +774,8 @@ class MainFrame(GUIDesign.MyFrame):
         MyMessage.ShowModal()
         return
     def InfoHelp(self, event):
-        HelpMessage = f"MacroQueue {VersionNumber}\n"
+        HelpMessage = f"MacroQueue {VersionNumber} (9/2023)\n"
         HelpMessage += "Written by Brad Goff in Jay Gupta's CME Group at the Ohio State University\n"
-        HelpMessage += "9/2023\n"
         HelpMessage += "\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Info")
         MyMessage.ShowModal()
