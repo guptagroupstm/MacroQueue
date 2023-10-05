@@ -238,7 +238,6 @@ class MyMacroDialog ( MacroDialog ):
             FunctionInfo = self.FunctionInfoList[FunctionLabel].copy()
             for ParameterName in ParametersDict.keys():
                 if FunctionInfo[2][ParameterName]["ValueType"] == "Choice":
-                    FunctionInfo[2][ParameterName]["DefaultList"] = FunctionInfo[2][ParameterName]['DefaultValue']
                     FunctionInfo[2][ParameterName] = {**FunctionInfo[2][ParameterName],**ParametersDict[ParameterName]}
                 else:
                     FunctionInfo[2][ParameterName] = {**FunctionInfo[2][ParameterName],**ParametersDict[ParameterName]}

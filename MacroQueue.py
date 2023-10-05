@@ -95,7 +95,7 @@ IconFileName = "MacroQueueIcon.ico"
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
 
-VersionNumber = "v1.3.1"
+VersionNumber = "v1.3.2"
 class MainFrame(GUIDesign.MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 

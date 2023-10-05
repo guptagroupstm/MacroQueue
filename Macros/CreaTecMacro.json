@@ -1097,13 +1097,64 @@
  ],
  "test": [
   [
-   "BField Spectrum",
+   "Set Scan Window Position",
    {
-    "BFields": {
-     "DefaultValue": "[5,1,20]",
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
      "Tooltip": "",
      "Frozen": false,
-     "ValueType": "String",
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "Image Coord",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
      "InRange": true
     }
    },
