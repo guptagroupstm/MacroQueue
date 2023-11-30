@@ -6,6 +6,9 @@ import pyvisa
 import pythoncom
 import wx
 import threading
+import os
+import pandas as pd
+from datetime import datetime
 
 STM = None
 CurrentMacro = None
@@ -624,6 +627,12 @@ def Spectrum():
     STM.btn_vertspec(int(Pixels//2)+1,0)
     Status = STM.getp('STMAFM.SCANSTATUS','')
 
+def Test(LogPath='Magnetic.csv'):
+    DF = pd.DataFrame({'datetime':[datetime.now()],'bye':[20]})
+    if os.path.exists(LogPath):
+        DF.to_csv(LogPath, mode='a', header=False)
+    else:
+        DF.to_csv(LogPath)
 
 if __name__ == "__main__":
     pass

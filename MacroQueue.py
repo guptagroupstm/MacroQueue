@@ -55,21 +55,15 @@ IconFileName = "MacroQueueIcon.ico"
 # TODO:
 # Show number of items in queue in status bar
 
-# Add limits - Make the function comment have dict format
+# If a macro failed, copy it and put it and the top of the queue (Let this be an option)
 
-# If a macro failed, copy it and put it and the top of the queue
-# Show time left of current scan
-
-# Write the help dialog
-
-# np arange stop responding when len > ~100,000
+# Improve the help dialog
 
 # RHK functions
 # Scan - Only top down
 # RHK Scan doesn't stop
 # Set position option (absolute or relative)
 # Set bias modulation amplitude
-# Set default save folder
 
 
 
@@ -86,10 +80,7 @@ IconFileName = "MacroQueueIcon.ico"
 
 
 
-# Check dialog when opening souce when frozen   #  What did I mean when I wrote this???
-
 # Save PDF
-# Email
 
 
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
@@ -114,7 +105,6 @@ class MainFrame(GUIDesign.MyFrame):
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
 
-        # Starts Thread with Incoming & Outgoing Queue.  Any time-consuming calculations/measurements should be made on this thread.
 
         # The GUIDesign is defined in GUIDesign.py as the class MyFrame. It was made with wxFormBuilder
         GUIDesign.MyFrame.__init__(self, parent=None) 
@@ -123,9 +113,15 @@ class MainFrame(GUIDesign.MyFrame):
             icon = wx.Icon(icon_file)
             self.SetIcon(icon)
 
+
+        # Starts the STM Thread with an Incoming & Outgoing Queue.  Any time-consuming calculations/measurements should be made on this thread.
         mp.set_start_method('spawn')
         self.OutgoingQueue = mp.Queue()
         self.IncomingQueue = mp.Queue()
+
+        self.Process = threading.Thread(target=Thread, args=(self,self.IncomingQueue,self.OutgoingQueue))
+        self.Process.start()
+
         # Read the saved settings file here
         if os.path.exists(self.SavedSettingsFile):
             SettingsSeries = pd.read_csv(self.SavedSettingsFile,names=['key','value'])
@@ -140,13 +136,16 @@ class MainFrame(GUIDesign.MyFrame):
             self.OnClose()
             return
         
-        self.Process = threading.Thread(target=Thread, args=(self,self.IncomingQueue,self.OutgoingQueue))
-        self.Process.start()
 
+
+
+        # Loads the bitmap images
         YBitmapSize = 20
         self.DownBitmap = wx.Bitmap( u"Bitmaps/DownArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
         self.UpBitmap = wx.Bitmap( u"Bitmaps/UpArrow.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
         self.RemoveBitmap = wx.Bitmap( u"Bitmaps/Remove.bmp", wx.BITMAP_TYPE_ANY).ConvertToImage().Scale(20,YBitmapSize).ConvertToBitmap()
+
+        # Makes the sizer to put the queue
         self.m_FunctionNameSizer = wx.FlexGridSizer( 0, 1, -6, 0 )
         self.m_FunctionNameSizer.AddGrowableCol( 0 )
         self.m_FunctionNameSizer.SetFlexibleDirection( wx.BOTH )
@@ -162,9 +161,15 @@ class MainFrame(GUIDesign.MyFrame):
         self.Show()
 
     def CheckQueue(self,event):
+        # This funtion runs on a timer.  Twice a second.
         try:
+            # A try loop to ignore any queue.Empty exceptions 
             Message = self.OutgoingQueue.get(False)
+            # get(False) gets the message from the queue but throws an exception if it's empty.
+            # get(True) would wait until there's a message
             while Message:
+                # The first item in the message is what function to run
+                # The second item in the message is the parameters for that function
                 if Message[0] == 'SetStatus':
                     self.StatusBar.SetStatusText(*Message[1])
                 if Message[0] == 'FunctionFinished':
@@ -177,6 +182,7 @@ class MainFrame(GUIDesign.MyFrame):
                     MyMessage.ShowModal()
                     pass
                 if Message[0] == "ExceptionThrown":
+                    # If there is an exception throw in the STM thread, it gets put here for a pop-up message.
                     if not self.Paused:
                         Macro,FunctionPanel,FunctionText = self.TheQueue.pop(0)
                         exception,FunctionName = Message[1]
@@ -191,6 +197,7 @@ class MainFrame(GUIDesign.MyFrame):
                 Message = self.OutgoingQueue.get(False)
         except queue.Empty:
             pass
+
         if not self.Paused and not self.Running and len(self.TheQueue) > 0 and self.Editting is not False:
             self.Editting -= 1
             if self.Editting == 0:
@@ -203,8 +210,11 @@ class MainFrame(GUIDesign.MyFrame):
             self.IncomingQueue.put(("StartFunction",Macro))
             self.StatusBar.SetStatusText(f"Macro: {FunctionText.GetLabel()}",0)
             self.StatusBar.SetStatusText("",1)
+    # The queue only has 500 Macros in it at any one time so it doesn't use too much memory
+    # If more are added to the queue, it will wait until there are less than 500 to add them.
         if len(self.AddToQueue) > 0  and len(self.TheQueue) < 500:
             AddN = 5
+        # It adds 5 every time to not clog the main thread.  Trying to add all of them at once would make the main thread unresponsive.
             AddN = AddN if len(self.AddToQueue) > AddN else len(self.AddToQueue)
             for i in range(AddN):
                 MacroName,Macro = self.AddToQueue.pop(0)
@@ -214,8 +224,10 @@ class MainFrame(GUIDesign.MyFrame):
 
         return
     def IdleLoop(self, event):
+        # This function runs whenever the GUI is idle (a few times a second)
         if len(self.AddToQueue) > 0 and len(self.TheQueue) < 500:
             AddN = 3
+        # It adds 3 every time to not clog the main thread.
             AddN = AddN if len(self.AddToQueue) > AddN else len(self.AddToQueue)
             for i in range(AddN):
                 MacroName,Macro = self.AddToQueue.pop(0)
@@ -380,8 +392,6 @@ class MainFrame(GUIDesign.MyFrame):
             self.AddToQueue = []
             self.TheQueue = self.TheQueue[:Index+1]
             self.m_QueueWindow.FitInside()
-            # print(self.m_FunctionNameSizer.GetChildren())
-            # print(len(self.m_FunctionNameSizer.GetChildren()))
         self.Bind(wx.EVT_MENU, RemoveBelow, menuItem)
         if Index == len(self.TheQueue)-1:
             menuItem.Enable(False)
@@ -433,18 +443,6 @@ class MainFrame(GUIDesign.MyFrame):
     def StartMakeNewMacro(self,event):
         MyMacroDialog = MacroDialog(self)
         MyMacroDialog.ShowModal()
-
-        # # https://docs.python.org/3/library/inspect.html
-        # # RHKFunctionsNames = dir(RHKFunctions)
-        
-        # FunctionSettings = {}
-        # for Name,Function in getmembers(RHKFunctions, isfunction):
-        #     print(Name)
-        #     print(getcomments(Function))
-        #     print(type(getcomments(Function)))
-        #     Settings = {Key:Value for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
-        #     FunctionSettings[Name] = Settings
-        # print(FunctionSettings)
         pass
     def DefineMacroSettings(self,Name,TheMacro):
         MyMacroSettingsDialog = MacroSettingsDialog(self,Name,TheMacro)
@@ -472,7 +470,6 @@ class MainFrame(GUIDesign.MyFrame):
                 nDataPoints *= ListLength
             ExpandedInputSpace = [{ExpandedKey: ExpandedValues[i] for ExpandedKey, ExpandedValues in ExpandedInputSpace.items()} for i in range(nDataPoints)]
             if Included:
-                # print(Name,ExpandedInputSpace)
                 if len(TheExpandedMacros) == 0:
                     for ParameterSet in ExpandedInputSpace:
                         ExpandedMacroFunction = {"Name":Name}
@@ -890,6 +887,7 @@ def Thread(self,IncomingQueue,OutgoingQueue):
     while True:
         Message = IncomingQueue.get() # Blocks until there's a message
         if Message[0] == "SoftwareChange":
+            # Changes the global parameters that are assessable to the new software's functions (e.g. RHK -> CreaTec)
             Software = Message[1]
             Functions[Software].MacroQueueSelf = self
             FunctionDict = {Name.replace("_"," "):Function for Name,Function in (getmembers(Functions[Software], isfunction) + getmembers(Functions["General"], isfunction))}
@@ -898,22 +896,27 @@ def Thread(self,IncomingQueue,OutgoingQueue):
         if Message[0] == "OnClose":
             if "OnClose" in FunctionDict.keys():
                 try:
+                    # Runs the OnClose functions for the given software
                     FunctionDict["OnClose"]()
                 except:
                     pass
             if self.Closing:
+                # Breaks out of the while loop which finishes/closes this thread
                 break
         if Message[0] == 'StartFunction':
+            # Starts the macro
             Name = None
             try:
                 Macro = Message[1]
                 Functions[Software].CurrentMacro = Macro
                 for ThisFunction,Included in Macro:
+                    # Runs each function
                     Name = ThisFunction['Name']
                     Parameters = ThisFunction['Parameters']
                     if Included:
                         Function = FunctionDict[Name]
                         if not Functions[Software].Cancel:
+                            # Doesn't run the function if it's been cancelled
                             OutgoingQueue.put(("SetStatus",(f"Function: {Name}",1)))
                             Function(**Parameters)
                 OutgoingQueue.put(("FunctionFinished",None))
