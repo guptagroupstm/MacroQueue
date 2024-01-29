@@ -17,7 +17,9 @@ import numpy as np
 import queue
 import GUIDesign
 import threading
-
+import importlib
+import importlib.util
+from inspect import getmembers, isfunction,getcomments
 
 import wx
 
@@ -53,6 +55,7 @@ IconFileName = "MacroQueueIcon.ico"
 # Canceled during move to image start of a dIdV scan and it stopped responding.
 
 # TODO:
+# Does this work on a Mac?
 # Show number of items in queue in status bar
 
 # If a macro failed, copy it and put it and the top of the queue (Let this be an option)
@@ -86,24 +89,25 @@ IconFileName = "MacroQueueIcon.ico"
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
 
-VersionNumber = "v1.3.2"
+VersionNumber = "v1.4.0"
 class MainFrame(GUIDesign.MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
 # Scanning, fine motion, course motion, dI/dV scans, point spectra, tip form, 
-    Functions = {"RHK":RHKFunctions,"CreaTec":CreaTecFunctions,"SXM":SXMFunctions,"General":GeneralFunctions}
     TheQueue = []
     AddToQueue = []
+    FunctionsLoaded = []
     Paused = True
     Running = False
     Software = None
     Closing = False
     Editting = False
-
+# my_module = importlib.import_module('os.path')
     def __init__(self):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
+        print(application_path)
 
 
         # The GUIDesign is defined in GUIDesign.py as the class MyFrame. It was made with wxFormBuilder
@@ -112,6 +116,8 @@ class MainFrame(GUIDesign.MyFrame):
         if os.path.exists(icon_file):
             icon = wx.Icon(icon_file)
             self.SetIcon(icon)
+        self.LoadFunctions()
+
 
 
         # Starts the STM Thread with an Incoming & Outgoing Queue.  Any time-consuming calculations/measurements should be made on this thread.
@@ -125,10 +131,19 @@ class MainFrame(GUIDesign.MyFrame):
         # Read the saved settings file here
         if os.path.exists(self.SavedSettingsFile):
             SettingsSeries = pd.read_csv(self.SavedSettingsFile,names=['key','value'])
+            
             self.SettingsDict = SettingsSeries.set_index('key').T.iloc[0].to_dict()
+            if "Functions" in self.SettingsDict.keys():
+                self.FunctionsLoaded = [string.replace(" ", "").replace("'", "") for string in (self.SettingsDict["Functions"][1:-1].split(','))]
             self.Software = self.SettingsDict["Software"]
-            ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
+            ThisChooseSoftwareDialog = ChooseSoftwareDialog(self,self.FunctionsLoaded)
             ThisChooseSoftwareDialog.SetSoftware(self.Software)
+            
+            for item in self.m_NotSTMMenu.GetMenuItems():
+                if item.GetItemLabel() in self.FunctionsLoaded:
+                    item.Check()
+                else:
+                    item.Check(False)
         else:
             ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
             ThisChooseSoftwareDialog.ShowModal()
@@ -242,6 +257,32 @@ class MainFrame(GUIDesign.MyFrame):
                 self.Process.join(timeout=0.5)
         if self.Closing:
             self.Destroy()
+    def LoadFunctions(self):
+        FunctionNames = [file for file in os.listdir('Functions') if file[-3:] == ".py"]
+
+        self.Functions = {f"{FunctionName[:-3]}":import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}')) for FunctionName in FunctionNames}        
+        for file in ["CreaTec.py","RHK.py","SXM.py"]:
+            try:
+                FunctionNames.remove(file)
+            except:
+                pass
+        try:
+            FunctionNames.insert(0, FunctionNames.pop(FunctionNames.index("General.py")))
+        except:
+            pass
+        for file in FunctionNames:
+            CheckFunction = self.m_NotSTMMenu.AppendCheckItem(wx.ID_ANY,file[:-3])
+            self.Bind(wx.EVT_MENU,self.EditLoadedFunctionFiles,CheckFunction)
+    def EditLoadedFunctionFiles(self,event=None):
+        self.FunctionsLoaded = []
+        for item in self.m_NotSTMMenu.GetMenuItems():
+            if item.IsChecked():
+                self.FunctionsLoaded.append(item.GetItemLabel())
+        
+        ThisChooseSoftwareDialog = ChooseSoftwareDialog(self,self.FunctionsLoaded)
+        ThisChooseSoftwareDialog.SetSoftware(self.Software)
+        
+    
     def MakeFunctionButtons(self):
         for child in self.m_FunctionButtonWindow.GetChildren():
             child.Destroy()
@@ -259,40 +300,53 @@ class MainFrame(GUIDesign.MyFrame):
                 json.dump(AllTheMacros, fp,indent=1)
 
         # for FunctionName in self.Functions[self.SettingsDict['Software']].keys():
-        for FunctionName in AllTheMacros.keys():
-            FunctionButton = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 120,30 ), 0 )
-            FunctionButton.Bind( wx.EVT_BUTTON, self.OnFunctionButton )
-            FunctionButton.SetToolTip(FunctionName)
-            FunctionButtonSizer.Add(FunctionButton,0, wx.ALL, 5)
-            def FunctionRightClick(event):
-                ThisButton = event.GetEventObject()
-                popupmenu = wx.Menu()
-                menuItem = popupmenu.Append(-1, 'Add to Queue')
-                def Queued(event2):
-                    self.OnFunctionButton(event)
-                self.Bind(wx.EVT_MENU, Queued, menuItem)
-                menuItem = popupmenu.Append(-1, 'Edit')
-                def Edit(event):
-                    MacroLabel = ThisButton.GetLabel()
-                    MyMacroDialog = MacroDialog(self,MacroName=MacroLabel,InitalMacro=AllTheMacros[MacroLabel])
-                    MyMacroDialog.ShowModal()
-                self.Bind(wx.EVT_MENU, Edit, menuItem)
-                menuItem = popupmenu.Append(-1, 'Delete')
-                def Delete(event):
-                    MacroLabel = ThisButton.GetLabel()
-                    MyMessage = wx.MessageDialog(self,message=f"Are you sure that you want to delete {MacroLabel}?\nThis cannot be undone.",caption="Delete Macro",style=wx.YES_NO)
-                    YesOrNo = MyMessage.ShowModal()
-                    if YesOrNo == wx.ID_YES:
-                        with open(self.MacroPath, 'r') as fp:
-                            AllTheMacros = json.load(fp)
-                        AllTheMacros.pop(MacroLabel)
-                        with open(self.MacroPath, 'w') as fp:
-                            json.dump(AllTheMacros, fp,indent=1)
-                        self.MakeFunctionButtons()
-                        self.m_FunctionButtonWindow.Layout()
-                self.Bind(wx.EVT_MENU, Delete, menuItem)
-                ThisButton.PopupMenu(popupmenu)
-            FunctionButton.Bind( wx.EVT_RIGHT_DOWN, FunctionRightClick )
+        
+        FunctionList = []
+        for FunctionFile in [self.Software,*self.FunctionsLoaded]:
+            NewFunctions = getmembers(self.Functions[FunctionFile], isfunction)
+            FunctionList = FunctionList + NewFunctions
+        FunctionList = [function[0].replace("_"," ") for function in FunctionList]
+        for FunctionName,Macro in AllTheMacros.items():
+            SkipMacro = False
+            for function in Macro:
+                functionname = function[0]
+                if not functionname in FunctionList:
+                    SkipMacro = True
+                    break
+            if not SkipMacro:
+                FunctionButton = wx.Button( self.m_FunctionButtonWindow, wx.ID_ANY, FunctionName, wx.DefaultPosition, wx.Size( 120,30 ), 0 )
+                FunctionButton.Bind( wx.EVT_BUTTON, self.OnFunctionButton )
+                FunctionButton.SetToolTip(FunctionName)
+                FunctionButtonSizer.Add(FunctionButton,0, wx.ALL, 5)
+                def FunctionRightClick(event):
+                    ThisButton = event.GetEventObject()
+                    popupmenu = wx.Menu()
+                    menuItem = popupmenu.Append(-1, 'Add to Queue')
+                    def Queued(event2):
+                        self.OnFunctionButton(event)
+                    self.Bind(wx.EVT_MENU, Queued, menuItem)
+                    menuItem = popupmenu.Append(-1, 'Edit')
+                    def Edit(event):
+                        MacroLabel = ThisButton.GetLabel()
+                        MyMacroDialog = MacroDialog(self,MacroName=MacroLabel,InitalMacro=AllTheMacros[MacroLabel])
+                        MyMacroDialog.ShowModal()
+                    self.Bind(wx.EVT_MENU, Edit, menuItem)
+                    menuItem = popupmenu.Append(-1, 'Delete')
+                    def Delete(event):
+                        MacroLabel = ThisButton.GetLabel()
+                        MyMessage = wx.MessageDialog(self,message=f"Are you sure that you want to delete {MacroLabel}?\nThis cannot be undone.",caption="Delete Macro",style=wx.YES_NO)
+                        YesOrNo = MyMessage.ShowModal()
+                        if YesOrNo == wx.ID_YES:
+                            with open(self.MacroPath, 'r') as fp:
+                                AllTheMacros = json.load(fp)
+                            AllTheMacros.pop(MacroLabel)
+                            with open(self.MacroPath, 'w') as fp:
+                                json.dump(AllTheMacros, fp,indent=1)
+                            self.MakeFunctionButtons()
+                            self.m_FunctionButtonWindow.Layout()
+                    self.Bind(wx.EVT_MENU, Delete, menuItem)
+                    ThisButton.PopupMenu(popupmenu)
+                FunctionButton.Bind( wx.EVT_RIGHT_DOWN, FunctionRightClick )
         self.m_FunctionButtonWindow.SetSizer(FunctionButtonSizer)
         self.m_FunctionButtonWindow.Layout()
 
@@ -437,8 +491,9 @@ class MainFrame(GUIDesign.MyFrame):
     def Cancel(self):
         if not self.Paused and self.m_PauseAfterCancel.IsChecked():
             self.Pause()
-        self.Functions[self.Software].Cancel = True
-        self.Functions["General"].Cancel = True
+        for FunctionFile in [self.Software,*self.FunctionsLoaded]:
+            self.Functions[FunctionFile].Cancel = True
+        
 
     def StartMakeNewMacro(self,event):
         MyMacroDialog = MacroDialog(self)
@@ -883,23 +938,31 @@ class MyPanelDropTarget(wx.DropTarget):
 
 def Thread(self,IncomingQueue,OutgoingQueue):
     Functions = {"RHK":RHKFunctions,"CreaTec":CreaTecFunctions,"SXM":SXMFunctions,"General":GeneralFunctions}
-    Functions["General"].MacroQueueSelf = self
     while True:
         Message = IncomingQueue.get() # Blocks until there's a message
         if Message[0] == "SoftwareChange":
             # Changes the global parameters that are assessable to the new software's functions (e.g. RHK -> CreaTec)
-            Software = Message[1]
+            Software,FunctionsToLoad = Message[1]
             Functions[Software].MacroQueueSelf = self
-            FunctionDict = {Name.replace("_"," "):Function for Name,Function in (getmembers(Functions[Software], isfunction) + getmembers(Functions["General"], isfunction))}
+            FunctionList = []
+            for FunctionFile in [self.Software,*self.FunctionsLoaded]:
+                NewFunctions = getmembers(self.Functions[FunctionFile], isfunction)
+                FunctionList = FunctionList + NewFunctions
+                Functions[FunctionFile] = self.Functions[FunctionFile]
+            FunctionDict = {Name.replace("_"," "):Function for Name,Function in FunctionList}
             Functions[Software].OutgoingQueue = OutgoingQueue
-            Functions["General"].OutgoingQueue = OutgoingQueue
+            for FunctionFile in FunctionsToLoad:
+                Functions[FunctionFile].MacroQueueSelf = self
+                Functions[FunctionFile].OutgoingQueue = OutgoingQueue
         if Message[0] == "OnClose":
-            if "OnClose" in FunctionDict.keys():
-                try:
-                    # Runs the OnClose functions for the given software
-                    FunctionDict["OnClose"]()
-                except:
-                    pass
+            for FunctionFile in [self.Software,*self.FunctionsLoaded]:
+                ClosingFunctionDict = {Name.replace("_"," "):Function for Name,Function in getmembers(self.Functions[FunctionFile], isfunction)}
+                if "OnClose" in ClosingFunctionDict.keys():
+                    try:
+                        # Runs the OnClose functions for the given softwares
+                        ClosingFunctionDict["OnClose"]()
+                    except:
+                        pass
             if self.Closing:
                 # Breaks out of the while loop which finishes/closes this thread
                 break
@@ -920,8 +983,10 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                             OutgoingQueue.put(("SetStatus",(f"Function: {Name}",1)))
                             Function(**Parameters)
                 OutgoingQueue.put(("FunctionFinished",None))
+                
                 Functions[Software].Cancel = False
-                Functions["General"].Cancel = False
+                for FunctionFile in FunctionsToLoad:
+                    Functions[FunctionFile].Cancel = False
                 OutgoingQueue.put(("SetStatus",(f"",1)))
 
 
@@ -929,6 +994,42 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                 OutgoingQueue.put(("ExceptionThrown",[e,Name]))
 
 
+
+import importlib.util
+import sys
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    import types
+def import_source_file(fname= str, modname= str) -> "types.ModuleType":
+    """
+    Import a Python source file and return the loaded module.
+    Args:
+        fname: The full path to the source file.  It may container characters like `.`
+            or `-`.
+        modname: The name for the loaded module.  It may contain `.` and even characters
+            that would normally not be allowed (e.g., `-`).
+    Return:
+        The imported module
+    Raises:
+        ImportError: If the file cannot be imported (e.g, if it's not a `.py` file or if
+            it does not exist).
+        Exception: Any exception that is raised while executing the module (e.g.,
+            :exc:`SyntaxError).  These are errors made by the author of the module!
+    """
+    # https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+    spec = importlib.util.spec_from_file_location(modname, fname)
+    if spec is None:
+        raise ImportError(f"Could not load spec for module '{modname}' at: {fname}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[modname] = module
+    try:
+        spec.loader.exec_module(module)
+    except FileNotFoundError as e:
+        raise ImportError(f"{e.strerror}: {fname}") from e
+    return module
 
 if __name__ == '__main__':
     mp.freeze_support()

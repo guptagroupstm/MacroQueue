@@ -69,6 +69,9 @@ class MyFrame ( wx.Frame ):
 
 		self.m_menubar1.Append( self.m_SystemMenu, u"System" )
 
+		self.m_NotSTMMenu = wx.Menu()
+		self.m_menubar1.Append( self.m_NotSTMMenu, u"Included Functions" )
+
 		self.m_menu5 = wx.Menu()
 		self.m_menuItem10 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Basic Usage", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu5.Append( self.m_menuItem10 )
@@ -305,6 +308,7 @@ class MacroDialog ( wx.Dialog ):
 		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Define The Macro", pos = wx.DefaultPosition, size = wx.Size( 800,600 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
 
 		self.SetSizeHints( wx.Size( -1,-1 ), wx.DefaultSize )
+		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_SCROLLBAR ) )
 
 		vbox = wx.FlexGridSizer( 0, 1, 0, 0 )
 		vbox.AddGrowableCol( 0 )
@@ -350,11 +354,28 @@ class MacroDialog ( wx.Dialog ):
 		Windowshbox.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
 		Windowshbox.SetMinSize( wx.Size( 750,50 ) )
-		self.m_FunctionButtonScrolledWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.VSCROLL )
-		self.m_FunctionButtonScrolledWindow.SetScrollRate( 0, 5 )
-		self.m_FunctionButtonScrolledWindow.SetMinSize( wx.Size( -1,100 ) )
+		self.m_panel14 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel14.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNSHADOW ) )
+		self.m_panel14.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNSHADOW ) )
 
-		Windowshbox.Add( self.m_FunctionButtonScrolledWindow, 1, wx.EXPAND |wx.ALL, 5 )
+		fgSizer13 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer13.AddGrowableCol( 0 )
+		fgSizer13.AddGrowableRow( 0 )
+		fgSizer13.SetFlexibleDirection( wx.BOTH )
+		fgSizer13.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		self.m_FunctionButtonNotebook = wx.Notebook( self.m_panel14, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_FunctionButtonNotebook.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNSHADOW ) )
+		self.m_FunctionButtonNotebook.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_MENU ) )
+
+
+		fgSizer13.Add( self.m_FunctionButtonNotebook, 1, wx.EXPAND |wx.ALL, 5 )
+
+
+		self.m_panel14.SetSizer( fgSizer13 )
+		self.m_panel14.Layout()
+		fgSizer13.Fit( self.m_panel14 )
+		Windowshbox.Add( self.m_panel14, 1, wx.EXPAND |wx.ALL, 5 )
 
 		self.m_FunctionQueueScrolledWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 300,-1 ), wx.HSCROLL|wx.VSCROLL )
 		self.m_FunctionQueueScrolledWindow.SetScrollRate( 5, 5 )
@@ -402,7 +423,6 @@ class MacroDialog ( wx.Dialog ):
 		self.Centre( wx.BOTH )
 
 		# Connect Events
-		self.m_FunctionButtonScrolledWindow.Bind( wx.EVT_SIZE, self.OnScrolledButtonWindowSize )
 		self.applyButton.Bind( wx.EVT_BUTTON, self.Accept )
 		self.closeButton.Bind( wx.EVT_BUTTON, self.OnExit )
 
@@ -411,9 +431,6 @@ class MacroDialog ( wx.Dialog ):
 
 
 	# Virtual event handlers, override them in your derived class
-	def OnScrolledButtonWindowSize( self, event ):
-		event.Skip()
-
 	def Accept( self, event ):
 		event.Skip()
 

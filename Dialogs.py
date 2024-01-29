@@ -3,7 +3,6 @@ import wx
 from inspect import getmembers, isfunction,getcomments
 from GUIDesign import MacroDialog
 import inspect
-import Functions.RHK as RHKFunctions
 import json
 from GUIDesign import MacroSettingsDialog
 import os
@@ -145,15 +144,7 @@ class MyMacroDialog ( MacroDialog ):
         self.m_MacroTextCtrl.SetValue(MacroName)
 
     def SetFunctionButtons(self):
-        AddFunctionButtonSizer = wx.FlexGridSizer( 0, 3, 0, 0 )
-        AddFunctionButtonSizer.AddGrowableCol( 0 )
-        AddFunctionButtonSizer.AddGrowableCol( 1 )
-        AddFunctionButtonSizer.SetFlexibleDirection( wx.BOTH )
-        AddFunctionButtonSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-
-        self.FunctionInfoList = {}
-        FunctionList = getmembers(self.Parent.Functions[self.Parent.Software], isfunction) + getmembers(self.Parent.Functions["General"], isfunction)
         def GetValueType(Value):
             ValueType = type(Value)
             if ValueType == list or Value == tuple:
@@ -167,65 +158,82 @@ class MyMacroDialog ( MacroDialog ):
                 return "Numerical"
             except:
                 raise TypeError(f'The default variable, {Value}, cannot be put into one of the type categories.  It is of type {ValueType}.')
-        for Name,Function in FunctionList:
-            if Name != "Initialize" and Name != "OnClose" and Name != "OnCancel":
-                Name = Name.replace("_"," ")
-                FunctionButton = wx.Button( self.m_FunctionButtonScrolledWindow, wx.ID_ANY, Name, wx.DefaultPosition, wx.DefaultSize, 0 )
-                FunctionButton.SetMinSize( wx.Size( 150,-1 ) )
-                AddFunctionButtonSizer.Add( FunctionButton, 0, wx.ALL, 5 )
-                Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","Frozen":False,"ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
-                for ParameterName in Parameters.keys():
-                    Parameters[ParameterName]["InRange"] = True
-                    if Parameters[ParameterName]["ValueType"] == "Choice":
-                        Parameters[ParameterName]["DefaultList"] = Parameters[ParameterName]['DefaultValue']
-                        Parameters[ParameterName]["DefaultValue"] = Parameters[ParameterName]['DefaultValue'][0]
-                    
-                Comments = getcomments(Function)
-                if Comments is not None:
-                    for line in Comments.splitlines():
-                        CurlyBracketIndex = line.find("{")
-                        if CurlyBracketIndex != -1:
-                            ParameterDict = json.loads(line[1:])
-                            parameter = ParameterDict["Name"]
-                            if parameter in Parameters.keys():
-                                Parameters[parameter] = {**Parameters[parameter],**ParameterDict}
-                                if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
-                                    Parameters[parameter]['Tooltip'] += f"\nAcceptable range: ({ParameterDict['Min']},{ParameterDict['Max']})"
-                                if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
-                                    Parameters[parameter]['Tooltip'] += f"\nMaximum value: {ParameterDict['Max']}"
-                                if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
-                                    Parameters[parameter]['Tooltip'] += f"\nMinimum value: {ParameterDict['Min']}"
-                        else:
-                            for parameter in Parameters.keys():
-                                ParameterIndex = line.find(parameter)
-                                if ParameterIndex != -1:
-                                    EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
-                                    SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
-                                    if SemiColonIndex != -1:
-                                        Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
-                                        Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
-                                    else:
-                                        Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:] 
-                FunctionButton.Bind(wx.EVT_BUTTON, self.AddFunctionToQueue)
-
-
-                FunctionButton
-                FunctionInfo = [FunctionButton,Function,Parameters]
-                self.FunctionInfoList[Name] = FunctionInfo
             
-        
-        self.m_FunctionNameSizer = wx.FlexGridSizer( 0, 1, -6, 0 )
-        self.m_FunctionNameSizer.AddGrowableCol( 0 )
-        self.m_FunctionNameSizer.SetFlexibleDirection( wx.BOTH )
-        self.m_FunctionNameSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        self.m_FunctionQueueScrolledWindow.SetSizer(self.m_FunctionNameSizer)
+        self.FunctionInfoList = {}
+        # FunctionList = getmembers(self.Parent.Functions[self.Parent.Software], isfunction)
+        FunctionList = []
+        for FunctionFile in [self.Parent.Software,*self.Parent.FunctionsLoaded]:
+            AddFunctionButtonSizer = wx.FlexGridSizer( 0, 3, 0, 0 )
+            AddFunctionButtonSizer.AddGrowableCol( 0 )
+            AddFunctionButtonSizer.AddGrowableCol( 1 )
+            AddFunctionButtonSizer.SetFlexibleDirection( wx.BOTH )
+            AddFunctionButtonSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+            NewFunctions = getmembers(self.Parent.Functions[FunctionFile], isfunction)
+            FunctionList = FunctionList + NewFunctions
+            
+            m_FunctionButtonScrolledWindow = wx.ScrolledWindow( self.m_FunctionButtonNotebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.VSCROLL )
+            m_FunctionButtonScrolledWindow.SetScrollRate( 0, 5 )
+            for Name,Function in NewFunctions:
+                if Name != "Initialize" and Name != "OnClose" and Name != "OnCancel":
+                    Name = Name.replace("_"," ")
+                    FunctionButton = wx.Button( m_FunctionButtonScrolledWindow, wx.ID_ANY, Name, wx.DefaultPosition, wx.DefaultSize, 0 )
+                    FunctionButton.SetMinSize( wx.Size( 150,-1 ) )
+                    AddFunctionButtonSizer.Add( FunctionButton, 0, wx.ALL, 5 )
+                    Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","Frozen":False,"ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
+                    for ParameterName in Parameters.keys():
+                        Parameters[ParameterName]["InRange"] = True
+                        if Parameters[ParameterName]["ValueType"] == "Choice":
+                            Parameters[ParameterName]["DefaultList"] = Parameters[ParameterName]['DefaultValue']
+                            Parameters[ParameterName]["DefaultValue"] = Parameters[ParameterName]['DefaultValue'][0]
+                        
+                    Comments = getcomments(Function)
+                    if Comments is not None:
+                        for line in Comments.splitlines():
+                            CurlyBracketIndex = line.find("{")
+                            if CurlyBracketIndex != -1:
+                                ParameterDict = json.loads(line[1:])
+                                parameter = ParameterDict["Name"]
+                                if parameter in Parameters.keys():
+                                    Parameters[parameter] = {**Parameters[parameter],**ParameterDict}
+                                    if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                        Parameters[parameter]['Tooltip'] += f"\nAcceptable range: ({ParameterDict['Min']},{ParameterDict['Max']})"
+                                    if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
+                                        Parameters[parameter]['Tooltip'] += f"\nMaximum value: {ParameterDict['Max']}"
+                                    if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                        Parameters[parameter]['Tooltip'] += f"\nMinimum value: {ParameterDict['Min']}"
+                            else:
+                                for parameter in Parameters.keys():
+                                    ParameterIndex = line.find(parameter)
+                                    if ParameterIndex != -1:
+                                        EqualSignIndex = line[ParameterIndex+len(parameter):].find("=")
+                                        SemiColonIndex = line[ParameterIndex+len(parameter):].find(";")
+                                        if SemiColonIndex != -1:
+                                            Parameters[parameter]['Units'] = line[ParameterIndex+len(parameter):][EqualSignIndex+1:SemiColonIndex]
+                                            Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter):][SemiColonIndex+1:]
+                                        else:
+                                            Parameters[parameter]['Tooltip'] = line[ParameterIndex+len(parameter)+EqualSignIndex+1:] 
+                    FunctionButton.Bind(wx.EVT_BUTTON, self.AddFunctionToQueue)
+
+
+                    FunctionInfo = [FunctionButton,Function,Parameters]
+                    self.FunctionInfoList[Name] = FunctionInfo
+                
+            
+            self.m_FunctionNameSizer = wx.FlexGridSizer( 0, 1, -6, 0 )
+            self.m_FunctionNameSizer.AddGrowableCol( 0 )
+            self.m_FunctionNameSizer.SetFlexibleDirection( wx.BOTH )
+            self.m_FunctionNameSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+            self.m_FunctionQueueScrolledWindow.SetSizer(self.m_FunctionNameSizer)
 
 
 
 
-        self.m_FunctionButtonScrolledWindow.SetSizer( AddFunctionButtonSizer )
-        self.m_FunctionButtonScrolledWindow.Layout()
-        AddFunctionButtonSizer.Fit( self.m_FunctionButtonScrolledWindow )
+            m_FunctionButtonScrolledWindow.SetSizer( AddFunctionButtonSizer )
+            m_FunctionButtonScrolledWindow.Layout()
+            AddFunctionButtonSizer.Fit( m_FunctionButtonScrolledWindow )
+            
+            self.m_FunctionButtonNotebook.AddPage(m_FunctionButtonScrolledWindow,FunctionFile)
+        # self.m_FunctionButtonNotebook.SetPadding(wx.Size(10,0))
         return
     def AddFunctionToQueue(self,event=None,Function=None):
         Included = True
@@ -237,10 +245,7 @@ class MyMacroDialog ( MacroDialog ):
             FunctionLabel, ParametersDict, Included = Function
             FunctionInfo = self.FunctionInfoList[FunctionLabel].copy()
             for ParameterName in ParametersDict.keys():
-                if FunctionInfo[2][ParameterName]["ValueType"] == "Choice":
-                    FunctionInfo[2][ParameterName] = {**FunctionInfo[2][ParameterName],**ParametersDict[ParameterName]}
-                else:
-                    FunctionInfo[2][ParameterName] = {**FunctionInfo[2][ParameterName],**ParametersDict[ParameterName]}
+                FunctionInfo[2][ParameterName] = {**FunctionInfo[2][ParameterName],**ParametersDict[ParameterName]}
         YBitmapSize = 20
         m_FunctionWindow = wx.Panel( self.m_FunctionQueueScrolledWindow, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1,-1), wx.TAB_TRAVERSAL )
         m_FunctionWindow.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
@@ -594,9 +599,12 @@ class MyStartMacroDialog(StartMacroDialog):
             except:
                 raise TypeError(f'The default variable, {Value}, cannot be put into one of the type categories.  It is of type {ValueType}.')
         self.TheFunctionInfos = {}
-        FunctionList = getmembers(self.Parent.Functions[self.Parent.Software], isfunction) + getmembers(self.Parent.Functions["General"], isfunction)
+
+        FunctionList = getmembers(self.Parent.Functions[self.Parent.Software], isfunction)
+        for FunctionFile in self.Parent.FunctionsLoaded:
+            FunctionList = FunctionList + getmembers(self.Parent.Functions[FunctionFile], isfunction)
+
         for FunctionName,Function in FunctionList:
-            # if FunctionName != "Initialize" and FunctionName != "OnClose" and FunctionName != "OnCancel":
             FunctionName = FunctionName.replace("_"," ")
             Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
             Comments = getcomments(Function)
@@ -1091,9 +1099,6 @@ class MyStartMacroDialog(StartMacroDialog):
                 if Panel.GetId() == thisPanel.GetId():
                     break
 
-            # ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.QueueObject[0]]
-            # self.QueueObject[0] = ThisMacro
-            #Remove the macro here
             self.Parent.TheQueue.pop(Index)
             thisPanel.Destroy()
             self.Parent.m_QueueWindow.FitInside()
@@ -1105,9 +1110,10 @@ class MyStartMacroDialog(StartMacroDialog):
 
 
 class MyChooseSoftwareDialog(ChooseSoftware):
-    def __init__(self, parent):
+    def __init__(self, parent,FunctionsToLoad=None):
         super().__init__(parent)
         self.SavedSettingsFile = self.Parent.SavedSettingsFile
+        self.FunctionsToLoad = FunctionsToLoad
     def OnRHK(self, event=None):
         self.SetSoftware("RHK")
     def OnCreaTec(self, event=None):
@@ -1127,10 +1133,13 @@ class MyChooseSoftwareDialog(ChooseSoftware):
                 self.Parent.m_SXMmenuItem.Check(True)
             self.Parent.Software = software
             self.Parent.MacroPath = self.Parent.MacroPaths[software]
-            self.Parent.MakeFunctionButtons()
-            SettingsDict = {"Software":software}
+            if self.FunctionsToLoad is None:
+                SettingsDict = {"Software":software,'Functions':['General']}
+            else:
+                SettingsDict = {"Software":software,'Functions':self.FunctionsToLoad}
+                
             pd.Series(SettingsDict).to_csv(self.SavedSettingsFile,header=False)
             self.Parent.MakeFunctionButtons()
-            self.Parent.IncomingQueue.put(["SoftwareChange",software])
+            self.Parent.IncomingQueue.put(["SoftwareChange",[software,self.FunctionsToLoad]])
             
         self.Destroy()
