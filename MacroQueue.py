@@ -2,18 +2,7 @@ import wx
 import os
 import sys
 import pandas as pd
-import pyvisa
-import SXMRemote
-import time
-import socket
-# from shutil import copytree,rmtree
-# from functools import partial
-# import win32com.client
-# import plotly.graph_objects as go
-# import plotly.express as px
 import multiprocessing as mp
-import numpy as np
-# from math import log10 , floor
 import queue
 import GUIDesign
 import threading
