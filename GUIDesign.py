@@ -88,6 +88,9 @@ class MyFrame ( wx.Frame ):
 		self.m_menuItem121 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Info", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu5.Append( self.m_menuItem121 )
 
+		self.m_menuItem1211 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"License", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.Append( self.m_menuItem1211 )
+
 		self.m_menubar1.Append( self.m_menu5, u"Help" )
 
 		self.SetMenuBar( self.m_menubar1 )
@@ -162,6 +165,7 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.MakeAMacroHelp, id = self.m_menuItem11.GetId() )
 		self.Bind( wx.EVT_MENU, self.WriteANewFunctionHelp, id = self.m_menuItem12.GetId() )
 		self.Bind( wx.EVT_MENU, self.InfoHelp, id = self.m_menuItem121.GetId() )
+		self.Bind( wx.EVT_MENU, self.License, id = self.m_menuItem1211.GetId() )
 		self.Bind( wx.EVT_TIMER, self.CheckQueue, id=wx.ID_ANY )
 		self.m_PauseAfterButton.Bind( wx.EVT_BUTTON, self.Pause )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.ClearQueue )
@@ -218,6 +222,9 @@ class MyFrame ( wx.Frame ):
 		event.Skip()
 
 	def InfoHelp( self, event ):
+		event.Skip()
+
+	def License( self, event ):
 		event.Skip()
 
 	def CheckQueue( self, event ):
