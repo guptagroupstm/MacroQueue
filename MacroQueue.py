@@ -261,11 +261,11 @@ class MainFrame(GUIDesign.MyFrame):
             self.m_QueueWindow.FitInside()
     def OnClose(self,event=None):
         self.Closing = True
-        if self.Software is not None:
-            self.ClearQueue()
-            self.IncomingQueue.put(['OnClose'])
-            while self.Closing and self.Process.is_alive():
-                self.Process.join(timeout=0.5)
+        # if self.Software is not None:
+        self.ClearQueue()
+        self.IncomingQueue.put(['OnClose'])
+        while self.Closing and self.Process.is_alive():
+            self.Process.join(timeout=0.5)
         if self.Closing:
             self.Destroy()
     def LoadFunctions(self):
