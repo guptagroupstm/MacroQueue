@@ -1,7 +1,8 @@
 import unittest
 import sys
 import os
-sys.path.append('..')
+application_path = os.path.dirname(__file__)
+sys.path.append(os.path.realpath(application_path+'\\..'))
 from MacroQueue import *
 
 
