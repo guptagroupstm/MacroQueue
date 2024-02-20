@@ -775,8 +775,8 @@ class MainFrame(GUIDesign.MyFrame):
     def AddConnectToQueue(self, event=None):
         Initialize = [['Initialize',{},True]]
         if not self.test:
-        MyStartMacroDialog = StartMacroDialog(self,"Connect",Initialize)
-        MyStartMacroDialog.AddToQueue()
+            MyStartMacroDialog = StartMacroDialog(self,"Connect",Initialize)
+            MyStartMacroDialog.AddToQueue()
         return
     def AddDisconnectToQueue(self, event=None):
         OnClose = [['OnClose',{},True],['Pause',{},True]]
