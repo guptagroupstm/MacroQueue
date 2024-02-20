@@ -137,7 +137,7 @@ class MainFrame(GUIDesign.MyFrame):
         self.IncomingQueue = mp.Queue()
 
         self.Process = threading.Thread(target=Thread, args=(self,self.IncomingQueue,self.OutgoingQueue))
-        # self.Process.start()
+        self.Process.start()
 
         # Read the saved settings file here
         if os.path.exists(self.SavedSettingsFile):
@@ -184,7 +184,7 @@ class MainFrame(GUIDesign.MyFrame):
             self.m_QueueWindow.FitInside()
         self.m_QueueWindow.Bind( wx.EVT_SIZE, OnQueueSize )
         self.AddConnectToQueue()
-        self.Show()
+        # self.Show()
 
     def CheckQueue(self,event):
         # This funtion runs on a timer.  Twice a second.
