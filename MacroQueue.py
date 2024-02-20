@@ -463,7 +463,10 @@ class MainFrame(GUIDesign.MyFrame):
                 self.Cancel()
             else:
                 for Function,RemovePanel,Text in self.TheQueue:
-                    RemovePanel.Destroy()
+                    try:
+                        RemovePanel.Destroy()
+                    except:
+                        pass
                 self.TheQueue = []
             self.m_QueueWindow.FitInside()
     def Pause(self, event=None):
