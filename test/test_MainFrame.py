@@ -13,8 +13,7 @@ class MainFrame_test(unittest.TestCase):
         MyMainFrame.CheckQueue(event=None)
         MyMainFrame.IdleLoop(event=None)
         MyMainFrame.Close()
-        app.OnExit()
-        wx.Exit()
+
         
         pass
     

@@ -137,7 +137,7 @@ class MainFrame(GUIDesign.MyFrame):
         self.IncomingQueue = mp.Queue()
 
         self.Process = threading.Thread(target=Thread, args=(self,self.IncomingQueue,self.OutgoingQueue))
-        self.Process.start()
+        # self.Process.start()
 
         # Read the saved settings file here
         if os.path.exists(self.SavedSettingsFile):
@@ -1036,7 +1036,7 @@ def Thread(self,IncomingQueue,OutgoingQueue):
 
             except Exception as e:
                 OutgoingQueue.put(("ExceptionThrown",[e,Name]))
-
+    print("Broken")
 
 
 import importlib.util
