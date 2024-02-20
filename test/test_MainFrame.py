@@ -1,7 +1,9 @@
 import unittest
 import multiprocessing as mp
 import sys
-sys.path.append('..')
+import os
+application_path = os.path.dirname(__file__)
+sys.path.append(os.path.realpath(application_path+'..'))
 from MacroQueue import *
 
 class MainFrame_test(unittest.TestCase):
