@@ -1001,13 +1001,13 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                 Functions[FunctionFile].OutgoingQueue = OutgoingQueue
         if Message[0] == "OnClose":
             for FunctionFile in [self.Software,*self.FunctionsLoaded]:
-                ClosingFunctionDict = {Name.replace("_"," "):Function for Name,Function in getmembers(self.Functions[FunctionFile], isfunction)}
-                if "OnClose" in ClosingFunctionDict.keys():
-                    try:
+                try:
+                    ClosingFunctionDict = {Name.replace("_"," "):Function for Name,Function in getmembers(self.Functions[FunctionFile], isfunction)}
+                    if "OnClose" in ClosingFunctionDict.keys():
                         # Runs the OnClose functions for the given softwares
                         ClosingFunctionDict["OnClose"]()
-                    except:
-                        pass
+                except:
+                    pass
             if self.Closing:
                 # Breaks out of the while loop which finishes/closes this thread
                 break
