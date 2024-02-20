@@ -160,9 +160,9 @@ class MainFrame(GUIDesign.MyFrame):
             if not test:
                 ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
                 ThisChooseSoftwareDialog.ShowModal()
-        if self.Software is None:
-            self.OnClose()
-            return
+        # if self.Software is None:
+        #     self.OnClose()
+        #     return
         
 
 
@@ -1044,7 +1044,6 @@ def Thread(self,IncomingQueue,OutgoingQueue):
 
             except Exception as e:
                 OutgoingQueue.put(("ExceptionThrown",[e,Name]))
-    print("Broken")
 
 
 import importlib.util
