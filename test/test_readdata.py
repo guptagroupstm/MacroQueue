@@ -1,8 +1,7 @@
 import unittest
 import os
 import sys
-application_path = os.path.dirname(__file__)
-sys.path.append(os.path.realpath(application_path+'..'))
+sys.path.append('..')
 from Dialogs import LoadMacros, GetFunctionList
 
 
