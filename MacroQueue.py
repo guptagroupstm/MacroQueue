@@ -121,6 +121,7 @@ class MainFrame(GUIDesign.MyFrame):
         if os.path.exists(icon_file):
             icon = wx.Icon(icon_file)
             self.SetIcon(icon)
+            
         self.LoadFunctions()
 
 
@@ -269,8 +270,12 @@ class MainFrame(GUIDesign.MyFrame):
             self.Destroy()
     def LoadFunctions(self):
         FunctionNames = [file for file in os.listdir('Functions') if file[-3:] == ".py"]
-
-        self.Functions = {f"{FunctionName[:-3]}":import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}')) for FunctionName in FunctionNames}        
+        self.Functions = {}
+        for FunctionName in FunctionNames:
+            try:
+                self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}'))         
+            except:
+                pass
         for file in ["CreaTec.py","RHK.py","SXM.py"]:
             try:
                 FunctionNames.remove(file)
