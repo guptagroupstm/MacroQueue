@@ -108,7 +108,7 @@ class MainFrame(GUIDesign.MyFrame):
     Closing = False
     Editting = False
 # my_module = importlib.import_module('os.path')
-    def __init__(self):
+    def __init__(self,test=False):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
@@ -156,8 +156,9 @@ class MainFrame(GUIDesign.MyFrame):
                 else:
                     item.Check(False)
         else:
-            ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
-            ThisChooseSoftwareDialog.ShowModal()
+            if not test:
+                ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
+                ThisChooseSoftwareDialog.ShowModal()
         if self.Software is None:
             self.OnClose()
             return
@@ -184,7 +185,7 @@ class MainFrame(GUIDesign.MyFrame):
             self.m_QueueWindow.FitInside()
         self.m_QueueWindow.Bind( wx.EVT_SIZE, OnQueueSize )
         self.AddConnectToQueue()
-        # self.Show()
+        self.Show()
 
     def CheckQueue(self,event):
         # This funtion runs on a timer.  Twice a second.

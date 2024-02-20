@@ -9,9 +9,9 @@ from MacroQueue import *
 class MainFrame_test(unittest.TestCase):
     def test_GUI(self):
         app = wx.App() 
-        MyMainFrame = MainFrame()
-        # MyMainFrame.CheckQueue(event=None)
-        # MyMainFrame.IdleLoop(event=None)
+        MyMainFrame = MainFrame(test=True)
+        MyMainFrame.CheckQueue(event=None)
+        MyMainFrame.IdleLoop(event=None)
         MyMainFrame.Close()
 
         
