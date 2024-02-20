@@ -982,7 +982,7 @@ class MyPanelDropTarget(wx.DropTarget):
         return d
 
 def Thread(self,IncomingQueue,OutgoingQueue):
-    Functions = {"RHK":RHKFunctions,"CreaTec":CreaTecFunctions,"SXM":SXMFunctions,"General":GeneralFunctions}
+    Functions = self.Functions
     while True:
         Message = IncomingQueue.get() # Blocks until there's a message
         if Message[0] == "SoftwareChange":
