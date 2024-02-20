@@ -26,11 +26,27 @@ from Macros import *
 # from GUIDesign import MacroDialog
 from inspect import getmembers, isfunction
 
+# They all go in try/except just in case the required packages aren't installed for one of them 
+# (e.g. you can still use RHK's functions even without win32com which you need for CreaTec)
+try:
+    import Functions.RHK as RHKFunctions
+except:
+    pass
 
-import Functions.RHK as RHKFunctions
-import Functions.CreaTec as CreaTecFunctions
-import Functions.SXM as SXMFunctions
-import Functions.General as GeneralFunctions
+try:
+    import Functions.CreaTec as CreaTecFunctions
+except:
+    pass
+
+try:
+    import Functions.SXM as SXMFunctions
+except:
+    pass
+
+try:
+    import Functions.General as GeneralFunctions
+except:
+    pass
 
 import json
 
