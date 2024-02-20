@@ -8,12 +8,13 @@ from MacroQueue import *
 
 class MainFrame_test(unittest.TestCase):
     def test_GUI(self):
-        mp.freeze_support()
-        self.app = wx.App() 
-        self.MyMainFrame = MainFrame()
-        self.MyMainFrame.CheckQueue(event=None)
-        self.MyMainFrame.IdleLoop(event=None)
-        self.MyMainFrame.Close()
+        app = wx.App() 
+        MyMainFrame = MainFrame()
+        MyMainFrame.CheckQueue(event=None)
+        MyMainFrame.IdleLoop(event=None)
+        MyMainFrame.Close()
+        MyMainFrame.Destroy()
+        app.Destroy()
         pass
     
 
