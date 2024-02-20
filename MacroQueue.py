@@ -107,6 +107,7 @@ class MainFrame(GUIDesign.MyFrame):
     Software = None
     Closing = False
     Editting = False
+    Functions = {}
 # my_module = importlib.import_module('os.path')
     def __init__(self,test=False):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
