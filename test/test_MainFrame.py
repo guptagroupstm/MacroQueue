@@ -14,7 +14,7 @@ class MainFrame_test(unittest.TestCase):
         MyMainFrame.IdleLoop(event=None)
         MyMainFrame.Close()
         MyMainFrame.Destroy()
-        app.Destroy()
+        app.OnExit()
         pass
     
 
