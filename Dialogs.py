@@ -405,7 +405,11 @@ class MyMacroDialog ( MacroDialog ):
         self.Destroy()
         return
 
-
+def LoadMacros(MacroPath):
+    with open(MacroPath, 'r') as fp:
+        AllTheMacros = json.load(fp)
+    return AllTheMacros
+                    
 class MyMacroSettingsDialog(MacroSettingsDialog):
     def __init__(self, parent, Name, TheMacro):
         super().__init__(parent)
@@ -539,6 +543,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
             if os.path.exists(MacroPath):
                 with open(MacroPath, 'r') as fp:
                     AllTheMacros = json.load(fp)
+                AllTheMacros = LoadMacros(MacroPath)
                 if MacroName in AllTheMacros.keys() and not self.TheMacro == AllTheMacros[MacroName]:
                     MyMessage = wx.MessageDialog(self,message=f"There is already a macro named {MacroName}.\nWould you like to overwrite?",caption="Warning - Overwrite Macro",style=wx.YES_NO)
                     YesOrNo = MyMessage.ShowModal()
@@ -568,7 +573,8 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                         Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[i][ParameterName][0].GetValue()
                     Parameters[ParameterName]['Frozen'] = self.TheMacroCtrls[i][ParameterName][1].GetValue()
             self.TheMacro[i][2] = self.TheMacroCtrls[i]["__Included__"].GetValue()
-
+def GetFunctionList(name):
+    return getmembers(name, isfunction)
 class MyStartMacroDialog(StartMacroDialog):
     def __init__(self, parent,MacroLabel,TheDefaultMacro,EdittingMode = False,QueueObject=None):
         super().__init__(parent)
@@ -599,8 +605,7 @@ class MyStartMacroDialog(StartMacroDialog):
             except:
                 raise TypeError(f'The default variable, {Value}, cannot be put into one of the type categories.  It is of type {ValueType}.')
         self.TheFunctionInfos = {}
-
-        FunctionList = getmembers(self.Parent.Functions[self.Parent.Software], isfunction)
+        FunctionList = GetFunctionList(self.Parent.Functions[self.Parent.Software])
         for FunctionFile in self.Parent.FunctionsLoaded:
             FunctionList = FunctionList + getmembers(self.Parent.Functions[FunctionFile], isfunction)
 

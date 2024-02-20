@@ -110,7 +110,12 @@ class MainFrame(GUIDesign.MyFrame):
 
 
         # Starts the STM Thread with an Incoming & Outgoing Queue.  Any time-consuming calculations/measurements should be made on this thread.
-        mp.set_start_method('spawn')
+        try:
+            mp.set_start_method('spawn')
+        except RuntimeError:
+            pass
+
+
         self.OutgoingQueue = mp.Queue()
         self.IncomingQueue = mp.Queue()
 

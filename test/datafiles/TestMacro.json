@@ -1,0 +1,424 @@
+{
+ "Scan": [
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in nm directly or the Resolution in nm/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Tooltip": "The length of a row and column in nm or nm/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Move To Image Start",
+   {
+    "Wait_Time": {
+     "DefaultValue": "10",
+     "Tooltip": "The time to wait after the tip is moved in seconds.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "s/line",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "ms/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "0.5",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or ms/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "50",
+     "Tooltip": "The current setpoint in pA",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "pA"
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The bias voltage in Volts",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "V"
+    }
+   },
+   false
+  ],
+  [
+   "Scan",
+   {},
+   true
+  ]
+ ],
+ "dIdV Scan": [
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in nm directly or the Resolution in nm/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Tooltip": "The length of a row and column in nm or nm/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Move To Image Start",
+   {
+    "Wait_Time": {
+     "DefaultValue": "10",
+     "Tooltip": "The time to wait after the tip is moved in seconds.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "ms/pixel",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "ms/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "8",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or ms/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "50",
+     "Tooltip": "The current setpoint in pA",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "pA"
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The bias voltage in Volts",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "V"
+    }
+   },
+   false
+  ],
+  [
+   "dIdV Scan",
+   {},
+   true
+  ]
+ ],
+ "Wait": [
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   true
+  ]
+ ],
+ "Move Tip": [
+  [
+   "Move Tip",
+   {
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "10",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   false
+  ]
+ ],
+ "dIdV Spectra": [
+  [
+   "Move Tip",
+   {
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y center of the image in nm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "nm"
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "10",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "dIdV Spectra",
+   {},
+   true
+  ]
+ ],
+ "AutoPhase": [
+  [
+   "Z Course Steps Out",
+   {
+    "NSteps": {
+     "DefaultValue": "3",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "WaitBetween": {
+     "DefaultValue": "2",
+     "Tooltip": "The time to wait between steps",
+     "Frozen": true,
+     "ValueType": "Numerical",
+     "Units": "S"
+    }
+   },
+   true
+  ],
+  [
+   "AutoPhase",
+   {},
+   true
+  ],
+  [
+   "Approach",
+   {},
+   true
+  ]
+ ],
+ "Approach": [
+  [
+   "Approach",
+   {},
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "600",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   true
+  ]
+ ],
+ "Step Out": [
+  [
+   "Z Course Steps Out",
+   {
+    "NSteps": {
+     "DefaultValue": "3",
+     "Tooltip": "The number of steps out to take",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "WaitBetween": {
+     "DefaultValue": "2",
+     "Tooltip": "The time to wait between steps",
+     "Frozen": true,
+     "ValueType": "Numerical",
+     "Units": "S"
+    }
+   },
+   true
+  ]
+ ]
+}
