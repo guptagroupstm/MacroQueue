@@ -10,8 +10,7 @@ class STMThread_test(unittest.TestCase):
     def test_thread(self):
         mp.freeze_support()
         self.app = wx.App() 
-        self.MyMainFrame = MainFrame()
-        self.MyMainFrame.Show()
+        self.MyMainFrame = MainFrame(test=True)
         TestMacro = [[{'Name':"test","Parameters":[]},False]]
         self.MyMainFrame.IncomingQueue.put(("StartFunction",TestMacro))
         Message = self.MyMainFrame.OutgoingQueue.get(timeout=10)
