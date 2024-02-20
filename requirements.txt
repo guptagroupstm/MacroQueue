@@ -1,3 +1,5 @@
 attrdict3>=2.0.2
+wheel>=0.1.0
+pygame>=2.0.0
 wxPython>=4.2.1
 pandas>=2.1.3
