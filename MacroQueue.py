@@ -110,6 +110,7 @@ class MainFrame(GUIDesign.MyFrame):
     Functions = {}
 # my_module = importlib.import_module('os.path')
     def __init__(self,test=False):
+        self.test = test
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
@@ -773,6 +774,7 @@ class MainFrame(GUIDesign.MyFrame):
             result = dropSource.DoDragDrop()
     def AddConnectToQueue(self, event=None):
         Initialize = [['Initialize',{},True]]
+        if not self.test:
         MyStartMacroDialog = StartMacroDialog(self,"Connect",Initialize)
         MyStartMacroDialog.AddToQueue()
         return
