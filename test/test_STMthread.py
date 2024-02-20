@@ -14,7 +14,7 @@ class STMThread_test(unittest.TestCase):
         self.MyMainFrame.Show()
         TestMacro = [[{'Name':"test","Parameters":[]},False]]
         self.MyMainFrame.IncomingQueue.put(("StartFunction",TestMacro))
-        Message = self.MyMainFrame.OutgoingQueue.get()
+        Message = self.MyMainFrame.OutgoingQueue.get(timeout=10)
         self.assertEqual(f"{Message}","('FunctionFinished', None)")
         self.MyMainFrame.OnClose()
 
