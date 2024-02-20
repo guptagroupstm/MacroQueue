@@ -1,4 +1,3 @@
-Python >= 3.9.13
 wxPython>=4.2.1
 pandas>=2.1.3
 pyinstall>=6.2.0
