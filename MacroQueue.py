@@ -1016,7 +1016,10 @@ def Thread(self,IncomingQueue,OutgoingQueue):
             Name = None
             try:
                 Macro = Message[1]
-                Functions[Software].CurrentMacro = Macro
+                try:
+                    Functions[Software].CurrentMacro = Macro
+                except:
+                    pass
                 for ThisFunction,Included in Macro:
                     # Runs each function
                     Name = ThisFunction['Name']
@@ -1029,9 +1032,12 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                             Function(**Parameters)
                 OutgoingQueue.put(("FunctionFinished",None))
                 
-                Functions[Software].Cancel = False
-                for FunctionFile in FunctionsToLoad:
-                    Functions[FunctionFile].Cancel = False
+                try:
+                    Functions[Software].Cancel = False
+                    for FunctionFile in FunctionsToLoad:
+                        Functions[FunctionFile].Cancel = False
+                except:
+                    pass
                 OutgoingQueue.put(("SetStatus",(f"",1)))
 
 
