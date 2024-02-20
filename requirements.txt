@@ -1,4 +1,6 @@
 attrdict3>=2.0.2
+six>=0.0.1
+Pillow>=0.0.1
 wheel>=0.1.0
-wxPython>=4.0.1
 pandas>=2.0.3
+wxPython>=4.0.1
