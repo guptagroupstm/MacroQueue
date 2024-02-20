@@ -1,2 +1,3 @@
 wxPython>=4.2.1
+attrdict3>=21.1.0
 pandas>=2.1.3
