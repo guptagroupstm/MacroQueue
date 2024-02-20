@@ -1022,9 +1022,9 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                     pass
                 for ThisFunction,Included in Macro:
                     # Runs each function
-                    Name = ThisFunction['Name']
-                    Parameters = ThisFunction['Parameters']
                     if Included:
+                        Name = ThisFunction['Name']
+                        Parameters = ThisFunction['Parameters']
                         Function = FunctionDict[Name]
                         if not Functions[Software].Cancel:
                             # Doesn't run the function if it's been cancelled
