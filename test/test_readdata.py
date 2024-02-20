@@ -1,5 +1,7 @@
 import unittest
 import os
+import sys
+sys.path.append('..')
 from Dialogs import LoadMacros, GetFunctionList
 
 

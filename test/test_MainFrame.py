@@ -1,9 +1,8 @@
 import unittest
-import shutil
-import os
-import warnings
-from MacroQueue import *
 import multiprocessing as mp
+import sys
+sys.path.append('..')
+from MacroQueue import *
 
 class MainFrame_test(unittest.TestCase):
     def test_GUI(self):
