@@ -38,3 +38,6 @@ jobs:
       run: |
         pip install pytest pytest-cov
         pytest -v --cache-clear
+    - name: Open Journals PDF Generator
+      uses: openjournals/openjournals-draft-action@v.1.0
+    
