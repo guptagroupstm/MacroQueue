@@ -53,7 +53,7 @@ MacroQueue makes a GUI, shown in Figure \autoref{fig:MainGUI}, using the WxPytho
 
 ![Caption for GUI figure.\label{fig:MainGUI}](Figures\Figure1.png){width=50%}
 
-![Caption for AddMacro figure.\label{fig:AddMacro}](Figures\Figure2.png){width=50%}
+![Caption for AddMacro figure.\label{fig:AddMacro}](Figure2.png){width=50%}
 
 ![Caption for EditMacro figure.\label{fig:EditMacro}](Figures\Figure3.png){width=50%}
 
