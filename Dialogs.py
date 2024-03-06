@@ -1139,9 +1139,9 @@ class MyChooseSoftwareDialog(ChooseSoftware):
             self.Parent.Software = software
             self.Parent.MacroPath = self.Parent.MacroPaths[software]
             if self.FunctionsToLoad is None:
-                SettingsDict = {"Software":software,'Functions':['General']}
+                SettingsDict = {"Software":software,'Functions':['General'],'PauseAfterCancel':self.Parent.m_PauseAfterCancel.IsChecked()}
             else:
-                SettingsDict = {"Software":software,'Functions':self.FunctionsToLoad}
+                SettingsDict = {"Software":software,'Functions':self.FunctionsToLoad,'PauseAfterCancel':self.Parent.m_PauseAfterCancel.IsChecked()}
                 
             pd.Series(SettingsDict).to_csv(self.SavedSettingsFile,header=False)
             self.Parent.MakeFunctionButtons()

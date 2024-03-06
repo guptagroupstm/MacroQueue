@@ -153,6 +153,7 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_SIZE, self.OnSize )
 		self.Bind( wx.EVT_MENU, self.OpenSourceFolder, id = self.m_SourceMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnClose, id = self.m_ExitMenuItem.GetId() )
+		self.Bind( wx.EVT_MENU, self.PauseAfterCancel, id = self.m_PauseAfterCancel.GetId() )
 		self.Bind( wx.EVT_MENU, self.StartMakeNewMacro, id = self.m_MakeMacroMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OpenMacroFile, id = self.m_OpenMacroMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.AddConnectToQueue, id = self.m_menuItem7.GetId() )
@@ -187,6 +188,9 @@ class MyFrame ( wx.Frame ):
 	def OpenSourceFolder( self, event ):
 		event.Skip()
 
+
+	def PauseAfterCancel( self, event ):
+		event.Skip()
 
 	def StartMakeNewMacro( self, event ):
 		event.Skip()

@@ -12,14 +12,12 @@ from inspect import getmembers, isfunction,getcomments
 
 import wx
 
-# from STMMacroQueue.GUIDesign import MacroSettingsDialog
 from time import time as timer
 
 from Dialogs import MyMacroDialog as MacroDialog
 from Dialogs import MyMacroSettingsDialog as MacroSettingsDialog
 from Dialogs import MyStartMacroDialog as StartMacroDialog
 from Dialogs import MyChooseSoftwareDialog as ChooseSoftwareDialog
-# from GUIDesign import MacroSettingsDialog
 
 from Macros import *
 
@@ -144,10 +142,11 @@ class MainFrame(GUIDesign.MyFrame):
         # Read the saved settings file here
         if os.path.exists(self.SavedSettingsFile):
             SettingsSeries = pd.read_csv(self.SavedSettingsFile,names=['key','value'])
-            
             self.SettingsDict = SettingsSeries.set_index('key').T.iloc[0].to_dict()
             if "Functions" in self.SettingsDict.keys():
                 self.FunctionsLoaded = [string.replace(" ", "").replace("'", "") for string in (self.SettingsDict["Functions"][1:-1].split(','))]
+            if "PauseAfterCancel" in self.SettingsDict.keys():
+                self.m_PauseAfterCancel.Check(self.SettingsDict['PauseAfterCancel'] != 'False')
             self.Software = self.SettingsDict["Software"]
             ThisChooseSoftwareDialog = ChooseSoftwareDialog(self,self.FunctionsLoaded)
             ThisChooseSoftwareDialog.SetSoftware(self.Software)
@@ -796,6 +795,10 @@ class MainFrame(GUIDesign.MyFrame):
         ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
         ThisChooseSoftwareDialog.OnSXM()
         return
+    def PauseAfterCancel(self,event):
+        ThisChooseSoftwareDialog = ChooseSoftwareDialog(self,self.FunctionsLoaded)
+        ThisChooseSoftwareDialog.SetSoftware(self.Software)
+        pass
     def BasicUseageHelp(self, event):
         HelpMessage = "Left click on your choosen macro from the list on the main page.\n"
         HelpMessage += "Each function in the macro has a checkbox on the left side of the function's panel.  You may check/uncheck it.  If it is checked it will be run.  If it is unchecked it will not run.\n"
