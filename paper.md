@@ -40,20 +40,22 @@ Numerous instruments have to be controlled in sync to access the full parameter 
 
 
 
-Example citation: `@goff2023scanning`. 
+Example citation: @Goff_2024. 
 
 MacroQueue can be packaged into an executable, by either using the provided script or using PyInstaller directly, so that coding is completely optional.  To further allow the user experience to be as simple as possible, a basic python function is all that is nessesary to add a function.  Everything else is handled automatically.  Even as a executable, users can open the "source folder" via the File menu where they can find different python files to control various intstruments.  Upon launching, MacroQueue searches this folder for new files.  All the functions, from every python file, are dynamically imported using the package importlib, part of python's standard library.  For each parameter in a function, MacroQueue reads the default value to interpret the datatype (e.g. string, numerical, boolean, list) and the appriate control in the GUI (e.g. text box, numbers only text box, checkmark, dropdown menu respectively).  Figure \autoref{fig:ExampleCode} shows example code and the various controls that are produced in the GUI.  
 
-![Caption for ExampleCode figure.\label{fig:ExampleCode}](Figures\slide4.jpg){width=20%}
+![Caption for ExampleCode figure.\label{fig:ExampleCode}](Figures\Figure4.png)
 
 For additional features, users can write metadata for each parameter in comments above each function.  The metadata includes units and an explation of what the parameter does, which will be included in the parameters's hover tooltip.  Numerical values can also have a soft minimum and/or maximum value in their metadata; when a users tries to input a value outside the range, there will be a pop-up warning to confirm that they want to proced.  Hard limits can be applied in indiviual funtions by throwing an exception in typical pythonic fashion.  If an exception is thrown in any of the functions, the queue will be paused, the current macro will be canceled, and a pop-up will provide the user with the exception's details.
 
 
 MacroQueue makes a GUI, shown in Figure \autoref{fig:MainGUI}, using the WxPython toolkit [].  The queue is on the left, showing the macros that will be run.  Macros can be defined for each type of measurement to combine several functions into a single package.  When macros are in the queue, they will be ran one at a time until the queue is empty or paused.  New macros can be defined via the Macro menu and existing Macros can be edited by right clicking on their corresponding button in the center of the GUI.  By left clicking a macro's button, it will bring up the menu where you can edit which functions in the macro will be run and the values for each parameter that will be used, shown in Figure \autoref{fig:EditMacro}.  Multple copies of the same macro, with different values for parameters, can conveniently be added to the queue simultaneously by adding multiple values for each parameter, seperated by commas, as shown in Figure \autoref{fig:AddMacro}.  In additon, numerical parameters can expanded by using the format: start,stop, stepsize; e.g. 1,10,0.5 is equilvent to inputting all values between 1 and 10, inclusively, in steps of 0.5.  This can be used to quickly add thousands of macros to the queue.
 
-![Caption for GUI figure.\label{fig:MainGUI}](Figures\slide1.jpg){width=20%}
-![Caption for AddMacro figure.\label{fig:AddMacro}](Figures\slide2.jpg){width=20%}
-![Caption for EditMacro figure.\label{fig:EditMacro}](Figures\slide3.jpg){width=20%}
+![Caption for GUI figure.\label{fig:MainGUI}](Figures\Figure1.png){width=50%}
+
+![Caption for AddMacro figure.\label{fig:AddMacro}](Figures\Figure2.png){width=50%}
+
+![Caption for EditMacro figure.\label{fig:EditMacro}](Figures\Figure3.png){width=50%}
 
 As an additional satefy precaution, Users have the ability to add soft and hard limits for each of their function's numerical parameters.  
 
