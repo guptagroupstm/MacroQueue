@@ -21,59 +21,35 @@ bibliography: paper.bib
 
 # Summary
 
-
-
 Scanning Probe Microscopy (SPM) operators often use several different instruments for a single measurement; such as, an external lock-in amplifer, a power supply to create a magnetic field, a RF generator, etc..  Often, these intruments have to be manually controlled and then their parameters have to be manually recorded.  MacroQueue is a modular software designed for controlling and automating SPM systems and various other laboratory equipment in sync.  It provides a single GUI to control the 3 major commerical SPMs, CreaTec, RHK, and Scienta Omicron in combination with any other instruments that are apart of the systems.  
 
-Users can easily add python functions to control new and existing equipment.  Although any arbitary python function can be added, the base functions were created with the functional programming paradigm in mind, so the functions are small and each perform a single task.  For example, the function "Set RF Frequency", changes the frequency on the RF generator and logs the new value.  This allows the functions to be reused for many types of measurements.
+Users can easily add python functions to control new and existing equipment.  Although any arbitary python function can be added, the base functions were created with the functional programming paradigm in mind, so the functions are small and each perform a single task.  For example, the function "Set RF Frequency", changes the frequency on the RF generator and records the new value.  This allows the functions to be reused for many types of measurements.
 
-The functions can be grouped into "macros" for each type of measurement.  Macros are added to a queue with different values for each parameter (e.g. bias, magnetic field, etc.) to perform measurements throughout a parameter space.  Each measurement is performed consecutively on a seperate thread to enable measurements in the queue to be modified.
+The functions can be grouped into macros for each type of measurement.  Macros are added to a queue with different values for each parameter (e.g. bias, magnetic field, etc.) to perform measurements throughout a parameter space.  Each measurement is performed consecutively on a seperate thread to enable measurements in the queue to be modified.
 These features allow users to easily control several instruments in sync, perform a long series of measurements with minimal input, and add new instruments to a system. 
 
 
 
 # Statement of need
 
-Numerous instruments have to be controlled in sync to access the full parameter space of an SPM system.  This is typically automated with python scripts for longer measurements, such as QPI mapping [] which is a series of a dozen measurements, each taking an hour.  Writing a python script for each type of measurement, at best, leads to the spagetti code that physists are notoriously known for, and at worst, it is prohibitively difficult for novice SPM operators.  MacroQueue provides a simple GUI and allows users to easily add or modify functions to control new and existing equipment.  Several similar packages already exist, such as ** [], ** [], ** [], and ** [].  A good overview of available Python packages can be found in ** [].  The goal of MacroQueue is to provide a GUI that allow users to perform measurements in high-dimension parameter spaces without requiring coding ability while still providing users with coding ability the flexibility to write arbitrarily complex functions.  This software is currently actively used in our group at The Ohio State University, the NSF NeXUS Facility, and ***. 
+Numerous instruments have to be controlled in sync to access the full parameter space of an SPM system.  This is typically automated with python scripts for longer measurements, such as QPI mapping [] which is a series of a dozen measurements, each taking an hour.  Writing a python script for each type of measurement leads to the spagetti code that physists are notoriously known for at best, and at worst, is prohibitively difficult for novice SPM operators.  MacroQueue provides a simple GUI and allows users to easily add or modify functions to control new and existing equipment.  This software is currently in active use in several laboratories at The Ohio State University, the NSF NeXUS Facility, and ***.  Several similar packages already exist, such as @PyMeasure, @bluesky, and @ScopeFoundry2023  A good overview of available Python packages can be found in [@buchner_2022_6399528].  The goal of MacroQueue is to provide a GUI that allow users to perform measurements in high-dimensional parameter spaces without requiring coding ability while still providing users with coding ability the flexibility to write arbitrarily complex functions.  
+ 
 
 # Overview
 
 
 
-Example citation: @Goff_2024. 
 
-MacroQueue can be packaged into an executable, by either using the provided script or using PyInstaller directly, so that coding is completely optional.  To further allow the user experience to be as simple as possible, a basic python function is all that is nessesary to add a function.  Everything else is handled automatically.  Even as a executable, users can open the "source folder" via the File menu where they can find different python files to control various intstruments.  Upon launching, MacroQueue searches this folder for new files.  All the functions, from every python file, are dynamically imported using the package importlib, part of python's standard library.  For each parameter in a function, MacroQueue reads the default value to interpret the datatype (e.g. string, numerical, boolean, list) and the appriate control in the GUI (e.g. text box, numbers only text box, checkmark, dropdown menu respectively).  Figure \autoref{fig:ExampleCode} shows example code and the various controls that are produced in the GUI.  
+MacroQueue can be packaged into an executable, by either using the provided script or using PyInstaller directly, so that coding is completely optional.  To further allow the user experience to be as simple as possible, a basic python function is all that is nessesary to add a function.  Everything else is handled automatically.  Even as a executable, users can open the "source folder" via the File menu where they can find different python files to control various intstruments.  Upon launching, MacroQueue searches this folder for new files.  Every function, from each python file, is dynamically imported using the package importlib, part of python's standard library.  For each parameter in a function, MacroQueue reads the default value to interpret the datatype (e.g. string, numerical, boolean, list) and the appriate control in the GUI (e.g. text box, numbers only text box, checkmark, dropdown menu respectively).  \autoref{fig:ExampleCode} shows example code and the various controls that are produced in the GUI.  
 
-![Caption for ExampleCode figure.\label{fig:ExampleCode}](Figures\Figure4.png)
+![The workflow for adding a new function and defining a new macro.\label{fig:ExampleCode}](Figure1.png)
 
 For additional features, users can write metadata for each parameter in comments above each function.  The metadata includes units and an explation of what the parameter does, which will be included in the parameters's hover tooltip.  Numerical values can also have a soft minimum and/or maximum value in their metadata; when a users tries to input a value outside the range, there will be a pop-up warning to confirm that they want to proced.  Hard limits can be applied in indiviual funtions by throwing an exception in typical pythonic fashion.  If an exception is thrown in any of the functions, the queue will be paused, the current macro will be canceled, and a pop-up will provide the user with the exception's details.
 
 
-MacroQueue makes a GUI, shown in Figure \autoref{fig:MainGUI}, using the WxPython toolkit [].  The queue is on the left, showing the macros that will be run.  Macros can be defined for each type of measurement to combine several functions into a single package.  When macros are in the queue, they will be ran one at a time until the queue is empty or paused.  New macros can be defined via the Macro menu and existing Macros can be edited by right clicking on their corresponding button in the center of the GUI.  By left clicking a macro's button, it will bring up the menu where you can edit which functions in the macro will be run and the values for each parameter that will be used, shown in Figure \autoref{fig:EditMacro}.  Multple copies of the same macro, with different values for parameters, can conveniently be added to the queue simultaneously by adding multiple values for each parameter, seperated by commas, as shown in Figure \autoref{fig:AddMacro}.  In additon, numerical parameters can expanded by using the format: start,stop, stepsize; e.g. 1,10,0.5 is equilvent to inputting all values between 1 and 10, inclusively, in steps of 0.5.  This can be used to quickly add thousands of macros to the queue.
+MacroQueue makes a GUI, shown in \autoref{fig:AddMacro}, using the WxPython toolkit @WxPython.  The queue is on the left, showing the macros that will be run.  Macros can be defined for each type of measurement to combine several functions into a single package.  When macros are in the queue, they will be ran one at a time until the queue is empty or paused.  New macros can be defined via the Macro menu and existing Macros can be edited by right clicking on their corresponding button in the center of the GUI.  By left clicking a macro's button, it will bring up the menu where you can edit which functions in the macro will be run and the values for each parameter that will be used, shown in \autoref{fig:ExampleCode}.  Multple copies of the same macro, with different values for parameters, can conveniently be added to the queue simultaneously by adding multiple values for each parameter, seperated by commas, as shown in \autoref{fig:AddMacro}.  In additon, numerical parameters can expanded by using the format: start, stop, stepsize; e.g. 1,10,0.5 is equilvent to inputting all values between 1 and 10, inclusively, in steps of 0.5.  This can be used to quickly add thousands of macros to the queue.
 
-![Caption for GUI figure.\label{fig:MainGUI}](Figures\Figure1.png){width=50%}
-
-![Caption for AddMacro figure.\label{fig:AddMacro}](Figure2.png){width=50%}
-
-![Caption for EditMacro figure.\label{fig:EditMacro}](Figures\Figure3.png){width=50%}
-
-As an additional satefy precaution, Users have the ability to add soft and hard limits for each of their function's numerical parameters.  
-
-same GUI for multiple systems.  Ability to use the parameters you like (nm/s or s/line; nm or A)
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
+![Caption for GUI figure.\label{fig:AddMacro}](Figure2.png)
 
 
 # Acknowledgements
