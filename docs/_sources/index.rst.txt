@@ -1,0 +1,46 @@
+.. MacroQueue documentation master file, created by
+   sphinx-quickstart on Fri Mar 15 11:33:35 2024.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+MacroQueue's documentation
+======================================
+
+
+
+MacroQueue stuff
+
+MacroQueue was built by Brad Goff as part of the Gupta Group in the physics department at The Ohio State University.  Visit our group's website here: https://u.osu.edu/guptagroup/.
+
+Contents
+==================
+
+* :ref:`Install`
+* :ref:`Tutorial`
+* :ref:`Contributing`
+* :ref:`search`
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+
+   install
+   Tutorial
+   contributing
+
+
+
+
+Support
+-------
+
+If you are having issues, please let us know.  You can open a ticket here: https://github.com/guptagroupstm/STMMacroQueue/issues
+
+We have a mailing list located at: guptagroupstm@gmail.com.
+
+
+
+License
+-------
+
+The project is licensed under the MIT license.
