@@ -6,7 +6,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-docs_src/_build
 build
 
 # C extensions
