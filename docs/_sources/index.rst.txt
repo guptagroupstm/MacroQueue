@@ -12,31 +12,17 @@ MacroQueue stuff
 
 MacroQueue was built by Brad Goff as part of the Gupta Group in the physics department at The Ohio State University.  Visit our group's website here: https://u.osu.edu/guptagroup/.
 
-Contents
-==================
-
-* :ref:`Install`
-* :ref:`Tutorial`
-* :ref:`Contributing`
-* :ref:`search`
 
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
 
-   install
+   Install
    Tutorial
-   contributing
+   Contributing
 
 
 
-
-Support
--------
-
-If you are having issues, please let us know.  You can open a ticket here: https://github.com/guptagroupstm/STMMacroQueue/issues
-
-We have a mailing list located at: guptagroupstm@gmail.com.
 
 
 

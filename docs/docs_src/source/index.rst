@@ -24,13 +24,6 @@ MacroQueue was built by Brad Goff as part of the Gupta Group in the physics depa
 
 
 
-Support
--------
-
-If you are having issues, please let us know.  You can open a ticket here: https://github.com/guptagroupstm/STMMacroQueue/issues
-
-We have a mailing list located at: guptagroupstm@gmail.com.
-
 
 
 License
