@@ -18,7 +18,6 @@
 # copyright recipe-577654-1
 # changed by Falk mailbox@anfatec.de
 
-import SXMRemote
 import ctypes
 import threading
 import time
