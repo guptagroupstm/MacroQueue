@@ -92,7 +92,7 @@ IconFileName = "MacroQueueIcon.ico"
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
 
-VersionNumber = "v1.4.0"
+VersionNumber = "v0.1.5"
 class MacroQueue(GUIDesign.MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
@@ -877,7 +877,7 @@ SOFTWARE.
         MyMessage.ShowModal()
         return
     def InfoHelp(self, event):
-        HelpMessage = f"MacroQueue {VersionNumber} (9/2023)\n"
+        HelpMessage = f"MacroQueue {VersionNumber} (3/2024)\n"
         HelpMessage += "Written by Brad Goff in Jay Gupta's CME Group at the Ohio State University\n"
         HelpMessage += "\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Info")
