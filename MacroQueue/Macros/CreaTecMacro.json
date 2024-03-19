@@ -1,0 +1,557 @@
+{
+ "Scan": [
+  [
+   "Set Recorded Channels",
+   {
+    "Topography": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "Current": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "LockInX": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "\u00c5"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "s/line",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "0.5",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Scan",
+   {},
+   true
+  ]
+ ],
+ "dIdV Scan": [
+  [
+   "Set Recorded Channels",
+   {
+    "Topography": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": true,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "Current": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": true,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "LockInX": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": true,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "\u00c5"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "s/line",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "1",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "Voltage",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "dIdV Scan",
+   {},
+   true
+  ]
+ ],
+ "Spectrum": [
+  [
+   "Fine Move Tip",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Amplitude",
+   {
+    "Lockin_Amp": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in voltage amplitude in mV",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "mV"
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Frequency",
+   {
+    "Lockin_Freq": {
+     "DefaultValue": "877",
+     "Tooltip": "The lock-in frequency in Hz",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "Hz"
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn TimeConstant",
+   {
+    "Lockin_RC": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in time constant in Hz",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "Hz"
+    }
+   },
+   false
+  ],
+  [
+   "Spectrum",
+   {},
+   true
+  ]
+ ],
+ "Wait": [
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "10",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   true
+  ]
+ ],
+ "AutoPhase": [
+  [
+   "Z Course Steps Out",
+   {
+    "NBursts": {
+     "DefaultValue": "3",
+     "Tooltip": "Number of Z steps to retract",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   true
+  ],
+  [
+   "AutoPhase",
+   {},
+   true
+  ],
+  [
+   "Approach",
+   {},
+   true
+  ]
+ ],
+ "Course Step": [
+  [
+   "Define as Course Origin",
+   {},
+   true
+  ],
+  [
+   "Burst XY",
+   {
+    "Burst_XY": {
+     "DefaultValue": true,
+     "Tooltip": "Check Burst XY in the Course Positioning Form",
+     "Frozen": false,
+     "ValueType": "Boolean"
+    }
+   },
+   true
+  ],
+  [
+   "XYCourse Step",
+   {
+    "X_Position": {
+     "DefaultValue": "10",
+     "Tooltip": "The X position to course move to.",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "Y_Position": {
+     "DefaultValue": "10",
+     "Tooltip": "The Y position to course move to.",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    },
+    "NSteps_Out": {
+     "DefaultValue": "5",
+     "Tooltip": "The number of Z steps to retract before course moving in X and Y",
+     "Frozen": false,
+     "ValueType": "Numerical"
+    }
+   },
+   true
+  ],
+  [
+   "Approach",
+   {},
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "120",
+     "Tooltip": "The time to wait in seconds",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "Units": "s"
+    }
+   },
+   false
+  ]
+ ]
+}
