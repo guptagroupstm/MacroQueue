@@ -25,22 +25,22 @@ from inspect import getmembers, isfunction
 # They all go in try/except just in case the required packages aren't installed for one of them 
 # (e.g. you can still use RHK's functions even without win32com which you need for CreaTec)
 try:
-    import Functions.RHK as RHKFunctions
+    import MacroQueue.Functions.RHK as RHKFunctions
 except:
     pass
 
 try:
-    import Functions.CreaTec as CreaTecFunctions
+    import MacroQueue.Functions.CreaTec as CreaTecFunctions
 except:
     pass
 
 try:
-    import Functions.SXM as SXMFunctions
+    import MacroQueue.Functions.SXM as SXMFunctions
 except:
     pass
 
 try:
-    import Functions.General as GeneralFunctions
+    import MacroQueue.Functions.General as GeneralFunctions
 except:
     pass
 
@@ -90,7 +90,7 @@ IconFileName = "MacroQueueIcon.ico"
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
 
-VersionNumber = "v0.1.5"
+VersionNumber = "v0.1.18"
 class MacroQueue(MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
