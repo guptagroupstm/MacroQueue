@@ -10,7 +10,7 @@ if [ -e dist ]; then
 fi
 
 # Create package
-python setup.py sdist bdist_wheel
+python setup.py sdist
 
 echo "---------------------------------"
 echo "Did you check version is correct?(yes/no)"

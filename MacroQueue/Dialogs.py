@@ -1,16 +1,16 @@
 from numpy import array, floor, log10
 import wx
 from inspect import getmembers, isfunction,getcomments
-from GUIDesign import MacroDialog
 import inspect
 import json
-from GUIDesign import MacroSettingsDialog
 import os
 from functools import partial
 import numpy as np
 
-from GUIDesign import StartMacroDialog
-from GUIDesign import ChooseSoftware
+from MacroQueue.GUIDesign import MacroDialog
+from MacroQueue.GUIDesign import MacroSettingsDialog
+from MacroQueue.GUIDesign import StartMacroDialog
+from MacroQueue.GUIDesign import ChooseSoftware
 import pandas as pd
 class SettingsDialog(wx.Dialog):
 

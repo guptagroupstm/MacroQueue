@@ -4,7 +4,6 @@ import sys
 import pandas as pd
 import multiprocessing as mp
 import queue
-import GUIDesign
 import threading
 import importlib
 import importlib.util
@@ -14,12 +13,11 @@ import wx
 
 from time import time as timer
 
-from Dialogs import MyMacroDialog as MacroDialog
-from Dialogs import MyMacroSettingsDialog as MacroSettingsDialog
-from Dialogs import MyStartMacroDialog as StartMacroDialog
-from Dialogs import MyChooseSoftwareDialog as ChooseSoftwareDialog
-
-from Macros import *
+from MacroQueue.Dialogs import MyMacroDialog as MacroDialog
+from MacroQueue.Dialogs import MyMacroSettingsDialog as MacroSettingsDialog
+from MacroQueue.Dialogs import MyStartMacroDialog as StartMacroDialog
+from MacroQueue.Dialogs import MyChooseSoftwareDialog as ChooseSoftwareDialog
+from MacroQueue.GUIDesign import MyFrame
 
 # from GUIDesign import MacroDialog
 from inspect import getmembers, isfunction
@@ -93,7 +91,7 @@ IconFileName = "MacroQueueIcon.ico"
 # On close, I cancel the scan.  Should I try to prevent that?
 
 VersionNumber = "v0.1.5"
-class MacroQueue(GUIDesign.MyFrame):
+class MacroQueue(MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
 # Scanning, fine motion, course motion, dI/dV scans, point spectra, tip form, 
@@ -116,7 +114,7 @@ class MacroQueue(GUIDesign.MyFrame):
 
 
         # The GUIDesign is defined in GUIDesign.py as the class MyFrame. It was made with wxFormBuilder
-        GUIDesign.MyFrame.__init__(self, parent=None) 
+        MyFrame.__init__(self, parent=None) 
         icon_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), IconFileName)
         if os.path.exists(icon_file):
             icon = wx.Icon(icon_file)
