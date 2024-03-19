@@ -23,6 +23,8 @@ Please read [documentation](https://guptagroupstm.github.io/STMMacroQueue/Contri
 
 ## Acknowledgements
 
+MacroQueue was built by Brad Goff as part of the Gupta Group in the physics department at The Ohio State University. Visit our group’s website here: https://u.osu.edu/guptagroup/.
+
 This work was primarily supported by the Department of Energy (DOE) Basic Energy Sciences under Grant No. DE-SC0016379.
 
 ## License
