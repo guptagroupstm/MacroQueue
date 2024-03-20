@@ -9,7 +9,7 @@
 project = 'MacroQueue'
 copyright = '2024, Brad Goff'
 author = 'Brad Goff'
-release = '1.4.0'
+release = '0.1.19'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -25,5 +25,4 @@ exclude_patterns = ['_build']
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
 pygments_style = 'sphinx'

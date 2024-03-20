@@ -34,12 +34,12 @@ These features allow users to easily control several instruments in sync, perfor
 
 
 License
--------
+----------
 
 The project is licensed under the MIT license.
 
 Acknowledgements
--------
+--------------------
 
 *MacroQueue* was built by Brad Goff as part of the Gupta Group in the physics department at The Ohio State University.  Visit our group's website here: https://u.osu.edu/guptagroup/.
 
