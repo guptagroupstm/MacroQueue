@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Defining a Macro &mdash; MacroQueue 1.4.0 documentation</title>
+  <title>Error Handling &mdash; MacroQueue 1.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Writing a new function" href="WriteFunction.html" />
-    <link rel="prev" title="Multiple Parameters" href="Expanding/Expanding.html" /> 
+    <link rel="next" title="Changing Instruments" href="SystemChange.html" />
+    <link rel="prev" title="Writing a new function" href="WriteFunction.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,9 +50,14 @@
 <li class="toctree-l1 current"><a class="reference internal" href="Tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#basic-required-for-all-users">Basic: Required for all users</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="Tutorial.html#advanced-read-if-it-is-needed">Advanced: Read if it is needed</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Defining a Macro</a></li>
-<li class="toctree-l3"><a class="reference internal" href="WriteFunction.html">Writing a new function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="LogParameters.html">Logarithmically Spaced Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DefineMacro/DefineMacro.html">Defining a Macro</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WriteFunction.html">Writing a new function</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Error Handling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#out-of-bounds">Out of Bounds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exceptions">Exceptions</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="SystemChange.html">Changing Instruments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="test.html">Automated test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Architecture.html">Queue’s Structure</a></li>
@@ -79,9 +84,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="Tutorial.html">Tutorial</a></li>
-      <li class="breadcrumb-item active">Defining a Macro</li>
+      <li class="breadcrumb-item active">Error Handling</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/Tutorials/DefineMacro.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/Tutorials/ErrorHandling.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -89,55 +94,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="defining-a-macro">
-<h1>Defining a Macro<a class="headerlink" href="#defining-a-macro" title="Link to this heading"></a></h1>
-<ul>
-<li><p>Go to Macro -&gt; Make New Macro</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Or right click an existing macro, and choose Edit from the menu.</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>Choose the functions that you would like to be in the macro.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>You may change the order or remove a function in the macro in the panel on the right.</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>Choose a name for your macro.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>If it’s a pre-existing macro and you do not change the name, the original macro will be overwriten.</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>Press ‘Next’ to choose the default parameters of your macro.</p></li>
-<li><p>Each function has a checkbox that indicates whether the function will run by default in the macro.  Refer to <a class="reference internal" href="AddToQueue.html"><span class="doc">Add a Macro to the Queue</span></a> for additional information.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>You may uncheck the box if you do not want the function to be included by default.  This is useful for functions that you want to occasionally use in the macro.</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>You may choose the default value for each parameter of each function.</p></li>
-<li><p>You may choose to freeze the parameter.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>This will remove the option to change the parameter when adding it to the queue.  It simplifies the macro in exchange for less control.</p></li>
-</ul>
-</div></blockquote>
-</li>
-</ul>
+  <section id="error-handling">
+<h1>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h1>
+<section id="out-of-bounds">
+<h2>Out of Bounds<a class="headerlink" href="#out-of-bounds" title="Link to this heading"></a></h2>
+</section>
+<section id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Link to this heading"></a></h2>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Expanding/Expanding.html" class="btn btn-neutral float-left" title="Multiple Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="WriteFunction.html" class="btn btn-neutral float-right" title="Writing a new function" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="WriteFunction.html" class="btn btn-neutral float-left" title="Writing a new function" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SystemChange.html" class="btn btn-neutral float-right" title="Changing Instruments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

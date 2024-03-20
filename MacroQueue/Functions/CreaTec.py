@@ -19,17 +19,15 @@ RFGenerator = None
 
 BFieldControlThread = None
 BFieldPowerControl = None
-OnCloseFunctions = []
 
 
 
 
 def Initialize():
-    global STM, OnCloseFunctions
+    global STM
     pythoncom.CoInitialize()
     STM = win32com.client.Dispatch("pstmafm.stmafmrem")
     time.sleep(0.3)
-    # OnCloseFunctions.append()
 
 
 # {"Name":"Parameter","Units":"s","Max":10,"Min":-10,"Tooltip":"Example Tooltip"}
@@ -39,13 +37,15 @@ def Test(Parameter=5,Parameter2=3,Parameter3=-2):
     pass
 
 def OnClose():
+    if STM is not None:
+        pass
+
     if BField is not None:
         OutgoingQueue.put(("DontClose","The Magnetic Field is not off.  Run the function 'Turn B Field Off'."))
         MacroQueueSelf.Closing=False
 
-    if STM is not None:
-        pass
-
+    if RFGenerator is not None:
+        Turn_Off_RF_Generator()
 
 
 
@@ -490,27 +490,34 @@ def Set_Recorded_Channels(Topography=True,Current=True,LockInX=True):
     time.sleep(0.1)
 
 def Scan():
+    # Calculates how long the scan will take
     Size = float(STM.getp('SCAN.IMAGESIZE.NM.X',''))
     Lines = float(STM.getp('SCAN.IMAGESIZE.PIXEL.Y',''))
     Speed = float(STM.getp('SCAN.SPEED.NM/SEC',""))
     ScanTime = 2*Lines * Size/Speed
-    CheckTime = int(np.ceil(ScanTime/500))
-    # Time = 0 if Time <= 0 else Time
 
-    # STM.setp('SCAN.CHANNELS',('TOPOGRAPHY','CURRENT'))
-    time.sleep(1)
+    # How often the status bar will be updated.
+    CheckTime = int(np.ceil(ScanTime/500))
+
+    # Starts the scan
     STM.setp('STMAFM.BTN.START' ,'')
     time.sleep(0.1)
+
+
     StartTime = timer()
     Status = STM.getp('STMAFM.SCANSTATUS','')
+    # Keeps scanning until the scan is done (Status == 2) or the user cancelled the macro (Cancel)
     while Status == 2 and not Cancel:
         Status = STM.getp('STMAFM.SCANSTATUS','')
         StartCheckTime = timer()
+        # Every {CheckTime} seconds, the status bar is updated.
         while not Cancel and timer() - StartCheckTime < CheckTime:
             Percent = round(100*((timer() - StartTime)/ScanTime),1)
+            # Puts f"Scan {Percent}% Complete" in the third spot in the status bar.
             OutgoingQueue.put(("SetStatus",(f"Scan {Percent}% Complete",2)))
             time.sleep(1)
     if Cancel:
+        # If the user cancelled the macro, stop the scan.
         STM.setp('STMAFM.BTN.STOP',"")
         time.sleep(0.1)
         OutgoingQueue.put(("SetStatus",(f"",2)))

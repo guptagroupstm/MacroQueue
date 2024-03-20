@@ -4,11 +4,11 @@ Tutorial
 Basic: Required for all users
 -------------------------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    Introduction
    AddToQueue
-   Expanding
+   Expanding/Expanding
 
 
 Advanced: Read if it is needed
@@ -16,19 +16,12 @@ Advanced: Read if it is needed
 .. toctree::
    :maxdepth: 2
 
-   DefineMacro
-   WriteFunction
-   FunctionDatatype
-   FunctionMetaData
    LogParameters
+   DefineMacro/DefineMacro
+   WriteFunction
+   SpecialFunctions
+   ErrorHandling
    SystemChange   
-
-
-Tips
--------------------------
-.. toctree::
-   :maxdepth: 2
-
    test
    Architecture
 
@@ -36,6 +29,6 @@ Tips
 Examples gallery
 -------------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    Example1

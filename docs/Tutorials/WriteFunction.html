@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Parameter datatypes" href="FunctionDatatype.html" />
-    <link rel="prev" title="Defining a Macro" href="DefineMacro.html" /> 
+    <link rel="next" title="Special Functions" href="SpecialFunctions.html" />
+    <link rel="prev" title="Defining a Macro" href="DefineMacro/DefineMacro.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,15 +50,22 @@
 <li class="toctree-l1 current"><a class="reference internal" href="Tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#basic-required-for-all-users">Basic: Required for all users</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="Tutorial.html#advanced-read-if-it-is-needed">Advanced: Read if it is needed</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="DefineMacro.html">Defining a Macro</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Writing a new function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="FunctionDatatype.html">Parameter datatypes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="FunctionMetaData.html">Function’s Metadata</a></li>
 <li class="toctree-l3"><a class="reference internal" href="LogParameters.html">Logarithmically Spaced Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="SystemChange.html">Changing Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DefineMacro/DefineMacro.html">Defining a Macro</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Writing a new function</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-datatypes">Parameter datatypes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters-metadata-optional">Parameters Metadata (Optional)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-function">Example Function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#global-variable-hooks">Global Variable Hooks</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#tips">Tips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SpecialFunctions.html">Special Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ErrorHandling.html">Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SystemChange.html">Changing Instruments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="test.html">Automated test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Architecture.html">Queue’s Structure</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#examples-gallery">Examples gallery</a></li>
 </ul>
 </li>
@@ -92,15 +99,149 @@
              
   <section id="writing-a-new-function">
 <h1>Writing a new function<a class="headerlink" href="#writing-a-new-function" title="Link to this heading"></a></h1>
-<p>Something Here</p>
+<p><em>Needs updated</em></p>
+<ul class="simple">
+<li><p>Go to File -&gt; Open Source Folder.</p></li>
+<li><p>Add the function to the .py file that corresponds to the software you want it to work with.</p></li>
+<li><p>Open and close MacroQueue.  Your function can now be added to a macro.</p></li>
+</ul>
+<section id="parameter-datatypes">
+<h2>Parameter datatypes<a class="headerlink" href="#parameter-datatypes" title="Link to this heading"></a></h2>
+<p><em>Needs updated</em></p>
+<p>The parameters of your function must have default values so that MacroQueue knows what the datatype to allow.
+MacroQueue works with floats, booleans, and strings.
+If you only want the user to choose from a finite number of options, you may also put a list as the default parameter.
+The user will be able to choose a single list entry to be used.</p>
+</section>
+<section id="parameters-metadata-optional">
+<h2>Parameters Metadata (Optional)<a class="headerlink" href="#parameters-metadata-optional" title="Link to this heading"></a></h2>
+<p>You may add metadata for the parameters in a function by placing comments directly above the function.  An example function is shown below.</p>
+<ul>
+<li><p>The comments have to be directly above the relavent function with no spaces inbetween.</p></li>
+<li><p>The comment has to be formated as a python dict.  The acceptable keys are:</p>
+<blockquote>
+<div><ul>
+<li><p>Name</p></li>
+<li><p>Units</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Will appear next to the name in parentheses.</p></li>
+<li><p><em>Disclaimer</em>:  This is simply a string.  Changing the unit here will not change the code.  I show how to change the units in the example function below.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Tooltip</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Will appear as the first line of the hover tooltip</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Min</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Will appear in the second line of the hover tooltip</p></li>
+<li><p>See <a class="reference internal" href="ErrorHandling.html"><span class="doc">Error Handling</span></a> for additional information</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Max</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Will appear in the second line of the hover tooltip</p></li>
+<li><p>See <a class="reference internal" href="ErrorHandling.html"><span class="doc">Error Handling</span></a> for additional information</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="example-function">
+<h2>Example Function<a class="headerlink" href="#example-function" title="Link to this heading"></a></h2>
+<p>Here are 2 example functions which both change the setpoint.  They have the same functionality except the bare function accepts the setpoint in amperes and doesn’t warn you if you set the current too high.</p>
+<p>Bare Function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Set_Setpoint</span><span class="p">(</span><span class="n">Setpoint</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">STM</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="s1">&#39;SCAN.SETPOINT.AMPERE&#39;</span><span class="p">,</span><span class="n">Setpoint</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Full Function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># {&quot;Name&quot;:&quot;Setpoint&quot;,&quot;Units&quot;:&quot;pA&quot;,&quot;Min&quot;:0,&quot;Max&quot;:1e6,&quot;Tooltip&quot;:&quot;The current setpoint in pA&quot;}</span>
+<span class="k">def</span> <span class="nf">Set_Setpoint</span><span class="p">(</span><span class="n">Setpoint</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">Setpoint</span> <span class="o">*=</span> <span class="mf">1e-12</span> <span class="c1">#Convert from pA to A</span>
+    <span class="n">STM</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="s1">&#39;SCAN.SETPOINT.AMPERE&#39;</span><span class="p">,</span><span class="n">Setpoint</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is how the full function will appear:</p>
+<img alt="../_images/WriteFunctionMetaData.png" src="../_images/WriteFunctionMetaData.png" />
+</section>
+<section id="global-variable-hooks">
+<h2>Global Variable Hooks<a class="headerlink" href="#global-variable-hooks" title="Link to this heading"></a></h2>
+<p>There are several global variables that you can use in your function.  They are all defined at the top of their relavent python files.</p>
+<p>The main ones to note are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Cancel</span>
+<span class="n">OutgoingQueue</span>
+<span class="n">CurrentMacro</span>
+</pre></div>
+</div>
+<p>The following function uses Cancel and OutgoingQueue:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Scan</span><span class="p">():</span>
+    <span class="c1"># Calculates how long the scan will take</span>
+    <span class="n">Size</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">STM</span><span class="o">.</span><span class="n">getp</span><span class="p">(</span><span class="s1">&#39;SCAN.IMAGESIZE.NM.X&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+    <span class="n">Lines</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">STM</span><span class="o">.</span><span class="n">getp</span><span class="p">(</span><span class="s1">&#39;SCAN.IMAGESIZE.PIXEL.Y&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+    <span class="n">Speed</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">STM</span><span class="o">.</span><span class="n">getp</span><span class="p">(</span><span class="s1">&#39;SCAN.SPEED.NM/SEC&#39;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+    <span class="n">ScanTime</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">Lines</span> <span class="o">*</span> <span class="n">Size</span><span class="o">/</span><span class="n">Speed</span>
+
+    <span class="c1"># How often the status bar will be updated.</span>
+    <span class="n">CheckTime</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">ScanTime</span><span class="o">/</span><span class="mi">500</span><span class="p">))</span>
+
+    <span class="c1"># Starts the scan</span>
+    <span class="n">STM</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="s1">&#39;STMAFM.BTN.START&#39;</span> <span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+
+    <span class="n">StartTime</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">Status</span> <span class="o">=</span> <span class="n">STM</span><span class="o">.</span><span class="n">getp</span><span class="p">(</span><span class="s1">&#39;STMAFM.SCANSTATUS&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="c1"># Keeps scanning until the scan is done (Status == 2) or the user cancelled the macro (Cancel)</span>
+    <span class="k">while</span> <span class="n">Status</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">Cancel</span><span class="p">:</span>
+        <span class="n">Status</span> <span class="o">=</span> <span class="n">STM</span><span class="o">.</span><span class="n">getp</span><span class="p">(</span><span class="s1">&#39;STMAFM.SCANSTATUS&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">StartCheckTime</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+        <span class="c1"># Every {CheckTime} seconds, the status bar is updated.</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">Cancel</span> <span class="ow">and</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">StartCheckTime</span> <span class="o">&lt;</span> <span class="n">CheckTime</span><span class="p">:</span>
+            <span class="n">Percent</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="p">((</span><span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">StartTime</span><span class="p">)</span><span class="o">/</span><span class="n">ScanTime</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># Puts f&quot;Scan {Percent}% Complete&quot; in the third spot in the status bar.</span>
+            <span class="n">OutgoingQueue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s2">&quot;SetStatus&quot;</span><span class="p">,(</span><span class="sa">f</span><span class="s2">&quot;Scan </span><span class="si">{</span><span class="n">Percent</span><span class="si">}</span><span class="s2">% Complete&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Cancel</span><span class="p">:</span>
+        <span class="c1"># If the user cancelled the macro, stop the scan.</span>
+        <span class="n">STM</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="s1">&#39;STMAFM.BTN.STOP&#39;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">OutgoingQueue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s2">&quot;SetStatus&quot;</span><span class="p">,(</span><span class="sa">f</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+        <span class="k">while</span> <span class="n">Status</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">Status</span> <span class="o">=</span> <span class="n">STM</span><span class="o">.</span><span class="n">getp</span><span class="p">(</span><span class="s1">&#39;STMAFM.SCANSTATUS&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>Cancel</em> becomes True if the user cancels a function, either with the red X or by pressing “clear queue”.  Cancel should be used to ensure that the functions stop gracefully.
+If Cancel isn’t used, the function will finish as normal but the remaining functions in the macro will be ignored.</p>
+<p><em>CurrentMacro</em> contains the information for all the of the functions in the current macro.  This can be used if you need to know what the parameters are from the other functions.  See <a class="reference internal" href="Architecture.html"><span class="doc">Queue’s Structure</span></a> for the data structure of a macro.</p>
+<p>With <em>OutgoingQueue</em>, the ith slot (starting with i=0) in the status bar can be overridden:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SomeString</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Scan </span><span class="si">{</span><span class="n">Percent</span><span class="si">}</span><span class="s2">% Complete&quot;</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># For the third slot</span>
+<span class="n">OutgoingQueue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s2">&quot;SetStatus&quot;</span><span class="p">,(</span><span class="n">SomeString</span><span class="p">,</span> <span class="n">i</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>The first 2 slots in the status bar show the current macro and the current function.</p>
+<img alt="../_images/StatusBar.png" src="../_images/StatusBar.png" />
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="DefineMacro.html" class="btn btn-neutral float-left" title="Defining a Macro" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="FunctionDatatype.html" class="btn btn-neutral float-right" title="Parameter datatypes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="DefineMacro/DefineMacro.html" class="btn btn-neutral float-left" title="Defining a Macro" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SpecialFunctions.html" class="btn btn-neutral float-right" title="Special Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

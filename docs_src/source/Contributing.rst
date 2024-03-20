@@ -30,7 +30,7 @@ Pull requests are the best way to propose changes to the code. We actively welco
 2. Make sure your code follows pep8.
 3. If you've added code that should be tested, add tests.
 4. Ensure the :doc:`Tutorials/test` passes.
-5. If you've changed APIs, update the documentation. We use sphinx and reStructuredText for documentation.
+5. If you've changed APIs, update the documentation. We use sphinx and reStructuredText (.rst) for documentation.
 6. Issue that pull request in GitHub.
 
 Automated tests

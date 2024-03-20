@@ -553,5 +553,114 @@
    },
    false
   ]
+ ],
+ "RF Spectrum": [
+  [
+   "Fine Move Tip",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Amplitude",
+   {
+    "Lockin_Amp": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in voltage amplitude in mV",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "mV"
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Frequency",
+   {
+    "Lockin_Freq": {
+     "DefaultValue": "877",
+     "Tooltip": "The lock-in frequency in Hz",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "Hz"
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn TimeConstant",
+   {
+    "Lockin_RC": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in time constant in Hz",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "Hz"
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Freq",
+   {
+    "Freq": {
+     "DefaultValue": "1000000000.0",
+     "Tooltip": "The RF frequency in Hz",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "Hz"
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Power",
+   {
+    "Power": {
+     "DefaultValue": "0",
+     "Tooltip": "The amount of power for the RF generator in dBm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "dBm"
+    }
+   },
+   false
+  ],
+  [
+   "Spectrum",
+   {},
+   true
+  ]
  ]
 }

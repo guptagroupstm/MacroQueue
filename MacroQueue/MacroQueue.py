@@ -13,34 +13,36 @@ import wx
 
 from time import time as timer
 
-from MacroQueue.Dialogs import MyMacroDialog as MacroDialog
-from MacroQueue.Dialogs import MyMacroSettingsDialog as MacroSettingsDialog
-from MacroQueue.Dialogs import MyStartMacroDialog as StartMacroDialog
-from MacroQueue.Dialogs import MyChooseSoftwareDialog as ChooseSoftwareDialog
-from MacroQueue.GUIDesign import MyFrame
+sys.path.append(os.path.dirname(__file__))
+from Dialogs import MyMacroDialog
+from Dialogs import MyMacroSettingsDialog
+from Dialogs import MyStartMacroDialog
+from Dialogs import MyChooseSoftwareDialog
+from GUIDesign import MyFrame
 
 # from GUIDesign import MacroDialog
 from inspect import getmembers, isfunction
 
 # They all go in try/except just in case the required packages aren't installed for one of them 
 # (e.g. you can still use RHK's functions even without win32com which you need for CreaTec)
+sys.path.append(os.path.dirname(__file__)+"\\Functions")
 try:
-    import MacroQueue.Functions.RHK as RHKFunctions
+    import RHK as RHKFunctions
 except:
     pass
 
 try:
-    import MacroQueue.Functions.CreaTec as CreaTecFunctions
+    import CreaTec as CreaTecFunctions
 except:
     pass
 
 try:
-    import MacroQueue.Functions.SXM as SXMFunctions
+    import SXM as SXMFunctions
 except:
     pass
 
 try:
-    import MacroQueue.Functions.General as GeneralFunctions
+    import General as GeneralFunctions
 except:
     pass
 
@@ -110,7 +112,6 @@ class MacroQueue(MyFrame):
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
-        print(application_path)
 
 
         # The GUIDesign is defined in GUIDesign.py as the class MyFrame. It was made with wxFormBuilder
@@ -146,7 +147,7 @@ class MacroQueue(MyFrame):
             if "PauseAfterCancel" in self.SettingsDict.keys():
                 self.m_PauseAfterCancel.Check(self.SettingsDict['PauseAfterCancel'] != 'False')
             self.Software = self.SettingsDict["Software"]
-            ThisChooseSoftwareDialog = ChooseSoftwareDialog(self,self.FunctionsLoaded)
+            ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
             ThisChooseSoftwareDialog.SetSoftware(self.Software)
             
             for item in self.m_NotSTMMenu.GetMenuItems():
@@ -156,7 +157,7 @@ class MacroQueue(MyFrame):
                     item.Check(False)
         else:
             if not test:
-                ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
+                ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
                 ThisChooseSoftwareDialog.ShowModal()
         # if self.Software is None:
         #     self.OnClose()
@@ -294,7 +295,7 @@ class MacroQueue(MyFrame):
             if item.IsChecked():
                 self.FunctionsLoaded.append(item.GetItemLabel())
         
-        ThisChooseSoftwareDialog = ChooseSoftwareDialog(self,self.FunctionsLoaded)
+        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
         ThisChooseSoftwareDialog.SetSoftware(self.Software)
         
     
@@ -343,8 +344,8 @@ class MacroQueue(MyFrame):
                     menuItem = popupmenu.Append(-1, 'Edit')
                     def Edit(event):
                         MacroLabel = ThisButton.GetLabel()
-                        MyMacroDialog = MacroDialog(self,MacroName=MacroLabel,InitalMacro=AllTheMacros[MacroLabel])
-                        MyMacroDialog.ShowModal()
+                        ThisMacroDialog = MyMacroDialog(self,MacroName=MacroLabel,InitalMacro=AllTheMacros[MacroLabel])
+                        ThisMacroDialog.ShowModal()
                     self.Bind(wx.EVT_MENU, Edit, menuItem)
                     menuItem = popupmenu.Append(-1, 'Delete')
                     def Delete(event):
@@ -372,8 +373,8 @@ class MacroQueue(MyFrame):
         with open(self.MacroPath, 'r') as fp:
             AllTheMacros = json.load(fp)
         ThisMacro = AllTheMacros[MacroLabel]
-        MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacro)
-        MyStartMacroDialog.ShowModal()
+        ThisStartMacroDialog = MyStartMacroDialog(self,MacroLabel,ThisMacro)
+        ThisStartMacroDialog.ShowModal()
         
     def OnRFunctionClick(self, event):
         ThisText = event.GetEventObject()
@@ -514,12 +515,12 @@ class MacroQueue(MyFrame):
         
 
     def StartMakeNewMacro(self,event):
-        MyMacroDialog = MacroDialog(self)
-        MyMacroDialog.ShowModal()
+        ThisMacroDialog = MyMacroDialog(self)
+        ThisMacroDialog.ShowModal()
         pass
     def DefineMacroSettings(self,Name,TheMacro):
-        MyMacroSettingsDialog = MacroSettingsDialog(self,Name,TheMacro)
-        MyMacroSettingsDialog.ShowModal()
+        ThisMacroSettingsDialog = MyMacroSettingsDialog(self,Name,TheMacro)
+        ThisMacroSettingsDialog.ShowModal()
     def AddMacroToQueue(self,TheMacro,MacroName,Index=None):
         TheExpandedMacros = []
         for Function in TheMacro:
@@ -738,8 +739,8 @@ class MacroQueue(MyFrame):
             MacroLabel = self.TheQueue[Index][2].GetLabel()
             ThisMacroInfo = [[Function['Name'],{key:{"DefaultValue":f"{Parameter}",'Frozen':False} for key,Parameter in Function['Parameters'].items()},Included] for Function,Included in self.TheQueue[Index][0]]
             QueueObject=self.TheQueue[Index]
-            MyStartMacroDialog = StartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,QueueObject=QueueObject)
-            MyStartMacroDialog.ShowModal()
+            ThisStartMacroDialog = MyStartMacroDialog(self,MacroLabel,ThisMacroInfo,EdittingMode=True,QueueObject=QueueObject)
+            ThisStartMacroDialog.ShowModal()
             self.Editting = False
 
             if not OriginallyPaused and self.Paused:
@@ -772,29 +773,29 @@ class MacroQueue(MyFrame):
     def AddConnectToQueue(self, event=None):
         Initialize = [['Initialize',{},True]]
         if not self.test:
-            MyStartMacroDialog = StartMacroDialog(self,"Connect",Initialize)
-            MyStartMacroDialog.AddToQueue()
+            ThisStartMacroDialog = MyStartMacroDialog(self,"Connect",Initialize)
+            ThisStartMacroDialog.AddToQueue()
         return
     def AddDisconnectToQueue(self, event=None):
         OnClose = [['OnClose',{},True],['Pause',{},True]]
-        MyStartMacroDialog = StartMacroDialog(self,"Disconnect",OnClose)
-        MyStartMacroDialog.AddToQueue()
+        ThisStartMacroDialog = MyStartMacroDialog(self,"Disconnect",OnClose)
+        ThisStartMacroDialog.AddToQueue()
         self.AddConnectToQueue()
         return
     def OnRHKSoftware(self, event):
-        ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
+        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
         ThisChooseSoftwareDialog.OnRHK()
         return
     def OnCreaTecSoftware(self, event):
-        ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
+        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
         ThisChooseSoftwareDialog.OnCreaTec()
         return
     def OnSXMSoftware(self, event):
-        ThisChooseSoftwareDialog = ChooseSoftwareDialog(self)
+        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
         ThisChooseSoftwareDialog.OnSXM()
         return
     def PauseAfterCancel(self,event):
-        ThisChooseSoftwareDialog = ChooseSoftwareDialog(self,self.FunctionsLoaded)
+        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
         ThisChooseSoftwareDialog.SetSoftware(self.Software)
         pass
     def BasicUseageHelp(self, event):
@@ -1000,9 +1001,10 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                 Functions[FunctionFile] = self.Functions[FunctionFile]
             FunctionDict = {Name.replace("_"," "):Function for Name,Function in FunctionList}
             Functions[Software].OutgoingQueue = OutgoingQueue
-            for FunctionFile in FunctionsToLoad:
-                Functions[FunctionFile].MacroQueueSelf = self
-                Functions[FunctionFile].OutgoingQueue = OutgoingQueue
+            if not FunctionsToLoad is None:
+                for FunctionFile in FunctionsToLoad:
+                    Functions[FunctionFile].MacroQueueSelf = self
+                    Functions[FunctionFile].OutgoingQueue = OutgoingQueue
         if Message[0] == "OnClose":
             for FunctionFile in [self.Software,*self.FunctionsLoaded]:
                 try:

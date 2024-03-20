@@ -1,4 +1,4 @@
-import MacroQueue.Functions.SXMRemote
+import SXMRemote
 import numpy as np
 import time
 import os
