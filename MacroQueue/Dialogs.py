@@ -7,10 +7,10 @@ import os
 from functools import partial
 import numpy as np
 
-from GUIDesign import MacroDialog
-from GUIDesign import MacroSettingsDialog
-from GUIDesign import StartMacroDialog
-from GUIDesign import ChooseSoftware
+from MacroQueue.GUIDesign import MacroDialog
+from MacroQueue.GUIDesign import MacroSettingsDialog
+from MacroQueue.GUIDesign import StartMacroDialog
+from MacroQueue.GUIDesign import ChooseSoftware
 import pandas as pd
 class SettingsDialog(wx.Dialog):
 

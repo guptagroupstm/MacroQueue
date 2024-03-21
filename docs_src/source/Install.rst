@@ -45,7 +45,7 @@ In particular, this is recommended if you want to use :doc:`Tutorials/test`.
 
     python MacroQueue
 
-5. (Optional) Create an executable by running the following command in MacroQueue's folder::
+5. (Optional) Create an executable by running the following command *in MacroQueue's folder*::
 
     .\MakeExe.sh
 
