@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Error Handling &mdash; MacroQueue 0.1.20 documentation</title>
+  <title>QuasiParticle Interference (QPI) Mapping &mdash; MacroQueue 0.1.20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Changing Instruments" href="SystemChange.html" />
-    <link rel="prev" title="Special Functions" href="SpecialFunctions.html" /> 
+    <link rel="next" title="Contributing" href="../Contributing.html" />
+    <link rel="prev" title="Queue’s Structure" href="Architecture.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,22 +49,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="Tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#basic-required-for-all-users">Basic: Required for all users</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="Tutorial.html#advanced-read-if-it-is-needed">Advanced: Read if it is needed</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="LogParameters.html">Logarithmically Spaced Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="DefineMacro/DefineMacro.html">Defining a Macro</a></li>
-<li class="toctree-l3"><a class="reference internal" href="WriteFunction.html">Writing a new function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="SpecialFunctions.html">Special Functions</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Error Handling</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#out-of-bounds">Out of Bounds</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#advanced-read-if-it-is-needed">Advanced: Read if it is needed</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="Tutorial.html#examples-gallery">Examples gallery</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">QuasiParticle Interference (QPI) Mapping</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="SystemChange.html">Changing Instruments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="test.html">Automated test</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Architecture.html">Queue’s Structure</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="Tutorial.html#examples-gallery">Examples gallery</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../Contributing.html">Contributing</a></li>
@@ -85,9 +74,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="Tutorial.html">Tutorial</a></li>
-      <li class="breadcrumb-item active">Error Handling</li>
+      <li class="breadcrumb-item active">QuasiParticle Interference (QPI) Mapping</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/Tutorials/ErrorHandling.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/Tutorials/QPI.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -95,22 +84,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="error-handling">
-<h1>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h1>
-<section id="out-of-bounds">
-<h2>Out of Bounds<a class="headerlink" href="#out-of-bounds" title="Link to this heading"></a></h2>
-</section>
-<section id="exceptions">
-<h2>Exceptions<a class="headerlink" href="#exceptions" title="Link to this heading"></a></h2>
-</section>
+  <section id="quasiparticle-interference-qpi-mapping">
+<h1>QuasiParticle Interference (QPI) Mapping<a class="headerlink" href="#quasiparticle-interference-qpi-mapping" title="Link to this heading"></a></h1>
+<p><a class="reference external" href="https://www.nature.com/articles/363524a0">QPI Mapping</a> is well established technique to study the low-energy electronic structure, more specifically, it’s a techique to measure a matieral’s band stucture, ω(k)</p>
+<p>It is done by taking several dI/dV images at different biases and taking their fast fourier transform (FFT), shown in Figure (a).  The halo in reciprocal space corresponds to the band’s wavelength at this particular energy, plotted in Figure (b).</p>
+<p>This measurement takes over an hour for each image.  MacroQueue allows you to take all the images consecutively without additional human input, shown in Figure (c).</p>
+<img alt="../_images/QPIExample.png" src="../_images/QPIExample.png" />
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="SpecialFunctions.html" class="btn btn-neutral float-left" title="Special Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="SystemChange.html" class="btn btn-neutral float-right" title="Changing Instruments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Architecture.html" class="btn btn-neutral float-left" title="Queue’s Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../Contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

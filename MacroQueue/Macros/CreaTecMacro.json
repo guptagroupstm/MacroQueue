@@ -388,6 +388,7 @@
      "Tooltip": "",
      "Frozen": false,
      "ValueType": "Choice",
+     "InRange": true,
      "DefaultList": [
       "nm",
       "Image Coord",
@@ -398,13 +399,15 @@
      "DefaultValue": "0",
      "Tooltip": "The X position of the tip in nm, or Image Coordinate, or V",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "InRange": true
     },
     "YOffset": {
      "DefaultValue": "0",
      "Tooltip": "The Y X position of the tip in nm, or Image Coordinate, or V",
      "Frozen": false,
-     "ValueType": "Numerical"
+     "ValueType": "Numerical",
+     "InRange": true
     }
    },
    false
@@ -417,6 +420,7 @@
      "Tooltip": "The lock-in voltage amplitude in mV",
      "Frozen": false,
      "ValueType": "Numerical",
+     "InRange": true,
      "Units": "mV"
     }
    },
@@ -430,6 +434,7 @@
      "Tooltip": "The lock-in frequency in Hz",
      "Frozen": false,
      "ValueType": "Numerical",
+     "InRange": true,
      "Units": "Hz"
     }
    },
@@ -443,10 +448,39 @@
      "Tooltip": "The lock-in time constant in Hz",
      "Frozen": false,
      "ValueType": "Numerical",
+     "InRange": true,
      "Units": "Hz"
     }
    },
    false
+  ],
+  [
+   "Set RF Freq",
+   {
+    "Freq": {
+     "DefaultValue": "1e9",
+     "Tooltip": "The RF frequency in Hz",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "Hz"
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Power",
+   {
+    "Power": {
+     "DefaultValue": "0",
+     "Tooltip": "The amount of power for the RF generator in dBm",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "dBm"
+    }
+   },
+   true
   ],
   [
    "Spectrum",

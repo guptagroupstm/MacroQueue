@@ -14,12 +14,19 @@ import wx
 from time import time as timer
 
 sys.path.append(os.path.dirname(__file__))
-from MacroQueue.Dialogs import MyMacroDialog
-from MacroQueue.Dialogs import MyMacroSettingsDialog
-from MacroQueue.Dialogs import MyStartMacroDialog
-from MacroQueue.Dialogs import MyChooseSoftwareDialog
-from MacroQueue.GUIDesign import MyFrame
-
+try:
+    from MacroQueue.Dialogs import MyMacroDialog
+    from MacroQueue.Dialogs import MyMacroSettingsDialog
+    from MacroQueue.Dialogs import MyStartMacroDialog
+    from MacroQueue.Dialogs import MyChooseSoftwareDialog
+    from MacroQueue.GUIDesign import MyFrame
+except ModuleNotFoundError:
+    from Dialogs import MyMacroDialog
+    from Dialogs import MyMacroSettingsDialog
+    from Dialogs import MyStartMacroDialog
+    from Dialogs import MyChooseSoftwareDialog
+    from GUIDesign import MyFrame
+    
 # from GUIDesign import MacroDialog
 from inspect import getmembers, isfunction
 

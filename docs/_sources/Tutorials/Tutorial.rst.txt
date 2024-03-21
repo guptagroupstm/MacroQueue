@@ -31,4 +31,4 @@ Examples gallery
 .. toctree::
    :maxdepth: 1
 
-   Example1
+   QPI

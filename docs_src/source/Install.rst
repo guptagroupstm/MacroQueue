@@ -20,7 +20,7 @@ Installation from pip (recommended)
 
     python -m MacroQueue
 
-4. (Optional) Create an executable by running the following command in MacroQueue's folder::
+4. (Optional) Create an executable by running the following command *in MacroQueue's folder*::
 
     .\MakeExe.sh
 

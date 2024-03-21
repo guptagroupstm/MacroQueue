@@ -7,10 +7,17 @@ import os
 from functools import partial
 import numpy as np
 
-from MacroQueue.GUIDesign import MacroDialog
-from MacroQueue.GUIDesign import MacroSettingsDialog
-from MacroQueue.GUIDesign import StartMacroDialog
-from MacroQueue.GUIDesign import ChooseSoftware
+try:
+    from MacroQueue.GUIDesign import MacroDialog
+    from MacroQueue.GUIDesign import MacroSettingsDialog
+    from MacroQueue.GUIDesign import StartMacroDialog
+    from MacroQueue.GUIDesign import ChooseSoftware
+except ModuleNotFoundError:
+    from GUIDesign import MacroDialog
+    from GUIDesign import MacroSettingsDialog
+    from GUIDesign import StartMacroDialog
+    from GUIDesign import ChooseSoftware
+
 import pandas as pd
 class SettingsDialog(wx.Dialog):
 
@@ -1020,8 +1027,9 @@ class MyStartMacroDialog(StartMacroDialog):
         if ';' in OldString:
             NewString = OldString.split(';')
             NewString = [CleanNumber(Item) for Item in NewString if CleanNumber(Item) is not None]
-            if (len(NewString) == 3 and LogSpace) and int(np.floor(float(NewString[2]))) > 0 and float(NewString[0]) > 0 and float(NewString[1]) > 0:
-                Numbers = np.logspace(np.log10(float(NewString[0])),np.log10(float(NewString[1])),int(np.floor(float(NewString[2]))))
+            if (len(NewString) == 3 and LogSpace) and int(np.floor(float(NewString[2]))) > 0:
+                LowerNumber = np.min([float(NewString[0]),float(NewString[1])])-1
+                Numbers = np.logspace(np.log10(float(NewString[0])-LowerNumber),np.log10(float(NewString[1])-LowerNumber),int(np.floor(float(NewString[2]))))+LowerNumber
                 def round_sig(x, sig):
                     x = round(x, sig-int(floor(log10(abs(x))))-1) if x !=0 else 0
                     if x%1==0:
