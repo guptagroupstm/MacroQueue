@@ -159,7 +159,10 @@ class MyMacroDialog ( MacroDialog ):
             if ValueType == bool:
                 return "Boolean"
             if ValueType == str:
-                return "String"
+                if os.path.exists(Value):
+                    return "File"
+                else:
+                    return "String"
             try:
                 FloatValue = float(Value)
                 return "Numerical"
@@ -186,7 +189,14 @@ class MyMacroDialog ( MacroDialog ):
                     FunctionButton = wx.Button( m_FunctionButtonScrolledWindow, wx.ID_ANY, Name, wx.DefaultPosition, wx.DefaultSize, 0 )
                     FunctionButton.SetMinSize( wx.Size( 150,-1 ) )
                     AddFunctionButtonSizer.Add( FunctionButton, 0, wx.ALL, 5 )
-                    Parameters = {Key:{"DefaultValue":Value,"Tooltip":"","Frozen":False,"ValueType":GetValueType(Value)} for Key,Value in zip(inspect.getfullargspec(Function)[0],inspect.getfullargspec(Function)[3])} if len(inspect.getfullargspec(Function)[0]) > 0 else {}
+                    Parameters = {}
+                    if len(inspect.getfullargspec(Function)[0]) > 0:
+                        ParameterNames = inspect.getfullargspec(Function)[0]
+                        ParameterDefaults = list(inspect.getfullargspec(Function)[3])
+                        ParameterDefaults = ([''] * (len(ParameterNames) - len(ParameterDefaults))) + list(ParameterDefaults)
+                        for Key,Value in zip(ParameterNames,ParameterDefaults):
+                            Parameters[Key] = {"DefaultValue":Value,"Tooltip":"","Frozen":False,"ValueType":GetValueType(Value)}
+                            
                     for ParameterName in Parameters.keys():
                         Parameters[ParameterName]["InRange"] = True
                         if Parameters[ParameterName]["ValueType"] == "Choice":
@@ -456,7 +466,10 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
 
                     self.ParameterPanel = wx.Panel( FunctionPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
                     self.ParameterPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
-                    self.ParameterPanel.SetMinSize( wx.Size( 250,60 ) )
+                    if ParameterInfo['ValueType'] == 'File':
+                        self.ParameterPanel.SetMinSize( wx.Size( 330,60 ) )
+                    else:
+                        self.ParameterPanel.SetMinSize( wx.Size( 250,60 ) )
                     self.ParameterPanel.SetToolTip(Tooltip)
 
                     ParameterSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
@@ -487,6 +500,8 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                         ParameterDefaultValueText.SetValue(ParameterInfo['DefaultValue'])
                     elif ParameterInfo['ValueType'] == 'String':
                         ParameterDefaultValueText = wx.TextCtrl( self.ParameterPanel, wx.ID_ANY, ParameterInfo['DefaultValue'], wx.DefaultPosition, wx.DefaultSize, 0 )
+                    elif ParameterInfo['ValueType'] == 'File':
+                        ParameterDefaultValueText = wx.FilePickerCtrl( self.ParameterPanel, wx.ID_ANY, ParameterInfo['DefaultValue'], pos=wx.DefaultPosition, size=wx.DefaultSize ,style=wx.FLP_USE_TEXTCTRL )
                     elif ParameterInfo['ValueType'] == 'Choice':
                         ParameterDefaultValueText = wx.Choice( self.ParameterPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ParameterInfo['DefaultList'] )
                         ParameterDefaultValueText.SetStringSelection(ParameterInfo['DefaultValue'])
@@ -576,6 +591,8 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                 for ParameterName,ParameterInfo in Parameters.items():
                     if ParameterInfo['ValueType'] == "Choice":
                         Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[i][ParameterName][0].GetStringSelection()
+                    elif ParameterInfo['ValueType'] == "File":
+                        Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[i][ParameterName][0].GetPath()
                     else:
                         Parameters[ParameterName]['DefaultValue'] = self.TheMacroCtrls[i][ParameterName][0].GetValue()
                     Parameters[ParameterName]['Frozen'] = self.TheMacroCtrls[i][ParameterName][1].GetValue()
@@ -605,7 +622,10 @@ class MyStartMacroDialog(StartMacroDialog):
             if ValueType == bool:
                 return "Boolean"
             if ValueType == str:
-                return "String"
+                if os.path.exists(Value):
+                    return "File"
+                else:
+                    return "String"
             try:
                 FloatValue = float(Value)
                 return "Numerical"
@@ -795,7 +815,10 @@ class MyStartMacroDialog(StartMacroDialog):
 
                         ParameterPanel = wx.Panel( FunctionPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
                         ParameterPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
-                        ParameterPanel.SetMinSize( wx.Size( 250,-1 ) )
+                        if ParameterInfo['ValueType'] == 'File':
+                            ParameterPanel.SetMinSize( wx.Size( 330,-1 ) )
+                        else:
+                            ParameterPanel.SetMinSize( wx.Size( 250,-1 ) )
                         ParameterPanel.Bind(wx.EVT_LEFT_DOWN,ThisPanelTextCheckFunction)
                         ParameterPanel.Bind(wx.EVT_LEFT_DCLICK,ThisPanelTextCheckFunction)
 
@@ -889,10 +912,13 @@ class MyStartMacroDialog(StartMacroDialog):
                             # Block everything else
                             return
                         def UpdateParameters(Name,ThisFunction,ParameterName,FunctionTextCheck,event):
-                            Value = event.GetEventObject().GetValue()
+                            if ThisFunction['Parameters'][ParameterName]['ValueType'] == 'File':
+                                Value = event.GetEventObject().GetPath()
+                            else:
+                                Value = event.GetEventObject().GetValue()
                             ThisPanel = event.GetEventObject().GetParent()
 
-                            OldToolTip = event.GetEventObject().GetToolTip().GetTip()
+                            OldToolTip = event.GetEventObject().GetParent().GetToolTip().GetTip()
                             if '\n' in OldToolTip:
                                 FirstLine = OldToolTip[:OldToolTip.find("\n")]
                                 FirstLine += "\n"
@@ -955,6 +981,11 @@ class MyStartMacroDialog(StartMacroDialog):
                             ParameterValueText.SetValue(ParameterInfo['DefaultValue'])
                             ThisUpdateParameters = partial(UpdateParameters,Name,Function,ParameterName,m_FunctionTextCheck)
                             ParameterValueText.Bind( wx.EVT_TEXT, ThisUpdateParameters)
+                        elif ParameterInfo['ValueType'] == 'File':
+                            ParameterValueText = wx.FilePickerCtrl( ParameterPanel, wx.ID_ANY, ParameterInfo['DefaultValue'], pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.FLP_DEFAULT_STYLE )
+                            ParameterValueText.SetPath(ParameterInfo['DefaultValue'])
+                            ThisUpdateParameters = partial(UpdateParameters,Name,Function,ParameterName,m_FunctionTextCheck)
+                            ParameterValueText.Bind( wx.EVT_FILEPICKER_CHANGED, ThisUpdateParameters)
                         DefaultValueSizer.Add( ParameterValueText, 1, wx.ALL, 5 )
 
 

@@ -696,5 +696,68 @@
    {},
    true
   ]
+ ],
+ "Test": [
+  [
+   "Numerical Function",
+   {
+    "SomeNumber": {
+     "DefaultValue": "5",
+     "Tooltip": "An example function which only takes numbers\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "SomeNumber",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   true
+  ],
+  [
+   "Complex Function",
+   {
+    "SomeBoolean": {
+     "DefaultValue": true,
+     "Tooltip": "A Boolean parameter produces a checkbox",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true,
+     "Name": "SomeBoolean"
+    },
+    "SomeString": {
+     "DefaultValue": "String",
+     "Tooltip": "A String parameter produces a textbox",
+     "Frozen": false,
+     "ValueType": "String",
+     "InRange": true,
+     "Name": "SomeString"
+    },
+    "SomeFilePath": {
+     "DefaultValue": "C:\\",
+     "Tooltip": "A filepath parameter produces a 'browse' button",
+     "Frozen": false,
+     "ValueType": "File",
+     "InRange": true,
+     "Name": "SomeFilePath"
+    },
+    "SomeChoice": {
+     "DefaultValue": "Choice",
+     "Tooltip": "A Choice parameter produces a dropdown menu",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Choice",
+      "Combo",
+      "3rd",
+      "4th"
+     ],
+     "Name": "SomeChoice"
+    }
+   },
+   true
+  ]
  ]
 }

@@ -1,14 +1,23 @@
 Writing a new function
 ==================================================
 
-*Needs updated*
 
 - Go to File -> Open Source Folder.
 
-- Add the function to the .py file that corresponds to the software you want it to work with.
+.. image:: ./OpenSource.png
 
-- Open and close MacroQueue.  Your function can now be added to a macro.
 
+- Add the function to the .py file that corresponds to the instrument you are working with.
+
+    - Create a new .py file if you are working with a new instrument
+
+    - Any arbitary python function can be added.  An example is shown at the bottom of this page.
+
+- Reload the functions.  Your function can now be added to a macro.
+
+    - You could also open and close MacroQueue.  MacroQueue loads all the functions on start-up.
+
+.. image:: ./ReloadFunctions.png
 
 
 
@@ -17,13 +26,26 @@ Writing a new function
 Parameter datatypes
 ------------------------
 
-*Needs updated*
+The parameters of your function should have a default value so that MacroQueue knows what datatypes to allow.  If there is no default value, it's assumed to be an empty string.
 
-The parameters of your function must have default values so that MacroQueue knows what the datatype to allow.
-MacroQueue works with floats, booleans, and strings. 
+MacroQueue provides helpful controls for floats, booleans, strings, and filepaths. 
+
 If you only want the user to choose from a finite number of options, you may also put a list as the default parameter.  
-The user will be able to choose a single list entry to be used.
+The user will be able to choose a single list entry from a dropdown menu to be used.
 
+Here are two example functions::
+
+    def Numerical_Function(SomeNumber=5):
+        print(SomeNumber)
+
+    def Complex_Function(SomeBoolean=True,SomeString="String",SomeFilePath="C:\\",SomeChoice=['Choice','Combo','3rd','4th']):
+        if SomeBoolean:
+            print(SomeString, SomeChoice, SomeFilePath)
+
+
+These functions will appear in MacroQueue as:
+
+.. image:: ./ParameterDatatype.png
 
 Parameters Metadata (Optional)
 ------------------------------

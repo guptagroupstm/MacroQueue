@@ -10,11 +10,11 @@ Installation from pip (recommended)
 
 1. Update pip::
 
-    pip install --upgrade pip
+    python -m pip install --upgrade pip
 
 2. Install MacroQueue by pip::
 
-    pip install MacroQueue
+    python -m pip install MacroQueue
 
 3. Start MacroQueue by the command below::
 

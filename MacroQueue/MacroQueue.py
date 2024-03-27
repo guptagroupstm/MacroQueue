@@ -33,25 +33,6 @@ from inspect import getmembers, isfunction
 # They all go in try/except just in case the required packages aren't installed for one of them 
 # (e.g. you can still use RHK's functions even without win32com which you need for CreaTec)
 sys.path.append(os.path.dirname(__file__)+"\\Functions")
-try:
-    import RHK as RHKFunctions
-except:
-    pass
-
-try:
-    import CreaTec as CreaTecFunctions
-except:
-    pass
-
-try:
-    import SXM as SXMFunctions
-except:
-    pass
-
-try:
-    import General as GeneralFunctions
-except:
-    pass
 
 import json
 
@@ -99,7 +80,7 @@ IconFileName = "MacroQueueIcon.ico"
 # In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
 # On close, I cancel the scan.  Should I try to prevent that?
 
-VersionNumber = "v0.1.18"
+VersionNumber = "v0.2.0"
 class MacroQueue(MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
@@ -118,6 +99,7 @@ class MacroQueue(MyFrame):
         self.test = test
         application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
+        
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
 
 
@@ -276,7 +258,7 @@ class MacroQueue(MyFrame):
             self.Process.join(timeout=0.5)
         if self.Closing:
             self.Destroy()
-    def LoadFunctions(self):
+    def LoadFunctions(self,Reloading=False):
         FunctionNames = [file for file in os.listdir('Functions') if file[-3:] == ".py"]
         self.Functions = {}
         for FunctionName in FunctionNames:
@@ -284,7 +266,7 @@ class MacroQueue(MyFrame):
                 self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}'))         
             except:
                 pass
-        for file in ["CreaTec.py","RHK.py","SXM.py"]:
+        for file in ["CreaTec.py","RHK.py","SXM.py","SXMRemote.py"]:
             try:
                 FunctionNames.remove(file)
             except:
@@ -294,8 +276,16 @@ class MacroQueue(MyFrame):
         except:
             pass
         for file in FunctionNames:
-            CheckFunction = self.m_NotSTMMenu.AppendCheckItem(wx.ID_ANY,file[:-3])
-            self.Bind(wx.EVT_MENU,self.EditLoadedFunctionFiles,CheckFunction)
+            
+            if not Reloading:
+                CheckFunction = self.m_NotSTMMenu.AppendCheckItem(wx.ID_ANY,file[:-3])
+                self.Bind(wx.EVT_MENU,self.EditLoadedFunctionFiles,CheckFunction)
+            else:
+                MenuItems = self.m_NotSTMMenu.GetMenuItems()
+                MenuLabels = [MenuItem.GetItemLabel() for MenuItem in MenuItems ]
+                if not file[:-3] in MenuLabels:
+                    CheckFunction = self.m_NotSTMMenu.AppendCheckItem(wx.ID_ANY,file[:-3])
+                    self.Bind(wx.EVT_MENU,self.EditLoadedFunctionFiles,CheckFunction)
     def EditLoadedFunctionFiles(self,event=None):
         self.FunctionsLoaded = []
         for item in self.m_NotSTMMenu.GetMenuItems():
@@ -805,6 +795,10 @@ class MacroQueue(MyFrame):
         ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
         ThisChooseSoftwareDialog.SetSoftware(self.Software)
         pass
+    def ReloadFunctions(self,event):
+        self.LoadFunctions(Reloading=True)
+        self.IncomingQueue.put(["SoftwareChange",[self.Software,self.FunctionsLoaded]])
+        pass
     def BasicUseageHelp(self, event):
         HelpMessage = "Left click on your choosen macro from the list on the main page.\n"
         HelpMessage += "Each function in the macro has a checkbox on the left side of the function's panel.  You may check/uncheck it.  If it is checked it will be run.  If it is unchecked it will not run.\n"
@@ -998,6 +992,7 @@ def Thread(self,IncomingQueue,OutgoingQueue):
     while True:
         Message = IncomingQueue.get() # Blocks until there's a message
         if Message[0] == "SoftwareChange":
+            Functions = self.Functions
             # Changes the global parameters that are assessable to the new software's functions (e.g. RHK -> CreaTec)
             Software,FunctionsToLoad = Message[1]
             Functions[Software].MacroQueueSelf = self

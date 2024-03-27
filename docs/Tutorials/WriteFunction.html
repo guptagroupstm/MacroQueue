@@ -99,19 +99,45 @@
              
   <section id="writing-a-new-function">
 <h1>Writing a new function<a class="headerlink" href="#writing-a-new-function" title="Link to this heading"></a></h1>
-<p><em>Needs updated</em></p>
 <ul class="simple">
 <li><p>Go to File -&gt; Open Source Folder.</p></li>
-<li><p>Add the function to the .py file that corresponds to the software you want it to work with.</p></li>
-<li><p>Open and close MacroQueue.  Your function can now be added to a macro.</p></li>
 </ul>
+<img alt="../_images/OpenSource.png" src="../_images/OpenSource.png" />
+<ul>
+<li><p>Add the function to the .py file that corresponds to the instrument you are working with.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Create a new .py file if you are working with a new instrument</p></li>
+<li><p>Any arbitary python function can be added.  An example is shown at the bottom of this page.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Reload the functions.  Your function can now be added to a macro.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>You could also open and close MacroQueue.  MacroQueue loads all the functions on start-up.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<img alt="../_images/ReloadFunctions.png" src="../_images/ReloadFunctions.png" />
 <section id="parameter-datatypes">
 <h2>Parameter datatypes<a class="headerlink" href="#parameter-datatypes" title="Link to this heading"></a></h2>
-<p><em>Needs updated</em></p>
-<p>The parameters of your function must have default values so that MacroQueue knows what the datatype to allow.
-MacroQueue works with floats, booleans, and strings.
-If you only want the user to choose from a finite number of options, you may also put a list as the default parameter.
-The user will be able to choose a single list entry to be used.</p>
+<p>The parameters of your function should have a default value so that MacroQueue knows what datatypes to allow.  If there is no default value, it’s assumed to be an empty string.</p>
+<p>MacroQueue provides helpful controls for floats, booleans, strings, and filepaths.</p>
+<p>If you only want the user to choose from a finite number of options, you may also put a list as the default parameter.
+The user will be able to choose a single list entry from a dropdown menu to be used.</p>
+<p>Here are two example functions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Numerical_Function</span><span class="p">(</span><span class="n">SomeNumber</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">SomeNumber</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">Complex_Function</span><span class="p">(</span><span class="n">SomeBoolean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">SomeString</span><span class="o">=</span><span class="s2">&quot;String&quot;</span><span class="p">,</span><span class="n">SomeFilePath</span><span class="o">=</span><span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">SomeChoice</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Choice&#39;</span><span class="p">,</span><span class="s1">&#39;Combo&#39;</span><span class="p">,</span><span class="s1">&#39;3rd&#39;</span><span class="p">,</span><span class="s1">&#39;4th&#39;</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">SomeBoolean</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">SomeString</span><span class="p">,</span> <span class="n">SomeChoice</span><span class="p">,</span> <span class="n">SomeFilePath</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These functions will appear in MacroQueue as:</p>
+<img alt="../_images/ParameterDatatype.png" src="../_images/ParameterDatatype.png" />
 </section>
 <section id="parameters-metadata-optional">
 <h2>Parameters Metadata (Optional)<a class="headerlink" href="#parameters-metadata-optional" title="Link to this heading"></a></h2>

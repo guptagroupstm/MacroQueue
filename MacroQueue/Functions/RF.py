@@ -1,4 +1,5 @@
 import pyvisa
+import CreaTec
 
 CurrentMacro = None
 OutgoingQueue = None
@@ -7,6 +8,7 @@ MacroQueueSelf = None
 
 def Connect_To_RF_Generator():
     global RFGenerator
+
     rm = pyvisa.ResourceManager()
     # ResourceList = rm.list_resources()
     RFGenerator = rm.open_resource('USB0::0x03EB::0xAFFF::481-34B6D0608-2368::INSTR')

@@ -4,20 +4,21 @@ Cancel = False
 MacroQueueSelf = None
 
 
-def Bare_Function(SomeParameter=""):
+def Bare_Function(SomeParameter,SomeParameter2="a"):
     print(SomeParameter)
-
+    print("Hehehe")
 
 # {"Name":"SomeNumber","Units":"V","Min":-10,"Max":10,"Tooltip":"An example function which only takes numbers"}
 def Numerical_Function(SomeNumber=5):
     print(SomeNumber)
 
-# {"Name":"Boolean","Tooltip":"A Boolean parameter produces a checkbox"}
-# {"Name":"String","Tooltip":"A String parameter produces a textbox"}
-# {"Name":"Choice","Tooltip":"A Choice parameter produces a dropdown menu"}
-def Complex_Function(Boolean=True,String="String",Choice=['Choice','Combo','3rd','4th']):
-    if Boolean:
-        print(String, Choice)
+# {"Name":"SomeBoolean","Tooltip":"A Boolean parameter produces a checkbox"}
+# {"Name":"SomeString","Tooltip":"A String parameter produces a textbox"}
+# {"Name":"SomeFilePath","Tooltip":"A filepath parameter produces a 'browse' button"}
+# {"Name":"SomeChoice","Tooltip":"A Choice parameter produces a dropdown menu"}
+def Complex_Function(SomeBoolean=True,SomeString="String",SomeFilePath="C:\\",SomeChoice=['Choice','Combo','3rd','4th']):
+    if SomeBoolean:
+        print(SomeString, SomeChoice)
 
 
 # {"Name":"WaitTime","Units":"s","Tooltip":"The time to wait"}

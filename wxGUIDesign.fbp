@@ -11,7 +11,7 @@
         <property name="embedded_files_path">res</property>
         <property name="encoding">UTF-8</property>
         <property name="event_generation">connect</property>
-        <property name="file">GUIDesign</property>
+        <property name="file">MacroQueue/GUIDesign</property>
         <property name="first_id">1000</property>
         <property name="help_provider">none</property>
         <property name="image_path_wrapper_function_name"></property>
@@ -131,8 +131,22 @@
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                     </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Reload Functions</property>
+                        <property name="name">m_menuItem17</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+R</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">ReloadFunctions</event>
+                    </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">Macro</property>
                     <property name="name">m_MacroMenu</property>
                     <property name="permission">protected</property>
@@ -146,7 +160,7 @@
                         <property name="label">Make New Macro</property>
                         <property name="name">m_MakeMacroMenuItem</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CRTL+M</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">StartMakeNewMacro</event>
                     </object>
@@ -165,7 +179,7 @@
                         <event name="OnMenuSelection">OpenMacroFile</event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">Connect</property>
                     <property name="name">m_Connectmenu</property>
                     <property name="permission">protected</property>
@@ -179,7 +193,7 @@
                         <property name="label">Connect</property>
                         <property name="name">m_menuItem7</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CRTL+C</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">AddConnectToQueue</event>
                     </object>
@@ -193,7 +207,7 @@
                         <property name="label">Disconnect</property>
                         <property name="name">m_menuItem8</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+D</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">AddDisconnectToQueue</event>
                     </object>

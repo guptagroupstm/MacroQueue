@@ -6,7 +6,7 @@ Adding Multiple Macros
 
 When inputing numerical parameters, you may simultaneously add several items to the queue in three ways. 
 
-- You may input either 1,3,7,9 or 1;3;7;9 and 4 macros will be added to the queue, each with a different value of the parameter. 
+- You may input lists of values (e.g. 1,3,7,9) and macros with each value will be added to the queue. 
 
 .. image:: ./Expanding1.png
 
@@ -31,8 +31,11 @@ When inputing numerical parameters, you may simultaneously add several items to 
 
 Which Functions will Run
 --------------------------
+It is important to note that when a user expands multiple parameters, the macros are created such that the loops are nested.  
 
-It is important to note that only the functions after the expanded function are included.  
+That is to say, if there are two functions each with 2 values, the first funciton will run twice and the second function will run four times (twice for each time the first function ran).
+
+
 For example, let's say I want to (1) change the setpoint, (2) wait some time, (3) change the bias, and (4) scan and I want 2 different setpoints and 2 different biases.  
 
 .. image:: ./Expanding6.png

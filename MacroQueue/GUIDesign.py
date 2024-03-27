@@ -37,10 +37,13 @@ class MyFrame ( wx.Frame ):
 		self.m_OptionsMenu.Append( self.m_PauseAfterCancel )
 		self.m_PauseAfterCancel.Check( True )
 
+		self.m_menuItem17 = wx.MenuItem( self.m_OptionsMenu, wx.ID_ANY, u"Reload Functions"+ u"\t" + u"CTRL+R", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_OptionsMenu.Append( self.m_menuItem17 )
+
 		self.m_menubar1.Append( self.m_OptionsMenu, u"Options" )
 
 		self.m_MacroMenu = wx.Menu()
-		self.m_MakeMacroMenuItem = wx.MenuItem( self.m_MacroMenu, wx.ID_ANY, u"Make New Macro", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_MakeMacroMenuItem = wx.MenuItem( self.m_MacroMenu, wx.ID_ANY, u"Make New Macro"+ u"\t" + u"CRTL+M", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_MacroMenu.Append( self.m_MakeMacroMenuItem )
 
 		self.m_OpenMacroMenuItem = wx.MenuItem( self.m_MacroMenu, wx.ID_ANY, u"Open Macro Folder", wx.EmptyString, wx.ITEM_NORMAL )
@@ -49,10 +52,10 @@ class MyFrame ( wx.Frame ):
 		self.m_menubar1.Append( self.m_MacroMenu, u"Macro" )
 
 		self.m_Connectmenu = wx.Menu()
-		self.m_menuItem7 = wx.MenuItem( self.m_Connectmenu, wx.ID_ANY, u"Connect", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem7 = wx.MenuItem( self.m_Connectmenu, wx.ID_ANY, u"Connect"+ u"\t" + u"CRTL+C", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_Connectmenu.Append( self.m_menuItem7 )
 
-		self.m_menuItem8 = wx.MenuItem( self.m_Connectmenu, wx.ID_ANY, u"Disconnect", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem8 = wx.MenuItem( self.m_Connectmenu, wx.ID_ANY, u"Disconnect"+ u"\t" + u"CTRL+D", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_Connectmenu.Append( self.m_menuItem8 )
 
 		self.m_menubar1.Append( self.m_Connectmenu, u"Connect" )
@@ -153,7 +156,7 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_SIZE, self.OnSize )
 		self.Bind( wx.EVT_MENU, self.OpenSourceFolder, id = self.m_SourceMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnClose, id = self.m_ExitMenuItem.GetId() )
-		self.Bind( wx.EVT_MENU, self.PauseAfterCancel, id = self.m_PauseAfterCancel.GetId() )
+		self.Bind( wx.EVT_MENU, self.ReloadFunctions, id = self.m_menuItem17.GetId() )
 		self.Bind( wx.EVT_MENU, self.StartMakeNewMacro, id = self.m_MakeMacroMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OpenMacroFile, id = self.m_OpenMacroMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.AddConnectToQueue, id = self.m_menuItem7.GetId() )
@@ -189,7 +192,7 @@ class MyFrame ( wx.Frame ):
 		event.Skip()
 
 
-	def PauseAfterCancel( self, event ):
+	def ReloadFunctions( self, event ):
 		event.Skip()
 
 	def StartMakeNewMacro( self, event ):
