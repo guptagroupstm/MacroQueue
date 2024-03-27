@@ -22,3 +22,20 @@ Once you start the queue, by pressing the button on the left, the button will tu
 .. image:: ./RunningQueue.png
 
 .. image:: ./PausedQueue.png
+
+
+Structure
+---------------------
+
+The queue is a global variable defined at the top of the MacroQueue class in MacroQueue.py::
+
+        TheQueue = []
+
+The queue is a list of macros; each Macro is a list of functions; each function is a list of parameter data.
+
+Here is the complete structure:
+
+.. image:: ./QueueStruct.png
+
+
+For concrete example, see :doc:`CourseStep`.

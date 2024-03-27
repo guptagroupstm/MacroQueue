@@ -49,7 +49,8 @@ These functions will appear in MacroQueue as:
 
 Parameters Metadata (Optional)
 ------------------------------
-You may add metadata for the parameters in a function by placing comments directly above the function.  An example function is shown below.
+You may add metadata for the parameters in a function by placing comments directly above the function.  This is used to clarify units, to add explanatory hover text (aka tooltip), and create soft limits for numerical parameters.
+An example function is shown in the next subsection.
 
 - The comments have to be directly above the relavent function with no spaces inbetween.
 

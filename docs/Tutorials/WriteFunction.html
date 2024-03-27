@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Writing a new function &mdash; MacroQueue 0.1.20 documentation</title>
+  <title>Writing a new function &mdash; MacroQueue 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=17aaaefc"></script>
+        <script src="../_static/documentation_options.js?v=938c9ccc"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -141,7 +141,8 @@ The user will be able to choose a single list entry from a dropdown menu to be u
 </section>
 <section id="parameters-metadata-optional">
 <h2>Parameters Metadata (Optional)<a class="headerlink" href="#parameters-metadata-optional" title="Link to this heading"></a></h2>
-<p>You may add metadata for the parameters in a function by placing comments directly above the function.  An example function is shown below.</p>
+<p>You may add metadata for the parameters in a function by placing comments directly above the function.  This is used to clarify units, to add explanatory hover text (aka tooltip), and create soft limits for numerical parameters.
+An example function is shown in the next subsection.</p>
 <ul>
 <li><p>The comments have to be directly above the relavent function with no spaces inbetween.</p></li>
 <li><p>The comment has to be formated as a python dict.  The acceptable keys are:</p>

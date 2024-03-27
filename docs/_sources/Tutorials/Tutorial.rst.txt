@@ -23,7 +23,6 @@ Advanced: Read if it is needed
    ErrorHandling
    SystemChange   
    test
-   Architecture
 
 
 Examples gallery
@@ -32,3 +31,4 @@ Examples gallery
    :maxdepth: 1
 
    QPI
+   CourseStep

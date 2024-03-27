@@ -4,6 +4,14 @@ Cancel = False
 MacroQueueSelf = None
 
 
+
+# {"Name":"SomeParameter","Max":10}
+def Exception_Function(SomeParameter=5):
+    if SomeParameter > 10:
+        raise ValueError(f"{SomeParameter} is too large.")
+    pass
+
+
 def Bare_Function(SomeParameter,SomeParameter2="a"):
     print(SomeParameter)
     print("Hehehe")

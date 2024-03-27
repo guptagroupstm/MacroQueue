@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; MacroQueue 0.1.20 documentation</title>
+  <title>Introduction &mdash; MacroQueue 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=17aaaefc"></script>
+        <script src="../_static/documentation_options.js?v=938c9ccc"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,7 +49,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../Install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="Tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="Tutorial.html#basic-required-for-all-users">Basic: Required for all users</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#structure">Structure</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="AddToQueue.html">Add a Macro to the Queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Expanding/Expanding.html">Multiple Parameters</a></li>
 </ul>
@@ -98,6 +101,17 @@
 <p>Once you start the queue, by pressing the button on the left, the button will turn into a “Pause after Macro” button.</p>
 <img alt="../_images/RunningQueue.png" src="../_images/RunningQueue.png" />
 <img alt="../_images/PausedQueue.png" src="../_images/PausedQueue.png" />
+<section id="structure">
+<h2>Structure<a class="headerlink" href="#structure" title="Link to this heading"></a></h2>
+<p>The queue is a global variable defined at the top of the MacroQueue class in MacroQueue.py:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TheQueue</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<p>The queue is a list of macros; each Macro is a list of functions; each function is a list of parameter data.</p>
+<p>Here is the complete structure:</p>
+<img alt="../_images/QueueStruct.png" src="../_images/QueueStruct.png" />
+<p>For concrete example, see <a class="reference internal" href="CourseStep.html"><span class="doc">Course Step</span></a>.</p>
+</section>
 </section>
 
 

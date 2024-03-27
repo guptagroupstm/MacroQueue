@@ -13,7 +13,8 @@ import wx
 
 from time import time as timer
 
-sys.path.append(os.path.dirname(__file__))
+application_path = os.path.join(os.path.dirname(sys.executable),"_internal\\") if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+sys.path.append(application_path)
 try:
     from MacroQueue.Dialogs import MyMacroDialog
     from MacroQueue.Dialogs import MyMacroSettingsDialog
@@ -97,7 +98,7 @@ class MacroQueue(MyFrame):
 # my_module = importlib.import_module('os.path')
     def __init__(self,test=False):
         self.test = test
-        application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+        application_path = os.path.join(os.path.dirname(sys.executable),"_internal\\") if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
         
         self.SavedSettingsFile = 'MacroQueueSettings.csv'

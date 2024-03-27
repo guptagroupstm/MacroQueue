@@ -1,4 +1,5 @@
-Queue's Structure
+Course Step
 ==================================================
 
-.. image:: ./QueueStruct.png
+
+.. image:: ./QPIExample.png

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Error Handling &mdash; MacroQueue 0.1.20 documentation</title>
+  <title>Error Handling &mdash; MacroQueue 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=17aaaefc"></script>
+        <script src="../_static/documentation_options.js?v=938c9ccc"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -55,8 +55,8 @@
 <li class="toctree-l3"><a class="reference internal" href="WriteFunction.html">Writing a new function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="SpecialFunctions.html">Special Functions</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Error Handling</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#out-of-bounds">Out of Bounds</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#exceptions">Exceptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#soft-limits">Soft limits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exceptions-and-hard-limits">Exceptions and hard limits</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="SystemChange.html">Changing Instruments</a></li>
@@ -97,11 +97,26 @@
              
   <section id="error-handling">
 <h1>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h1>
-<section id="out-of-bounds">
-<h2>Out of Bounds<a class="headerlink" href="#out-of-bounds" title="Link to this heading"></a></h2>
+<section id="soft-limits">
+<h2>Soft limits<a class="headerlink" href="#soft-limits" title="Link to this heading"></a></h2>
+<p>A minimum and maximum can be specified for a numerical parameter in the metadata of a funtion, see <a class="reference internal" href="WriteFunction.html"><span class="doc">Writing a new function</span></a>:</p>
+<img alt="../_images/Error1.png" src="../_images/Error1.png" />
+<p>When a user attempts to put a value in that’s out of range, the parameter will turn yellow:</p>
+<img alt="../_images/Error2.png" src="../_images/Error2.png" />
+<p>If the user decides to ignore the warning and adds the macro to the queue, there is a pop-up to confirm:</p>
+<a class="reference internal image-reference" href="../_images/Error3.png"><img alt="../_images/Error3.png" src="../_images/Error3.png" style="width: 300px;" /></a>
 </section>
-<section id="exceptions">
-<h2>Exceptions<a class="headerlink" href="#exceptions" title="Link to this heading"></a></h2>
+<section id="exceptions-and-hard-limits">
+<h2>Exceptions and hard limits<a class="headerlink" href="#exceptions-and-hard-limits" title="Link to this heading"></a></h2>
+<p>You can put a hard limit for any parameter by raising an exception.</p>
+<p>Any exception, either intentional or not, will pause the queue, cancel the current macro, and create a pop-up showing the exception that was raised.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># {&quot;Name&quot;:&quot;SomeParameter&quot;,&quot;Max&quot;:10}</span>
+<span class="k">def</span> <span class="nf">Exception_Function</span><span class="p">(</span><span class="n">SomeParameter</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">SomeParameter</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SomeParameter</span><span class="si">}</span><span class="s2"> is too large.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/Error4.png" src="../_images/Error4.png" />
 </section>
 </section>
 
