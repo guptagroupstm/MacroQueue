@@ -155,7 +155,7 @@ The following function uses Cancel and OutgoingQueue::
 *Cancel* becomes True if the user cancels a function, either with the red X or by pressing "clear queue".  Cancel should be used to ensure that the functions stop gracefully.
 If Cancel isn't used, the function will finish as normal but the remaining functions in the macro will be ignored.
 
-*CurrentMacro* contains the information for all the of the functions in the current macro.  This can be used if you need to know what the parameters are from the other functions.  See :doc:`Architecture` for the data structure of a macro.
+*CurrentMacro* contains the information for all the of the functions in the current macro.  This can be used if you need to know what the parameters are from the other functions.  See :doc:`Introduction` and :doc:`CourseStep` for the data structure of a macro.
 
 With *OutgoingQueue*, the ith slot (starting with i=0) in the status bar can be overridden::
 

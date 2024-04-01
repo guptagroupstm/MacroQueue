@@ -33,9 +33,7 @@ The queue is a global variable defined at the top of the MacroQueue class in Mac
 
 The queue is a list of macros; each Macro is a list of functions; each function is a list of parameter data.
 
-Here is the complete structure:
+Here is the general structure:
 
 .. image:: ./QueueStruct.png
 
-
-For concrete example, see :doc:`CourseStep`.

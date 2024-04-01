@@ -63,7 +63,6 @@
 <li class="toctree-l3"><a class="reference internal" href="ErrorHandling.html">Error Handling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="SystemChange.html">Changing Instruments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="test.html">Automated test</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Architecture.html">Queue’s Structure</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorial.html#examples-gallery">Examples gallery</a></li>
@@ -251,7 +250,7 @@ An example function is shown in the next subsection.</p>
 </div>
 <p><em>Cancel</em> becomes True if the user cancels a function, either with the red X or by pressing “clear queue”.  Cancel should be used to ensure that the functions stop gracefully.
 If Cancel isn’t used, the function will finish as normal but the remaining functions in the macro will be ignored.</p>
-<p><em>CurrentMacro</em> contains the information for all the of the functions in the current macro.  This can be used if you need to know what the parameters are from the other functions.  See <a class="reference internal" href="Architecture.html"><span class="doc">Queue’s Structure</span></a> for the data structure of a macro.</p>
+<p><em>CurrentMacro</em> contains the information for all the of the functions in the current macro.  This can be used if you need to know what the parameters are from the other functions.  See <a class="reference internal" href="Introduction.html"><span class="doc">Introduction</span></a> and <a class="reference internal" href="CourseStep.html"><span class="doc">Course Step</span></a> for the data structure of a macro.</p>
 <p>With <em>OutgoingQueue</em>, the ith slot (starting with i=0) in the status bar can be overridden:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SomeString</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Scan </span><span class="si">{</span><span class="n">Percent</span><span class="si">}</span><span class="s2">% Complete&quot;</span>
 <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># For the third slot</span>

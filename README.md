@@ -11,15 +11,15 @@ The goal of MacroQueue is to provide a GUI that allow users to perform measureme
 
 ![Brief image of MacroQueue](docs_src/source/ReadMe.png)
 
-Check out for the [documentation](https://guptagroupstm.github.io/STMMacroQueue/index.html) for more information.
+Check out for the [documentation](https://guptagroupstm.github.io/MacroQueue/index.html) for more information.
 
 ## Installation
 
-See the [install documentation](https://guptagroupstm.github.io/STMMacroQueue/Install.html). System requirements are also found in this page.
+See the [install documentation](https://guptagroupstm.github.io/MacroQueue/Install.html). System requirements are also found in this page.
 
 ## Contributing
 
-Please read [documentation](https://guptagroupstm.github.io/STMMacroQueue/Contributing.html) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [documentation](https://guptagroupstm.github.io/MacroQueue/Contributing.html) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Acknowledgements
 

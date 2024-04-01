@@ -87,7 +87,144 @@
              
   <section id="course-step">
 <h1>Course Step<a class="headerlink" href="#course-step" title="Link to this heading"></a></h1>
-<img alt="../_images/QPIExample.png" src="../_images/QPIExample.png" />
+<p>These are two of the most convenient macros that we use: Course step and New area scan.
+There’s nothing special about these macros, you can do the same thing manually or with a python script.  The macros just make it incredibly fast and convenient.</p>
+<p>The macro for <em>Course Steps</em> consists of the following functions:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Resets the “Course Origin”.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>XYCourse Step (Function #4) will move to a position relative to the Course Origin.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Burst Z</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets Burst Z to True so course steps will use CreaTec’s ‘bursts’ instead of individual steps.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Burst XY</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets Burst XY to True so course steps will use CreaTec’s ‘bursts’ instead of individual steps.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Scan Window position</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Moves the tip to near the bottom right corner of the DSP window.  Just in case the tip leaves a crater apon approach, the crater will be out of the way.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Bias</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets a somewhat large bias to make crashes and false approaches less likely.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Setpoint</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets a somewhat large setpoint to prevent false approaches from a capactive signal.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Approach</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Calls CreaTec’s approach function</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Setpoint</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Returns to a standard setpoint</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Bias</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Returns to a standard bias</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Scan Window Position</p>
+<ul class="simple">
+<li><p>Returns the tip to the center of the DSP window.</p></li>
+</ul>
+</li>
+<li><p>Wait</p>
+<ul class="simple">
+<li><p>Does nothing for 10 seconds to wait for the piezo creep to go away.</p></li>
+</ul>
+</li>
+</ol>
+</div></blockquote>
+<img alt="../_images/CourseStep.png" src="../_images/CourseStep.png" />
+<p>The macro for a <em>New area scan</em> consists of the following functions:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Set Recorded Channels</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets the topography, current, and dI/dV channel to be recorded.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set NPixels</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets the number of pixels in an image to be 512x512</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Scan Window Position</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Moves the tip to the top of the DSP window.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Image Scan Size</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets the scan size to be the full range of the DSP window.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Scan Speed</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets the scan speed to be somewhat slow (in terms of s/lines) because it’ll be scanning a large area.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Setpoint</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets a reasonable setpoint (The default setpoint is changed depending on the material; 2500pA is for Ni(111))</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Set Bias</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets a reasonable bias (The default bias is changed depending on the material; -0.2V is for Ni(111))</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Wait</p></li>
+<li><p>dI/dV Scan</p></li>
+</ol>
+</div></blockquote>
+<img alt="../_images/NewAreaScan.png" src="../_images/NewAreaScan.png" />
 </section>
 
 

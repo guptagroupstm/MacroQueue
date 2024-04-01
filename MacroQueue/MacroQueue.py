@@ -10,10 +10,13 @@ import importlib.util
 from inspect import getmembers, isfunction,getcomments
 
 import wx
+import pyvisa
+import pythoncom
+from datetime import datetime
 
 from time import time as timer
 
-application_path = os.path.join(os.path.dirname(sys.executable),"_internal\\") if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
 sys.path.append(application_path)
 try:
     from MacroQueue.Dialogs import MyMacroDialog
@@ -33,7 +36,10 @@ from inspect import getmembers, isfunction
 
 # They all go in try/except just in case the required packages aren't installed for one of them 
 # (e.g. you can still use RHK's functions even without win32com which you need for CreaTec)
-sys.path.append(os.path.dirname(__file__)+"\\Functions")
+if getattr(sys, 'frozen', False):
+    sys.path.append(os.path.dirname(sys.executable)+"\\Functions")
+else:
+    sys.path.append(os.path.dirname(__file__)+"\\Functions")
 
 import json
 
@@ -98,9 +104,8 @@ class MacroQueue(MyFrame):
 # my_module = importlib.import_module('os.path')
     def __init__(self,test=False):
         self.test = test
-        application_path = os.path.join(os.path.dirname(sys.executable),"_internal\\") if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+        application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
         os.chdir(os.path.realpath(application_path))
-        
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
 
 
@@ -264,8 +269,9 @@ class MacroQueue(MyFrame):
         self.Functions = {}
         for FunctionName in FunctionNames:
             try:
-                self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}'))         
-            except:
+                self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),FunctionName[:-3])         
+                # self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}'))         
+            except Exception as e:
                 pass
         for file in ["CreaTec.py","RHK.py","SXM.py","SXMRemote.py"]:
             try:
@@ -314,7 +320,7 @@ class MacroQueue(MyFrame):
                 json.dump(AllTheMacros, fp,indent=1)
 
         # for FunctionName in self.Functions[self.SettingsDict['Software']].keys():
-        
+                
         FunctionList = []
         for FunctionFile in [self.Software,*self.FunctionsLoaded]:
             NewFunctions = getmembers(self.Functions[FunctionFile], isfunction)

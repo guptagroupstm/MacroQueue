@@ -1,4 +1,0 @@
-Queue's Structure
-==================================================
-
-.. image:: ./QueueStruct.png

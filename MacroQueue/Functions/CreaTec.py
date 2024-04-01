@@ -44,8 +44,6 @@ def OnClose():
         OutgoingQueue.put(("DontClose","The Magnetic Field is not off.  Run the function 'Turn B Field Off'."))
         MacroQueueSelf.Closing=False
 
-    if RFGenerator is not None:
-        Turn_Off_RF_Generator()
 
 
 
