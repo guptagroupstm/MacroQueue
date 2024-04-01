@@ -49,7 +49,7 @@ For additional features, users can write metadata for each parameter in comments
 
 MacroQueue makes a GUI, shown in \autoref{fig:AddMacro}, using the WxPython toolkit @WxPython.  The queue is on the left, showing the macros that will be run.  Macros can be defined for each type of measurement to combine several functions into a single package.  When macros are in the queue, they will be ran one at a time until the queue is empty or paused.  New macros can be defined via the Macro menu and existing Macros can be edited by right clicking on their corresponding button in the center of the GUI.  By left clicking a macro's button, it will bring up the menu where you can edit which functions in the macro will be run and the values for each parameter that will be used, shown in \autoref{fig:ExampleCode}.  Multple copies of the same macro, with different values for parameters, can conveniently be added to the queue simultaneously by adding multiple values for each parameter, seperated by commas, as shown in \autoref{fig:AddMacro}.  In additon, numerical parameters can expanded by using the format: start, stop, stepsize; e.g. 1,10,0.5 is equilvent to inputting all values between 1 and 10, inclusively, in steps of 0.5.  This can be used to quickly add thousands of macros to the queue.
 
-![Caption for GUI figure.\label{fig:AddMacro}](Figure2.png)
+![The workflow for adding macros to the queue.\label{fig:AddMacro}](Figure2.png)
 
 
 # Acknowledgements
