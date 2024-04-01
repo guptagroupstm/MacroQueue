@@ -9,7 +9,9 @@ The functions can be grouped into macros for each type of measurement.  Macros a
 These features allow users to easily control several instruments in sync, perform a long series of measurements with minimal input, and add new instruments to a system. 
 The goal of MacroQueue is to provide a GUI that allow users to perform measurements in high-dimensional parameter spaces without requiring coding ability while still providing users with coding ability the flexibility to write arbitrarily complex functions.  
 
-![Brief image of MacroQueue](docs_src/source/ReadMe.png)
+![Brief image of MacroQueue](https://github.com/guptagroupstm/MacroQueue/blob/main/docs_src/source/ReadMe.png)
+
+![Brief image of MacroQueue](https://github.com/guptagroupstm/MacroQueue/blob/main/docs_src/source/ExpandingFigure.png)
 
 Check out for the [documentation](https://guptagroupstm.github.io/MacroQueue/index.html) for more information.
 
