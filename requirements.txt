@@ -3,3 +3,4 @@ wxPython>=4.2.1
 numpy>=1.24.4
 pyinstaller>=6.2.0
 PyVisa>=1.11.0
+pywin32>=300
