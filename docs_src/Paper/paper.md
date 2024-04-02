@@ -34,7 +34,7 @@ These features allow users to easily control several instruments in sync, add ne
 
 Numerous instruments have to be controlled in sync to access the full parameter space of an SPM system.  This is typically automated with python scripts for longer measurements, such as QPI mapping which is a series of a dozen measurements that each take over an hour, see @MacroQueueDocs.  Writing a python script for each type of measurement, at best, leads to the spagetti code that physists are notoriously known for, and at worst, is prohibitively difficult for novice SPM operators.  MacroQueue provides a simple GUI to allow users to perform measurements without coding and allows advanced users to easily add or modify functions to control new and existing equipment.  
 
-This software is currently in active use in several laboratories at The Ohio State University and the NSF NeXUS Facility.  Several similar packages and APIs already exist, such as @PyMeasure, @bluesky, and @ScopeFoundry2023.  A good overview of available Python packages can be found in [@buchner_2022_6399528].  The goal of MacroQueue is to provide a frontend GUI that allows users to perform measurements in high-dimensional parameter spaces without requiring the coding ability that is necessary to use the existing APIs while still providing advanced users the flexibility to write arbitrarily complex functions.  
+This software is currently in active use in several laboratories at The Ohio State University and the NSF NeXUS Facility.  It assisted in the research of [@Goff_2024,@koll2024formation].  Several similar packages and APIs already exist, such as [@PyMeasure], [@bluesky], and [@ScopeFoundry2023].  A good overview of available Python packages can be found in [@buchner_2022_6399528].  The goal of MacroQueue is to provide a frontend GUI that allows users to perform measurements in high-dimensional parameter spaces without requiring the coding ability that is necessary to use the existing APIs while still providing advanced users the flexibility to write arbitrarily complex functions.  
  
 
 # Overview
@@ -52,11 +52,7 @@ For additional features, users can write metadata for each parameter in comments
 ![The workflow for adding macros to the queue.\label{fig:AddMacro}](Figure2.png)
 
 MacroQueue makes a GUI, shown in \autoref{fig:AddMacro}, using the WxPython toolkit @WxPython.  
-The queue is on the left, showing the macros that will be run.  
-The existing macros are on the right.  New macros can be created via the Macro menu or by modifying an existing Macro.  
-When you add a macro to the queue, there will be a menu where you can edit which functions in the macro will be run and the values for each parameter that will be used.  Users can input multiple values for numerical parameters.  MacroQueue will 'expand' the macro into multiple macros, with each value, to the queue.  
-The macros are created as if there is a for loop at the expanding function and every function below the expanding function is inside the loop.  \autoref{fig:AddMacro} shows an example with 2 values for the setpoint and 5 values for the bias so 10 macros are created.  The setpoint function will run twice, and the bias function will run 10 times, 5 times per setpoint.  
-This can be used to quickly add thousands of measurements throughout the parameter space to the queue.
+The queue is on the left, showing the macros that will be run.  The existing macros are on the right.  New macros can be created via the Macro menu or by modifying an existing Macro.  When you add a macro to the queue, there will be a menu where you can edit which functions in the macro will be run and the values for each parameter that will be used.  Users can input multiple values for numerical parameters.  MacroQueue will 'expand' the macro into multiple macros, with each value, to the queue.  The macros are created as if there is a for loop at the expanding function and every function below the expanding function is inside the loop.  \autoref{fig:AddMacro} shows an example with 2 values for the setpoint and 5 values for the bias so 10 macros are created.  The setpoint function will run twice, and the bias function will run 10 times, 5 times per setpoint.  This can be used to quickly add thousands of measurements throughout the parameter space to the queue.
 
 
 
