@@ -6,3 +6,4 @@ rm MacroQueue.spec
 mv .\\dist\\MacroQueue\\_internal\\Macros .\\dist\\MacroQueue\\
 mv .\\dist\\MacroQueue\\_internal\\Functions .\\dist\\MacroQueue\\
 mv .\\dist\\MacroQueue\\_internal\\Bitmaps .\\dist\\MacroQueue\\
+start \\dist\\MacroQueue

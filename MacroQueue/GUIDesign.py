@@ -27,9 +27,6 @@ class MyFrame ( wx.Frame ):
 		self.m_SourceMenuItem = wx.MenuItem( self.m_FileMenu, wx.ID_ANY, u"Open Source Folder", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_FileMenu.Append( self.m_SourceMenuItem )
 
-		self.m_ExitMenuItem = wx.MenuItem( self.m_FileMenu, wx.ID_ANY, u"Exit", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_FileMenu.Append( self.m_ExitMenuItem )
-
 		self.m_menubar1.Append( self.m_FileMenu, u"File" )
 
 		self.m_OptionsMenu = wx.Menu()
@@ -155,7 +152,6 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_IDLE, self.IdleLoop )
 		self.Bind( wx.EVT_SIZE, self.OnSize )
 		self.Bind( wx.EVT_MENU, self.OpenSourceFolder, id = self.m_SourceMenuItem.GetId() )
-		self.Bind( wx.EVT_MENU, self.OnClose, id = self.m_ExitMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.ReloadFunctions, id = self.m_menuItem17.GetId() )
 		self.Bind( wx.EVT_MENU, self.StartMakeNewMacro, id = self.m_MakeMacroMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OpenMacroFile, id = self.m_OpenMacroMenuItem.GetId() )
@@ -190,7 +186,6 @@ class MyFrame ( wx.Frame ):
 
 	def OpenSourceFolder( self, event ):
 		event.Skip()
-
 
 	def ReloadFunctions( self, event ):
 		event.Skip()

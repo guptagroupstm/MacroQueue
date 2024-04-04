@@ -1,23 +1,252 @@
 {
- "Scan": [
+ "Change RF": [
   [
-   "Set Recorded Channels",
+   "Turn Off RF Generator",
+   {},
+   false
+  ],
+  [
+   "Set RF Freq Mode",
    {
-    "Topography": {
-     "DefaultValue": true,
+    "Mode": {
+     "DefaultValue": "CW",
      "Tooltip": "",
      "Frozen": false,
-     "ValueType": "Boolean",
-     "InRange": true
-    },
-    "Current": {
-     "DefaultValue": true,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "CW",
+      "List",
+      "SWE"
+     ]
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Freq",
+   {
+    "Freq": {
+     "DefaultValue": "1000000000.0",
+     "Tooltip": "The RF frequency in Hz in continuous wave mode\nAcceptable range: (100000.0,30000000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Freq",
+     "Units": "Hz",
+     "Min": 100000.0,
+     "Max": 30000000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Power Mode",
+   {
+    "Mode": {
+     "DefaultValue": "CW",
      "Tooltip": "",
      "Frozen": false,
-     "ValueType": "Boolean",
-     "InRange": true
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "CW",
+      "List",
+      "SWE"
+     ]
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Power",
+   {
+    "Power": {
+     "DefaultValue": "-10",
+     "Tooltip": "The amount of power for the RF generator in dBm in continuous wave mode\nAcceptable range: (-30,27)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Power",
+     "Units": "dBm",
+     "Min": -30,
+     "Max": 27
+    }
+   },
+   false
+  ],
+  [
+   "Turn Off RF Generator",
+   {},
+   false
+  ],
+  [
+   "Turn On RF Generator",
+   {},
+   false
+  ]
+ ],
+ "Default RF Settings": [
+  [
+   "Turn Off RF Generator",
+   {},
+   true
+  ],
+  [
+   "Set RF Freq Mode",
+   {
+    "Mode": {
+     "DefaultValue": "CW",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "CW",
+      "List",
+      "SWE"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Freq",
+   {
+    "Freq": {
+     "DefaultValue": "1000000000.0",
+     "Tooltip": "The RF frequency in Hz in continuous wave mode\nAcceptable range: (100000.0,30000000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Freq",
+     "Units": "Hz",
+     "Min": 100000.0,
+     "Max": 30000000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Power Mode",
+   {
+    "Mode": {
+     "DefaultValue": "CW",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "CW",
+      "List",
+      "SWE"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Power",
+   {
+    "Power": {
+     "DefaultValue": "-10",
+     "Tooltip": "The amount of power for the RF generator in dBm in continuous wave mode\nAcceptable range: (-30,27)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Power",
+     "Units": "dBm",
+     "Min": -30,
+     "Max": 27
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Trig Dir",
+   {
+    "Dir": {
+     "DefaultValue": "POS",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "POS",
+      "NEG"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Type",
+   {
+    "TrigType": {
+     "DefaultValue": "NORM",
+     "Tooltip": "NORMal trigger = edge initiates/stops sweeps; GATE trigger level starts/stops sweep.",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "NORM",
+      "GATE"
+     ],
+     "Name": "TrigType"
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Sour",
+   {
+    "Trig": {
+     "DefaultValue": "EXT",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "EXT",
+      "IMM",
+      "KEY",
+      "BUS"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Direction",
+   {
+    "direction": {
+     "DefaultValue": "UP",
+     "Tooltip": "Up is increasing, down is decreasing.",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "UP",
+      "DOWN"
+     ],
+     "Name": "direction"
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Count",
+   {
+    "count": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of sweeps to perform after a trigger\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "count",
+     "Min": 1
     },
-    "LockInX": {
+    "Infinite": {
      "DefaultValue": false,
      "Tooltip": "",
      "Frozen": false,
@@ -28,195 +257,72 @@
    true
   ],
   [
-   "Null",
+   "Set RF LIST Count",
    {
-    "Index": {
-     "DefaultValue": "0",
-     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+    "count": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of sweeps to perform after a trigger\nMinimum value: 1",
      "Frozen": false,
      "ValueType": "Numerical",
-     "InRange": true
-    }
-   },
-   false
-  ],
-  [
-   "Set NPixels",
-   {
-    "NPixels": {
-     "DefaultValue": "512",
-     "Tooltip": "The number of pixels in each row and each column",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Image Size",
-   {
-    "HowToSetSize": {
-     "DefaultValue": "Image Size",
-     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
-     "Frozen": false,
-     "ValueType": "Choice",
      "InRange": true,
-     "DefaultList": [
-      "Image Size",
-      "Resolution"
-     ]
+     "Name": "count",
+     "Min": 1
     },
-    "ImageSize": {
-     "DefaultValue": "1000",
-     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "\u00c5"
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Speed",
-   {
-    "HowToSetSpeed": {
-     "DefaultValue": "s/line",
-     "Tooltip": "Choose how the Image Speed is set",
-     "Frozen": false,
-     "ValueType": "Choice",
-     "InRange": true,
-     "DefaultList": [
-      "nm/s",
-      "s/line",
-      "s/pixel"
-     ]
-    },
-    "Speed": {
-     "DefaultValue": "0.5",
-     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Window Position",
-   {
-    "HowToSetPosition": {
-     "DefaultValue": "nm",
+    "Infinite": {
+     "DefaultValue": false,
      "Tooltip": "",
      "Frozen": false,
-     "ValueType": "Choice",
-     "InRange": true,
-     "DefaultList": [
-      "nm",
-      "Image Coord",
-      "Voltage"
-     ]
-    },
-    "XOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    },
-    "YOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
+     "ValueType": "Boolean",
      "InRange": true
     }
    },
-   false
-  ],
-  [
-   "Set Setpoint",
-   {
-    "Setpoint": {
-     "DefaultValue": "100",
-     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Name": "Setpoint",
-     "Units": "pA",
-     "Min": 0,
-     "Max": 1000000.0
-    }
-   },
-   false
-  ],
-  [
-   "Set Bias",
-   {
-    "Bias": {
-     "DefaultValue": "1",
-     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Name": "Bias",
-     "Units": "V",
-     "Min": -10,
-     "Max": 10
-    }
-   },
-   false
-  ],
-  [
-   "Wait",
-   {
-    "WaitTime": {
-     "DefaultValue": "1",
-     "Tooltip": "The time to wait in seconds",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "s"
-    }
-   },
-   false
-  ],
-  [
-   "Scan",
-   {},
    true
-  ]
- ],
- "dIdV Scan": [
+  ],
   [
-   "Set Recorded Channels",
+   "Set RF SWE Spacing",
    {
-    "Topography": {
-     "DefaultValue": true,
+    "Spacing": {
+     "DefaultValue": "Linear",
      "Tooltip": "",
-     "Frozen": true,
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Linear",
+      "Log"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF LIST Blanking",
+   {
+    "Blanking": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
      "ValueType": "Boolean",
      "InRange": true
-    },
-    "Current": {
-     "DefaultValue": true,
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Blanking",
+   {
+    "Blanking": {
+     "DefaultValue": false,
      "Tooltip": "",
-     "Frozen": true,
-     "ValueType": "Boolean",
-     "InRange": true
-    },
-    "LockInX": {
-     "DefaultValue": true,
-     "Tooltip": "",
-     "Frozen": true,
+     "Frozen": false,
      "ValueType": "Boolean",
      "InRange": true
     }
    },
    true
-  ],
+  ]
+ ],
+ "RF Power Sweep": [
   [
    "Null",
    {
@@ -231,253 +337,304 @@
    false
   ],
   [
-   "Set NPixels",
-   {
-    "NPixels": {
-     "DefaultValue": "512",
-     "Tooltip": "The number of pixels in each row and each column",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Image Size",
-   {
-    "HowToSetSize": {
-     "DefaultValue": "Image Size",
-     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
-     "Frozen": false,
-     "ValueType": "Choice",
-     "InRange": true,
-     "DefaultList": [
-      "Image Size",
-      "Resolution"
-     ]
-    },
-    "ImageSize": {
-     "DefaultValue": "1000",
-     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "\u00c5"
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Speed",
-   {
-    "HowToSetSpeed": {
-     "DefaultValue": "s/line",
-     "Tooltip": "Choose how the Image Speed is set",
-     "Frozen": false,
-     "ValueType": "Choice",
-     "InRange": true,
-     "DefaultList": [
-      "nm/s",
-      "s/line",
-      "s/pixel"
-     ]
-    },
-    "Speed": {
-     "DefaultValue": "1",
-     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    }
-   },
-   false
-  ],
-  [
-   "Set Scan Window Position",
-   {
-    "HowToSetPosition": {
-     "DefaultValue": "Voltage",
-     "Tooltip": "",
-     "Frozen": false,
-     "ValueType": "Choice",
-     "InRange": true,
-     "DefaultList": [
-      "nm",
-      "Image Coord",
-      "Voltage"
-     ]
-    },
-    "XOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    },
-    "YOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    }
-   },
-   false
-  ],
-  [
-   "Set Setpoint",
-   {
-    "Setpoint": {
-     "DefaultValue": "100",
-     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Name": "Setpoint",
-     "Units": "pA",
-     "Min": 0,
-     "Max": 1000000.0
-    }
-   },
-   false
-  ],
-  [
-   "Set Bias",
-   {
-    "Bias": {
-     "DefaultValue": "1",
-     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Name": "Bias",
-     "Units": "V",
-     "Min": -10,
-     "Max": 10
-    }
-   },
-   false
-  ],
-  [
-   "Wait",
-   {
-    "WaitTime": {
-     "DefaultValue": "1",
-     "Tooltip": "The time to wait in seconds",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "s"
-    }
-   },
-   false
-  ],
-  [
-   "dIdV Scan",
+   "Turn Off RF Generator",
    {},
    true
-  ]
- ],
- "Spectrum": [
+  ],
   [
-   "Fine Move Tip",
+   "Set RF Freq Mode",
    {
-    "HowToSetPosition": {
-     "DefaultValue": "nm",
+    "Mode": {
+     "DefaultValue": "CW",
      "Tooltip": "",
      "Frozen": false,
      "ValueType": "Choice",
      "InRange": true,
      "DefaultList": [
-      "nm",
-      "Image Coord",
-      "Voltage"
+      "CW",
+      "LIST",
+      "SWE"
      ]
-    },
-    "XOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The X position of the tip in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    },
-    "YOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The Y X position of the tip in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
     }
    },
-   false
+   true
   ],
   [
-   "Set LockIn Amplitude",
+   "Set RF Power Mode",
    {
-    "Lockin_Amp": {
-     "DefaultValue": "100",
-     "Tooltip": "The lock-in voltage amplitude in mV",
+    "Mode": {
+     "DefaultValue": "SWE",
+     "Tooltip": "",
      "Frozen": false,
-     "ValueType": "Numerical",
+     "ValueType": "Choice",
      "InRange": true,
-     "Units": "mV"
+     "DefaultList": [
+      "CW",
+      "LIST",
+      "SWE"
+     ]
     }
    },
-   false
-  ],
-  [
-   "Set LockIn Frequency",
-   {
-    "Lockin_Freq": {
-     "DefaultValue": "877",
-     "Tooltip": "The lock-in frequency in Hz",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "Hz"
-    }
-   },
-   false
-  ],
-  [
-   "Set LockIn TimeConstant",
-   {
-    "Lockin_RC": {
-     "DefaultValue": "100",
-     "Tooltip": "The lock-in time constant in Hz",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "Hz"
-    }
-   },
-   false
+   true
   ],
   [
    "Set RF Freq",
    {
     "Freq": {
-     "DefaultValue": "1e9",
-     "Tooltip": "The RF frequency in Hz",
+     "DefaultValue": "1000000000.0",
+     "Tooltip": "The RF frequency in Hz in continuous wave mode\nAcceptable range: (100000.0,30000000000.0)",
      "Frozen": false,
      "ValueType": "Numerical",
      "InRange": true,
-     "Units": "Hz"
+     "Name": "Freq",
+     "Units": "Hz",
+     "Min": 100000.0,
+     "Max": 30000000000.0
     }
    },
    false
   ],
   [
-   "Set RF Power",
+   "Set RF SWE Start",
    {
-    "Power": {
+    "Start": {
+     "DefaultValue": "-30",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set RF SWE Stop",
+   {
+    "Stop": {
      "DefaultValue": "0",
-     "Tooltip": "The amount of power for the RF generator in dBm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set RF SWE Points",
+   {
+    "points": {
+     "DefaultValue": "3000",
+     "Tooltip": "The number of points in a sweep.\nMinimum value: 1",
      "Frozen": false,
      "ValueType": "Numerical",
      "InRange": true,
-     "Units": "dBm"
+     "Name": "points",
+     "Min": 1
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Dir",
+   {
+    "Dir": {
+     "DefaultValue": "POS",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "POS",
+      "NEG"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF LIST Count",
+   {
+    "count": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of sweeps to perform after a trigger\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "count",
+     "Min": 1
+    },
+    "Infinite": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Sour",
+   {
+    "Trig": {
+     "DefaultValue": "EXT",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "EXT",
+      "IMM",
+      "KEY",
+      "BUS"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Type",
+   {
+    "TrigType": {
+     "DefaultValue": "NORM",
+     "Tooltip": "NORMal trigger = edge initiates/stops sweeps; GATE trigger level starts/stops sweep.",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "NORM",
+      "GATE"
+     ],
+     "Name": "TrigType"
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Blanking",
+   {
+    "Blanking": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Del",
+   {
+    "delay": {
+     "DefaultValue": "0",
+     "Tooltip": "Delay time before going to next point.  RF Off time.\nMinimum value: 0",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "delay",
+     "Units": "s",
+     "Min": 0
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Dwell",
+   {
+    "dwell": {
+     "DefaultValue": "0.1",
+     "Tooltip": "Dwell time on each point.  RF On time.\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "dwell",
+     "Units": "s",
+     "Min": 1
+    }
+   },
+   true
+  ],
+  [
+   "Turn On RF Generator",
+   {},
+   true
+  ],
+  [
+   "Set Spectrum Table to Constant Bias",
+   {},
+   true
+  ],
+  [
+   "Set Spectrum Table Trig Vaux",
+   {},
+   true
+  ],
+  [
+   "Set Spectrum Mode",
+   {
+    "Mode": {
+     "DefaultValue": "z(V)",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "I(V,z)",
+      "z(V)",
+      "z(V,X:I)"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set Spectrum Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "1",
+     "Tooltip": "The setpoint for constant current spectra\nMaximum value: 10000.0",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "nA",
+     "Max": 10000.0
+    },
+    "Use_Scan_Setpoint": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Spectra Time",
+   {
+    "Time": {
+     "DefaultValue": "60",
+     "Tooltip": "The duration of the spectrum for a single direction",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "s"
+    }
+   },
+   true
+  ],
+  [
+   "Set Spectra NAveraging",
+   {
+    "N": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of spectra to take and average.  Takes long. reduces noise.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
     }
    },
    true
@@ -488,208 +645,322 @@
    true
   ]
  ],
- "Wait": [
+ "RF Freq Sweep": [
   [
-   "Wait",
+   "Null",
    {
-    "WaitTime": {
-     "DefaultValue": "10",
-     "Tooltip": "The time to wait in seconds",
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
      "Frozen": false,
      "ValueType": "Numerical",
-     "Units": "s"
-    }
-   },
-   true
-  ]
- ],
- "AutoPhase": [
-  [
-   "Z Course Steps Out",
-   {
-    "NBursts": {
-     "DefaultValue": "3",
-     "Tooltip": "Number of Z steps to retract",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    }
-   },
-   true
-  ],
-  [
-   "AutoPhase",
-   {},
-   true
-  ],
-  [
-   "Approach",
-   {},
-   true
-  ]
- ],
- "Course Step": [
-  [
-   "Define as Course Origin",
-   {},
-   true
-  ],
-  [
-   "Burst XY",
-   {
-    "Burst_XY": {
-     "DefaultValue": true,
-     "Tooltip": "Check Burst XY in the Course Positioning Form",
-     "Frozen": false,
-     "ValueType": "Boolean"
-    }
-   },
-   true
-  ],
-  [
-   "XYCourse Step",
-   {
-    "X_Position": {
-     "DefaultValue": "10",
-     "Tooltip": "The X position to course move to.",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    },
-    "Y_Position": {
-     "DefaultValue": "10",
-     "Tooltip": "The Y position to course move to.",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    },
-    "NSteps_Out": {
-     "DefaultValue": "5",
-     "Tooltip": "The number of Z steps to retract before course moving in X and Y",
-     "Frozen": false,
-     "ValueType": "Numerical"
-    }
-   },
-   true
-  ],
-  [
-   "Approach",
-   {},
-   true
-  ],
-  [
-   "Wait",
-   {
-    "WaitTime": {
-     "DefaultValue": "120",
-     "Tooltip": "The time to wait in seconds",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "Units": "s"
+     "InRange": true
     }
    },
    false
-  ]
- ],
- "RF Spectrum": [
+  ],
   [
-   "Fine Move Tip",
+   "Turn Off RF Generator",
+   {},
+   true
+  ],
+  [
+   "Set RF Freq Mode",
    {
-    "HowToSetPosition": {
-     "DefaultValue": "nm",
+    "Mode": {
+     "DefaultValue": "SWE",
      "Tooltip": "",
      "Frozen": false,
      "ValueType": "Choice",
      "InRange": true,
      "DefaultList": [
-      "nm",
-      "Image Coord",
-      "Voltage"
+      "CW",
+      "LIST",
+      "SWE"
      ]
-    },
-    "XOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The X position of the tip in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
-    },
-    "YOffset": {
-     "DefaultValue": "0",
-     "Tooltip": "The Y X position of the tip in nm, or Image Coordinate, or V",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true
     }
    },
-   false
+   true
   ],
   [
-   "Set LockIn Amplitude",
+   "Set RF Power Mode",
    {
-    "Lockin_Amp": {
-     "DefaultValue": "100",
-     "Tooltip": "The lock-in voltage amplitude in mV",
+    "Mode": {
+     "DefaultValue": "CW",
+     "Tooltip": "",
      "Frozen": false,
-     "ValueType": "Numerical",
+     "ValueType": "Choice",
      "InRange": true,
-     "Units": "mV"
+     "DefaultList": [
+      "CW",
+      "LIST",
+      "SWE"
+     ]
     }
    },
-   false
-  ],
-  [
-   "Set LockIn Frequency",
-   {
-    "Lockin_Freq": {
-     "DefaultValue": "877",
-     "Tooltip": "The lock-in frequency in Hz",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "Hz"
-    }
-   },
-   false
-  ],
-  [
-   "Set LockIn TimeConstant",
-   {
-    "Lockin_RC": {
-     "DefaultValue": "100",
-     "Tooltip": "The lock-in time constant in Hz",
-     "Frozen": false,
-     "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "Hz"
-    }
-   },
-   false
+   true
   ],
   [
    "Set RF Freq",
    {
     "Freq": {
      "DefaultValue": "1000000000.0",
-     "Tooltip": "The RF frequency in Hz",
+     "Tooltip": "The RF frequency in Hz in continuous wave mode\nAcceptable range: (100000.0,30000000000.0)",
      "Frozen": false,
      "ValueType": "Numerical",
      "InRange": true,
-     "Units": "Hz"
+     "Name": "Freq",
+     "Units": "Hz",
+     "Min": 100000.0,
+     "Max": 30000000000.0
     }
    },
    false
   ],
   [
-   "Set RF Power",
+   "Set RF SWE Start",
    {
-    "Power": {
-     "DefaultValue": "0",
-     "Tooltip": "The amount of power for the RF generator in dBm",
+    "Start": {
+     "DefaultValue": "1e9",
+     "Tooltip": "",
      "Frozen": false,
      "ValueType": "Numerical",
-     "InRange": true,
-     "Units": "dBm"
+     "InRange": true
     }
    },
    false
+  ],
+  [
+   "Set RF SWE Stop",
+   {
+    "Stop": {
+     "DefaultValue": "20e9",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set RF SWE Points",
+   {
+    "points": {
+     "DefaultValue": "5000",
+     "Tooltip": "The number of points in a sweep.\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "points",
+     "Min": 1
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Dir",
+   {
+    "Dir": {
+     "DefaultValue": "POS",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "POS",
+      "NEG"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF LIST Count",
+   {
+    "count": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of sweeps to perform after a trigger\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "count",
+     "Min": 1
+    },
+    "Infinite": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Sour",
+   {
+    "Trig": {
+     "DefaultValue": "EXT",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "EXT",
+      "IMM",
+      "KEY",
+      "BUS"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set RF Trig Type",
+   {
+    "TrigType": {
+     "DefaultValue": "NORM",
+     "Tooltip": "NORMal trigger = edge initiates/stops sweeps; GATE trigger level starts/stops sweep.",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "NORM",
+      "GATE"
+     ],
+     "Name": "TrigType"
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Blanking",
+   {
+    "Blanking": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Del",
+   {
+    "delay": {
+     "DefaultValue": "0",
+     "Tooltip": "Delay time before going to next point.  RF Off time.\nMinimum value: 0",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "delay",
+     "Units": "s",
+     "Min": 0
+    }
+   },
+   true
+  ],
+  [
+   "Set RF SWE Dwell",
+   {
+    "dwell": {
+     "DefaultValue": "0.1",
+     "Tooltip": "Dwell time on each point.  RF On time.\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "dwell",
+     "Units": "s",
+     "Min": 1
+    }
+   },
+   true
+  ],
+  [
+   "Turn On RF Generator",
+   {},
+   true
+  ],
+  [
+   "Set Spectrum Table to Constant Bias",
+   {},
+   true
+  ],
+  [
+   "Set Spectrum Table Trig Vaux",
+   {},
+   true
+  ],
+  [
+   "Set Spectrum Mode",
+   {
+    "Mode": {
+     "DefaultValue": "z(V)",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "I(V,z)",
+      "z(V)",
+      "z(V,X:I)"
+     ]
+    }
+   },
+   true
+  ],
+  [
+   "Set Spectrum Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "1",
+     "Tooltip": "The setpoint for constant current spectra\nMaximum value: 10000.0",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "nA",
+     "Max": 10000.0
+    },
+    "Use_Scan_Setpoint": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Spectra Time",
+   {
+    "Time": {
+     "DefaultValue": "60",
+     "Tooltip": "The duration of the spectrum for a single direction",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "s"
+    }
+   },
+   true
+  ],
+  [
+   "Set Spectra NAveraging",
+   {
+    "N": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of spectra to take and average.  Takes long. reduces noise.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
   ],
   [
    "Spectrum",
@@ -699,19 +970,89 @@
  ],
  "Test": [
   [
-   "Exception Function",
+   "Null",
    {
-    "SomeParameter": {
-     "DefaultValue": "5",
-     "Tooltip": "\nMaximum value: 10",
+    "Index": {
+     "DefaultValue": "0,3,1",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
      "Frozen": false,
      "ValueType": "Numerical",
-     "InRange": true,
-     "Name": "SomeParameter",
-     "Max": 10
+     "InRange": true
     }
    },
    true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   true
+  ],
+  [
+   "Print",
+   {
+    "Number": {
+     "DefaultValue": "10,20",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Complex Function",
+   {
+    "SomeBoolean": {
+     "DefaultValue": true,
+     "Tooltip": "A Boolean parameter produces a checkbox",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true,
+     "Name": "SomeBoolean"
+    },
+    "SomeString": {
+     "DefaultValue": "String",
+     "Tooltip": "A String parameter produces a textbox",
+     "Frozen": false,
+     "ValueType": "String",
+     "InRange": true,
+     "Name": "SomeString"
+    },
+    "SomeFilePath": {
+     "DefaultValue": "C:\\",
+     "Tooltip": "A filepath parameter produces a 'browse' button",
+     "Frozen": false,
+     "ValueType": "File",
+     "InRange": true,
+     "Name": "SomeFilePath"
+    },
+    "SomeChoice": {
+     "DefaultValue": "Choice",
+     "Tooltip": "A Choice parameter produces a dropdown menu",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Choice",
+      "Combo",
+      "3rd",
+      "4th"
+     ],
+     "Name": "SomeChoice"
+    }
+   },
+   false
   ]
  ]
 }

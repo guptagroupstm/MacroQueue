@@ -5,20 +5,7 @@ MacroQueueSelf = None
 
 
 
-# {"Name":"SomeParameter","Max":10}
-def Exception_Function(SomeParameter=5):
-    if SomeParameter > 10:
-        raise ValueError(f"{SomeParameter} is too large.")
-    pass
 
-
-def Bare_Function(SomeParameter,SomeParameter2="a"):
-    print(SomeParameter)
-    print("Hehehe")
-
-# {"Name":"SomeNumber","Units":"V","Min":-10,"Max":10,"Tooltip":"An example function which only takes numbers"}
-def Numerical_Function(SomeNumber=5):
-    print(SomeNumber)
 
 # {"Name":"SomeBoolean","Tooltip":"A Boolean parameter produces a checkbox"}
 # {"Name":"SomeString","Tooltip":"A String parameter produces a textbox"}
@@ -48,5 +35,4 @@ def Pause():
 
 def Print(Number=0):
     print(Number)
-    print('')
 

@@ -9,11 +9,13 @@ import importlib
 import importlib.util
 from inspect import getmembers, isfunction,getcomments
 
+import PyInstaller
 import wx
 import pyvisa
 import pythoncom
 from datetime import datetime
-
+import shutil
+ 
 from time import time as timer
 
 application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
@@ -43,51 +45,23 @@ else:
 
 import json
 
+from PyInstaller.__main__ import run as PyInstall
+
 
 IconFileName = "MacroQueueIcon.ico"
 
 
 # BUG:
-# After edit macro, text on wrong side (Not reproducing?)
-# Dragging does not always work
 # Canceled during move to image start of a dIdV scan and it stopped responding.
 
 # TODO:
-# Does this work on a Mac?
 # Show number of items in queue in status bar
 
-# If a macro failed, copy it and put it and the top of the queue (Let this be an option)
-
-# Improve the help dialog
-
-# RHK functions
-# Scan - Only top down
-# RHK Scan doesn't stop
-# Set position option (absolute or relative)
-# Set bias modulation amplitude
+VersionNumber = "v0.2.5"
+# VersionNumber also in conf.py & setup.py
+Date = "4/2024"
 
 
-
-
-# Don't hold m_FunctionWindow,m_FunctionNameText in self.TheQueue.  The text only needs to be MacroLabel.  The window is only used to set the tooltip
-
-
-# Have a log dialog that can be opened (but doesn't have to be).  The log dialog shows whatever is printed (or the equivlant)
-
-# Ramping & scanning : set status bar 3
-# Progress bar: https://stackoverflow.com/questions/1883528/wxpython-progress-bar
-
-# RHK Scan time wrong
-
-
-
-# Save PDF
-
-
-# In the createc Scan, when I get the Y pixels, it crashes if I haven't set it?  There's no default value? 
-# On close, I cancel the scan.  Should I try to prevent that?
-
-VersionNumber = "v0.2.0"
 class MacroQueue(MyFrame):
     MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
 
@@ -108,9 +82,18 @@ class MacroQueue(MyFrame):
         os.chdir(os.path.realpath(application_path))
         self.SavedSettingsFile = 'MacroQueueSettings.csv'
 
-
         # The GUIDesign is defined in GUIDesign.py as the class MyFrame. It was made with wxFormBuilder
         MyFrame.__init__(self, parent=None) 
+        # self.m_EXEMenuItem.Enable(not getattr(sys, 'frozen', False))
+        if not getattr(sys, 'frozen', False):
+            self.m_EXEMenuItem = wx.MenuItem( self.m_FileMenu, wx.ID_ANY, u"Make Exe", wx.EmptyString, wx.ITEM_NORMAL )
+            self.m_FileMenu.Append( self.m_EXEMenuItem )
+            self.Bind( wx.EVT_MENU, self.MakeExe, id = self.m_EXEMenuItem.GetId() )
+            
+        self.m_ExitMenuItem = wx.MenuItem( self.m_FileMenu, wx.ID_ANY, u"Exit", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_FileMenu.Append( self.m_ExitMenuItem )
+        self.Bind( wx.EVT_MENU, self.OnClose, id = self.m_ExitMenuItem.GetId() )
+
         icon_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), IconFileName)
         if os.path.exists(icon_file):
             icon = wx.Icon(icon_file)
@@ -884,8 +867,11 @@ SOFTWARE.
         MyMessage.ShowModal()
         return
     def InfoHelp(self, event):
-        HelpMessage = f"MacroQueue {VersionNumber} (3/2024)\n"
+        HelpMessage = f"MacroQueue {VersionNumber} ({Date})\n"
         HelpMessage += "Written by Brad Goff in Jay Gupta's CME Group at the Ohio State University\n"
+        HelpMessage += "Check out https://guptagroupstm.github.io/MacroQueue for more information.\n"
+        
+
         HelpMessage += "\n"
         MyMessage = wx.MessageDialog(self,message=HelpMessage,caption="Info")
         MyMessage.ShowModal()
@@ -937,6 +923,35 @@ def Set_Setpoint(Setpoint=100):
         FolderPath = os.path.realpath("Macros/")
         os.startfile(FolderPath)
         return
+    def MakeExe(self,event):
+        if getattr(sys, 'frozen', True):
+            MyMessage = wx.MessageDialog(self,message=f"This will package MacroQueue into an executable.  It will take a few minutes.\nWould you like to continue?.",caption="Create Exe",style=wx.YES_NO)
+            YesOrNo = MyMessage.ShowModal()
+            if YesOrNo == wx.ID_YES:
+                try:
+                    shutil.rmtree(f"{os.path.dirname(__file__)}\\dist\\")
+                except:
+                    pass
+
+                PyInstall(['--onedir','--noconsole',f'--distpath={os.path.abspath(os.path.dirname(__file__))}\\dist',f'--icon={os.path.abspath("MacroQueueIcon.ico")}',f'--add-data={os.path.abspath("MacroQueueIcon.ico")};.',f'--add-data={os.path.abspath(f"{os.path.dirname(__file__)}/Bitmaps")}/*.bmp;Bitmaps','--exclude-module=Functions',f'--add-data={os.path.abspath(f"{os.path.dirname(__file__)}/Functions")}/*.py;Functions',f'--add-data={os.path.abspath(f"{os.path.dirname(__file__)}/Macros")}/*.json;Macros',f'{os.path.abspath("MacroQueue.py")}'])
+                # python -m PyInstaller --onedir --noconsole --icon=MacroQueueIcon.ico  --add-data="MacroQueueIcon.ico;." --add-data="Bitmaps/*.bmp;Bitmaps"  --exclude-module=Functions --add-data="Functions/*.py;Functions" --add-data="Macros/*.json;Macros" --clean  MacroQueue.py
+                try:
+                    shutil.rmtree(f"{os.path.abspath(os.path.dirname(__file__))}\\__pycache__\\")
+                    shutil.rmtree(f"{os.path.abspath(os.path.dirname(__file__))}\\build\\")
+                    os.remove("MacroQueue.spec")
+                except:
+                    pass
+                shutil.move(f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\_internal\\Macros",f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\")
+                shutil.move(f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\_internal\\Functions",f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\")
+                shutil.move(f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\_internal\\Bitmaps",f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\")
+                shutil.copy(f"{os.path.abspath(os.path.dirname(__file__))}\\{self.SavedSettingsFile}",f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\")
+                os.startfile(os.path.abspath(f"{os.path.dirname(__file__)}\\dist\\MacroQueue\\"))
+                pass
+        else:
+            MyMessage = wx.MessageDialog(self,message=f"MacroQueue is already an executable.",caption="Create Exe",style=wx.OK_DEFAULT)
+
+    
+
 class MyPanelDropTarget(wx.DropTarget):
     def __init__(self, window,Parent): 
         wx.DropTarget.__init__(self)

@@ -13,8 +13,10 @@ class STMThread_test(unittest.TestCase):
         mp.freeze_support()
         self.app = wx.App() 
         self.MyMainFrame = MacroQueue(test=True)
-        TestMacro = [ [{'Name':"test","Parameters":[]},False] ]
+        TestMacro = [ [{'Name':"Print","Parameters":{"Number":5}},True] ]
         self.MyMainFrame.IncomingQueue.put(("StartFunction",TestMacro))
+        Message = self.MyMainFrame.OutgoingQueue.get()
+        self.assertEqual(f"{Message}","('SetStatus', ('Function: Print', 1))")
         Message = self.MyMainFrame.OutgoingQueue.get()
         self.assertEqual(f"{Message}","('FunctionFinished', None)")
         self.MyMainFrame.OnClose()
