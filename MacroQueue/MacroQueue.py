@@ -101,8 +101,6 @@ class MacroQueue(MyFrame):
             
         self.LoadFunctions()
 
-
-
         # Starts the STM Thread with an Incoming & Outgoing Queue.  Any time-consuming calculations/measurements should be made on this thread.
         try:
             mp.set_start_method('spawn')
@@ -117,7 +115,7 @@ class MacroQueue(MyFrame):
         self.Process.start()
 
         # Read the saved settings file here
-        if os.path.exists(self.SavedSettingsFile):
+        if os.path.exists(self.SavedSettingsFile) and not self.test:
             SettingsSeries = pd.read_csv(self.SavedSettingsFile,names=['key','value'])
             self.SettingsDict = SettingsSeries.set_index('key').T.iloc[0].to_dict()
             if "Functions" in self.SettingsDict.keys():
@@ -134,9 +132,14 @@ class MacroQueue(MyFrame):
                 else:
                     item.Check(False)
         else:
-            if not test:
+            if not self.test:
                 ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
                 ThisChooseSoftwareDialog.ShowModal()
+            else:
+                self.Software = "CreaTec"
+                self.FunctionsLoaded = ["General"]
+                self.IncomingQueue.put(["SoftwareChange",[self.Software,self.FunctionsLoaded]])
+
         # if self.Software is None:
         #     self.OnClose()
         #     return
