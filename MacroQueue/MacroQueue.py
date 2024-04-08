@@ -36,16 +36,12 @@ except ModuleNotFoundError:
 # from GUIDesign import MacroDialog
 from inspect import getmembers, isfunction
 
-# They all go in try/except just in case the required packages aren't installed for one of them 
-# (e.g. you can still use RHK's functions even without win32com which you need for CreaTec)
-if getattr(sys, 'frozen', False):
-    sys.path.append(os.path.dirname(sys.executable)+"\\Functions")
-else:
-    sys.path.append(os.path.dirname(__file__)+"\\Functions")
+sys.path.append(os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else __file__)+"\\Functions")
 
 import json
 
 from PyInstaller.__main__ import run as PyInstall
+from functools import partial
 
 
 IconFileName = "MacroQueueIcon.ico"
@@ -57,13 +53,20 @@ IconFileName = "MacroQueueIcon.ico"
 # TODO:
 # Show number of items in queue in status bar
 
-VersionNumber = "v0.2.5"
+VersionNumber = "v0.3.0"
 # VersionNumber also in conf.py & setup.py
 Date = "4/2024"
 
 
 class MacroQueue(MyFrame):
-    MacroPaths = {"RHK":"Macros//RHKMacro.json","CreaTec":"Macros//CreaTecMacro.json","SXM":"Macros//SXMMacro.json"}
+    try:
+        import General
+        Systems = General.Systems
+    except:
+        Systems =['RHK','CreaTec','SXM',"Testing"]
+    NotAuxFiles = [f"{system}.py" for system in Systems]
+    NotAuxFiles.append("SXMRemote.py")
+    MacroPaths = {system:f"Macros//{system}Macro.json" for system in Systems}
 
 # Scanning, fine motion, course motion, dI/dV scans, point spectra, tip form, 
     TheQueue = []
@@ -75,6 +78,7 @@ class MacroQueue(MyFrame):
     Closing = False
     Editting = False
     Functions = {}
+    SystemMenuItems = []
 # my_module = importlib.import_module('os.path')
     def __init__(self,test=False):
         self.test = test
@@ -94,6 +98,12 @@ class MacroQueue(MyFrame):
         self.m_FileMenu.Append( self.m_ExitMenuItem )
         self.Bind( wx.EVT_MENU, self.OnClose, id = self.m_ExitMenuItem.GetId() )
 
+        for i,system in enumerate(self.Systems):
+            self.m_SystemmenuItem = wx.MenuItem( self.m_SystemMenu, wx.ID_ANY, system, wx.EmptyString, wx.ITEM_CHECK )
+            self.m_SystemMenu.Append( self.m_SystemmenuItem )
+            self.SystemMenuItems.append(self.m_SystemmenuItem)
+            OnTHISSoftware = partial(self.OnSoftware,i)
+            self.Bind( wx.EVT_MENU, OnTHISSoftware, id = self.m_SystemmenuItem.GetId() )
         icon_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), IconFileName)
         if os.path.exists(icon_file):
             icon = wx.Icon(icon_file)
@@ -124,7 +134,7 @@ class MacroQueue(MyFrame):
                 self.m_PauseAfterCancel.Check(self.SettingsDict['PauseAfterCancel'] != 'False')
             self.Software = self.SettingsDict["Software"]
             ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
-            ThisChooseSoftwareDialog.SetSoftware(self.Software)
+            ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))
             
             for item in self.m_NotSTMMenu.GetMenuItems():
                 if item.GetItemLabel() in self.FunctionsLoaded:
@@ -259,7 +269,7 @@ class MacroQueue(MyFrame):
                 # self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}'))         
             except Exception as e:
                 pass
-        for file in ["CreaTec.py","RHK.py","SXM.py","SXMRemote.py"]:
+        for file in self.NotAuxFiles:
             try:
                 FunctionNames.remove(file)
             except:
@@ -273,20 +283,22 @@ class MacroQueue(MyFrame):
             if not Reloading:
                 CheckFunction = self.m_NotSTMMenu.AppendCheckItem(wx.ID_ANY,file[:-3])
                 self.Bind(wx.EVT_MENU,self.EditLoadedFunctionFiles,CheckFunction)
+                CheckFunction.Check()
             else:
                 MenuItems = self.m_NotSTMMenu.GetMenuItems()
                 MenuLabels = [MenuItem.GetItemLabel() for MenuItem in MenuItems ]
                 if not file[:-3] in MenuLabels:
                     CheckFunction = self.m_NotSTMMenu.AppendCheckItem(wx.ID_ANY,file[:-3])
                     self.Bind(wx.EVT_MENU,self.EditLoadedFunctionFiles,CheckFunction)
+        self.EditLoadedFunctionFiles()
     def EditLoadedFunctionFiles(self,event=None):
         self.FunctionsLoaded = []
         for item in self.m_NotSTMMenu.GetMenuItems():
             if item.IsChecked():
                 self.FunctionsLoaded.append(item.GetItemLabel())
-        
-        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
-        ThisChooseSoftwareDialog.SetSoftware(self.Software)
+        if self.Software is not None:
+            ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
+            ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))
         
     
     def MakeFunctionButtons(self):
@@ -772,21 +784,13 @@ class MacroQueue(MyFrame):
         ThisStartMacroDialog.AddToQueue()
         self.AddConnectToQueue()
         return
-    def OnRHKSoftware(self, event):
+    def OnSoftware(self,i,event):
         ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
-        ThisChooseSoftwareDialog.OnRHK()
-        return
-    def OnCreaTecSoftware(self, event):
-        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
-        ThisChooseSoftwareDialog.OnCreaTec()
-        return
-    def OnSXMSoftware(self, event):
-        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
-        ThisChooseSoftwareDialog.OnSXM()
-        return
+        ThisChooseSoftwareDialog.SetSoftware(i)
+
     def PauseAfterCancel(self,event):
         ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
-        ThisChooseSoftwareDialog.SetSoftware(self.Software)
+        ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))
         pass
     def ReloadFunctions(self,event):
         self.LoadFunctions(Reloading=True)

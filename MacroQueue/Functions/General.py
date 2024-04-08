@@ -1,5 +1,8 @@
 from time import sleep
 
+Systems =['RHK','CreaTec','SXM',"Testing"]
+
+
 Cancel = False
 MacroQueueSelf = None
 
@@ -11,7 +14,7 @@ MacroQueueSelf = None
 # {"Name":"SomeString","Tooltip":"A String parameter produces a textbox"}
 # {"Name":"SomeFilePath","Tooltip":"A filepath parameter produces a 'browse' button"}
 # {"Name":"SomeChoice","Tooltip":"A Choice parameter produces a dropdown menu"}
-def Complex_Function(SomeBoolean=True,SomeString="String",SomeFilePath="C:\\",SomeChoice=['Choice','Combo','3rd','4th']):
+def Complex_Function2(SomeBoolean=True,SomeString="String",SomeFilePath="C:\\",SomeChoice=['Choice','Combo','3rd','4th']):
     if SomeBoolean:
         print(SomeString, SomeChoice)
 

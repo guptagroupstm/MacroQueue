@@ -11,12 +11,10 @@ try:
     from MacroQueue.GUIDesign import MacroDialog
     from MacroQueue.GUIDesign import MacroSettingsDialog
     from MacroQueue.GUIDesign import StartMacroDialog
-    from MacroQueue.GUIDesign import ChooseSoftware
 except ModuleNotFoundError:
     from GUIDesign import MacroDialog
     from GUIDesign import MacroSettingsDialog
     from GUIDesign import StartMacroDialog
-    from GUIDesign import ChooseSoftware
 
 import pandas as pd
 class SettingsDialog(wx.Dialog):
@@ -1153,28 +1151,55 @@ class MyStartMacroDialog(StartMacroDialog):
         self.Destroy()
 
 
-class MyChooseSoftwareDialog(ChooseSoftware):
+class MyChooseSoftwareDialog(wx.Dialog):
     def __init__(self, parent,FunctionsToLoad=None):
-        super().__init__(parent)
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Choose the STM Software", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+        self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+
+        fgSizer12 = wx.FlexGridSizer( 0, 1, 0, 0 )
+        fgSizer12.SetFlexibleDirection( wx.BOTH )
+        fgSizer12.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+        self.m_ChooseSoftwareText = wx.StaticText( self, wx.ID_ANY, u"Please select the STM Software you wish to use", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_ChooseSoftwareText.Wrap( -1 )
+
+        fgSizer12.Add( self.m_ChooseSoftwareText, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+
+        self.m_panel11 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        self.m_panel11.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_ACTIVECAPTION ) )
+
+        bSizer6 = wx.BoxSizer( wx.HORIZONTAL )
+        for i,system in enumerate(parent.Systems):
+            self.m_button = wx.Button( self.m_panel11, wx.ID_ANY, system, wx.DefaultPosition, wx.DefaultSize, 0 )
+            bSizer6.Add( self.m_button, 0, wx.ALL, 5 )
+            SetTHISSoftware = partial(self.SetSoftware,i)
+            self.m_button.Bind( wx.EVT_BUTTON,  SetTHISSoftware)
+
+
+
+        self.m_panel11.SetSizer( bSizer6 )
+        self.m_panel11.Layout()
+        bSizer6.Fit( self.m_panel11 )
+        fgSizer12.Add( self.m_panel11, 1, wx.EXPAND |wx.ALL, 5 )
+
+
+        self.SetSizer( fgSizer12 )
+        self.Layout()
+        fgSizer12.Fit( self )
+
+        self.Centre( wx.BOTH )
+
+
         self.SavedSettingsFile = self.Parent.SavedSettingsFile
         self.FunctionsToLoad = FunctionsToLoad
-    def OnRHK(self, event=None):
-        self.SetSoftware("RHK")
-    def OnCreaTec(self, event=None):
-        self.SetSoftware("CreaTec")
-    def OnSXM(self, event=None):
-        self.SetSoftware("SXM")
-    def SetSoftware(self,software=None):
-        self.Parent.m_RHKmenuItem.Check(False)
-        self.Parent.m_CreaTecmenuItem.Check(False)
-        self.Parent.m_SXMmenuItem.Check(False)
-        if software is not None:
-            if software == "RHK":
-                self.Parent.m_RHKmenuItem.Check(True)
-            if software == "CreaTec":
-                self.Parent.m_CreaTecmenuItem.Check(True)
-            if software == "SXM":
-                self.Parent.m_SXMmenuItem.Check(True)
+    def SetSoftware(self,softwareIndex=None,event=None):
+        for MenuItem in self.Parent.SystemMenuItems:
+            MenuItem.Check(False)
+        if softwareIndex is not None:
+            self.Parent.SystemMenuItems[softwareIndex].Check(True)
+            software = self.Parent.Systems[softwareIndex]
             self.Parent.Software = software
             self.Parent.MacroPath = self.Parent.MacroPaths[software]
             if self.FunctionsToLoad is None:

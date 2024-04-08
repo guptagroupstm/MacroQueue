@@ -1,0 +1,45 @@
+{
+ "TestMacro": [
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0,1",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   true
+  ],
+  [
+   "Print",
+   {
+    "Number": {
+     "DefaultValue": "0,5,1",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ]
+ ]
+}

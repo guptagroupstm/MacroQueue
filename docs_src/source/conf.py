@@ -9,7 +9,7 @@
 project = 'MacroQueue'
 copyright = '2024, Brad Goff'
 author = 'Brad Goff'
-release = '0.2.5'
+release = '0.3.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
