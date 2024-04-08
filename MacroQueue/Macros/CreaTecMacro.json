@@ -1,4 +1,1629 @@
 {
+ "Scan": [
+  [
+   "Set Recorded Channels",
+   {
+    "Topography": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "Current": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "LockInX": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "NPixels",
+     "Min": 1
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "\u00c5"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "s/line",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "1",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Scan",
+   {},
+   true
+  ]
+ ],
+ "dIdV Scan": [
+  [
+   "Set Recorded Channels",
+   {
+    "Topography": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "Current": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "LockInX": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set LockIn Amplitude",
+   {
+    "Lockin_Amp": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in voltage amplitude in mV\nAcceptable range: (0,10000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Amp",
+     "Units": "mV",
+     "Min": 0,
+     "Max": 10000
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn TimeConstant",
+   {
+    "Lockin_RC": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in time constant in Hz\nAcceptable range: (0.1,1000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_RC",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1000
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Frequency",
+   {
+    "Lockin_Freq": {
+     "DefaultValue": "877",
+     "Tooltip": "The lock-in frequency in Hz\nAcceptable range: (0.1,1500)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Freq",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1500
+    }
+   },
+   false
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "NPixels",
+     "Min": 1
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "1000",
+     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "\u00c5"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "s/line",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "1",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "dIdV Scan",
+   {},
+   true
+  ]
+ ],
+ "Course Step": [
+  [
+   "Define as Course Origin",
+   {},
+   true
+  ],
+  [
+   "Burst Z",
+   {
+    "Burst_Z": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Burst XY",
+   {
+    "Burst_XY": {
+     "DefaultValue": true,
+     "Tooltip": "Check Burst XY in the Course Positioning Form",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "XYCourse Step",
+   {
+    "NSteps_Out": {
+     "DefaultValue": "3",
+     "Tooltip": "The number of Z steps to retract before course moving in X and Y",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "X_Position": {
+     "DefaultValue": "5",
+     "Tooltip": "The X position to course move to.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "Y_Position": {
+     "DefaultValue": "-5",
+     "Tooltip": "The Y position to course move to.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "200",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "200",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "-3",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   true
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "500",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   true
+  ],
+  [
+   "Approach",
+   {
+    "Rectification_Steps": {
+     "DefaultValue": true,
+     "Tooltip": "Perform steps to center the Z piezo after approach.",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "-1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   true
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   true
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "200",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "4000",
+     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "\u00c5"
+    }
+   },
+   false
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "s/line",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "3",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "dIdV Scan",
+   {},
+   false
+  ]
+ ],
+ "New Area Scan": [
+  [
+   "Set Recorded Channels",
+   {
+    "Topography": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "Current": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    },
+    "LockInX": {
+     "DefaultValue": true,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set LockIn Amplitude",
+   {
+    "Lockin_Amp": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in voltage amplitude in mV\nAcceptable range: (0,10000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Amp",
+     "Units": "mV",
+     "Min": 0,
+     "Max": 10000
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn TimeConstant",
+   {
+    "Lockin_RC": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in time constant in Hz\nAcceptable range: (0.1,1000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_RC",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1000
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Frequency",
+   {
+    "Lockin_Freq": {
+     "DefaultValue": "877",
+     "Tooltip": "The lock-in frequency in Hz\nAcceptable range: (0.1,1500)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Freq",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1500
+    }
+   },
+   false
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set NPixels",
+   {
+    "NPixels": {
+     "DefaultValue": "512",
+     "Tooltip": "The number of pixels in each row and each column\nMinimum value: 1",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "NPixels",
+     "Min": 1
+    }
+   },
+   true
+  ],
+  [
+   "Set Scan Window Position",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X center of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "-389",
+     "Tooltip": "The Y top of the image in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Scan Image Size",
+   {
+    "HowToSetSize": {
+     "DefaultValue": "Image Size",
+     "Tooltip": "Choose to set the Image Size in \u00c5 directly or the Resolution in \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "Image Size",
+      "Resolution"
+     ]
+    },
+    "ImageSize": {
+     "DefaultValue": "8000",
+     "Tooltip": "The length of a row and column in \u00c5 or \u00c5/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "\u00c5"
+    }
+   },
+   true
+  ],
+  [
+   "Set Scan Speed",
+   {
+    "HowToSetSpeed": {
+     "DefaultValue": "s/line",
+     "Tooltip": "Choose how the Image Speed is set",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm/s",
+      "s/line",
+      "s/pixel"
+     ]
+    },
+    "Speed": {
+     "DefaultValue": "3",
+     "Tooltip": "The speed the tip moves in nm/s, s/line, or s/pixel",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   true
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   true
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "-1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   true
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "5",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   true
+  ],
+  [
+   "dIdV Scan",
+   {},
+   true
+  ]
+ ],
+ "Basic Spectrum": [
+  [
+   "Fine Move Tip",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Amplitude",
+   {
+    "Lockin_Amp": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in voltage amplitude in mV\nAcceptable range: (0,10000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Amp",
+     "Units": "mV",
+     "Min": 0,
+     "Max": 10000
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Frequency",
+   {
+    "Lockin_Freq": {
+     "DefaultValue": "877",
+     "Tooltip": "The lock-in frequency in Hz\nAcceptable range: (0.1,1500)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Freq",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1500
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn TimeConstant",
+   {
+    "Lockin_RC": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in time constant in Hz\nAcceptable range: (0.1,1000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_RC",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1000
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "-1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectrum Mode",
+   {
+    "Mode": {
+     "DefaultValue": "I(V,z)",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "I(V,z)",
+      "z(V)",
+      "z(V,X:I)"
+     ]
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectrum Table",
+   {
+    "Inital_Bias": {
+     "DefaultValue": "-1",
+     "Tooltip": "The inital bias for the spectrum.  ",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "V"
+    },
+    "Final_Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The final bias for the spectrum.  ",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "V"
+    },
+    "N_Datapoints": {
+     "DefaultValue": "1024",
+     "Tooltip": "The number of data points for a single direction",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectrum Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "1",
+     "Tooltip": "The setpoint for constant current spectra\nMaximum value: 10000.0",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "nA",
+     "Max": 10000.0
+    },
+    "Use_Scan_Setpoint": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectra NAveraging",
+   {
+    "N": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of spectra to take and average.  Takes long. reduces noise.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectra Time",
+   {
+    "Time": {
+     "DefaultValue": "60",
+     "Tooltip": "The duration of the spectrum for a single direction",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Spectrum",
+   {},
+   true
+  ]
+ ],
+ "Spectrum": [
+  [
+   "Fine Move Tip",
+   {
+    "HowToSetPosition": {
+     "DefaultValue": "nm",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "nm",
+      "Image Coord",
+      "Voltage"
+     ]
+    },
+    "XOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    },
+    "YOffset": {
+     "DefaultValue": "0",
+     "Tooltip": "The Y X position of the tip in nm, or Image Coordinate, or V",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Amplitude",
+   {
+    "Lockin_Amp": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in voltage amplitude in mV\nAcceptable range: (0,10000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Amp",
+     "Units": "mV",
+     "Min": 0,
+     "Max": 10000
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn Frequency",
+   {
+    "Lockin_Freq": {
+     "DefaultValue": "877",
+     "Tooltip": "The lock-in frequency in Hz\nAcceptable range: (0.1,1500)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_Freq",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1500
+    }
+   },
+   false
+  ],
+  [
+   "Set LockIn TimeConstant",
+   {
+    "Lockin_RC": {
+     "DefaultValue": "100",
+     "Tooltip": "The lock-in time constant in Hz\nAcceptable range: (0.1,1000)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Lockin_RC",
+     "Units": "Hz",
+     "Min": 0.1,
+     "Max": 1000
+    }
+   },
+   false
+  ],
+  [
+   "Set Bias",
+   {
+    "Bias": {
+     "DefaultValue": "-1",
+     "Tooltip": "The bias voltage in V\nAcceptable range: (-10,10)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Bias",
+     "Units": "V",
+     "Min": -10,
+     "Max": 10
+    }
+   },
+   false
+  ],
+  [
+   "Set Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "100",
+     "Tooltip": "The current setpoint in pA\nAcceptable range: (0,1000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "pA",
+     "Min": 0,
+     "Max": 1000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectrum Mode",
+   {
+    "Mode": {
+     "DefaultValue": "I(V,z)",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "I(V,z)",
+      "z(V)",
+      "z(V,X:I)"
+     ]
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectrum Table",
+   {
+    "Inital_Bias": {
+     "DefaultValue": "-1",
+     "Tooltip": "The inital bias for the spectrum.  ",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "V"
+    },
+    "Final_Bias": {
+     "DefaultValue": "1",
+     "Tooltip": "The final bias for the spectrum.  ",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "V"
+    },
+    "N_Datapoints": {
+     "DefaultValue": "1024",
+     "Tooltip": "The number of data points for a single direction",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectrum Setpoint",
+   {
+    "Setpoint": {
+     "DefaultValue": "1",
+     "Tooltip": "The setpoint for constant current spectra\nMaximum value: 10000.0",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Setpoint",
+     "Units": "nA",
+     "Max": 10000.0
+    },
+    "Use_Scan_Setpoint": {
+     "DefaultValue": false,
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Boolean",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectra NAveraging",
+   {
+    "N": {
+     "DefaultValue": "1",
+     "Tooltip": "The number of spectra to take and average.  Takes long. reduces noise.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set Spectra Time",
+   {
+    "Time": {
+     "DefaultValue": "60",
+     "Tooltip": "The duration of the spectrum for a single direction",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Set B Field",
+   {
+    "B": {
+     "DefaultValue": "1",
+     "Tooltip": "The magnetic field strength in T\nAcceptable range: (-1,1)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "B",
+     "Units": "T",
+     "Min": -1,
+     "Max": 1
+    },
+    "LogPath": {
+     "DefaultValue": "D:\\LabData\\BFieldLoop.csv",
+     "Tooltip": "",
+     "Frozen": true,
+     "ValueType": "String",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set B Field Keep Tip Away",
+   {
+    "B": {
+     "DefaultValue": "1",
+     "Tooltip": "The magnetic field strength in T\nAcceptable range: (-1,1)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "B",
+     "Units": "T",
+     "Min": -1,
+     "Max": 1
+    },
+    "LogPath": {
+     "DefaultValue": "D:\\LabData\\BFieldLoop.csv",
+     "Tooltip": "",
+     "Frozen": true,
+     "ValueType": "String",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Amplitude",
+   {
+    "Amplitude": {
+     "DefaultValue": "10",
+     "Tooltip": "The amplitude for the RF generator in mV in continuous wave mode\nAcceptable range: (10,7080)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Amplitude",
+     "Units": "mV",
+     "Min": 10,
+     "Max": 7080
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Power",
+   {
+    "Power": {
+     "DefaultValue": "-10",
+     "Tooltip": "The amount of power for the RF generator in dBm in continuous wave mode\nAcceptable range: (-30,27)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Power",
+     "Units": "dBm",
+     "Min": -30,
+     "Max": 27
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Freq",
+   {
+    "Freq": {
+     "DefaultValue": "1000000000.0",
+     "Tooltip": "The RF frequency in Hz in continuous wave mode\nAcceptable range: (100000.0,30000000000.0)",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "Freq",
+     "Units": "Hz",
+     "Min": 100000.0,
+     "Max": 30000000000.0
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Freq Mode",
+   {
+    "Mode": {
+     "DefaultValue": "CW",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "CW",
+      "LIST",
+      "SWE"
+     ]
+    }
+   },
+   false
+  ],
+  [
+   "Set RF Power Mode",
+   {
+    "Mode": {
+     "DefaultValue": "CW",
+     "Tooltip": "",
+     "Frozen": false,
+     "ValueType": "Choice",
+     "InRange": true,
+     "DefaultList": [
+      "CW",
+      "LIST",
+      "SWE"
+     ]
+    }
+   },
+   false
+  ],
+  [
+   "Turn On RF Generator",
+   {},
+   false
+  ],
+  [
+   "Null",
+   {
+    "Index": {
+     "DefaultValue": "0",
+     "Tooltip": "This has no impact.  It's solely used to repeat the functions.",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Wait",
+   {
+    "WaitTime": {
+     "DefaultValue": "1",
+     "Tooltip": "The time to wait",
+     "Frozen": false,
+     "ValueType": "Numerical",
+     "InRange": true,
+     "Name": "WaitTime",
+     "Units": "s"
+    }
+   },
+   false
+  ],
+  [
+   "Spectrum",
+   {},
+   true
+  ],
+  [
+   "Turn B Field Off",
+   {
+    "LogPath": {
+     "DefaultValue": "D:\\LabData\\BFieldLoop.csv",
+     "Tooltip": "",
+     "Frozen": true,
+     "ValueType": "String",
+     "InRange": true
+    }
+   },
+   false
+  ],
+  [
+   "Turn Off RF Generator",
+   {},
+   false
+  ]
+ ],
  "Change RF": [
   [
    "Turn Off RF Generator",
@@ -1055,65 +2680,43 @@
    false
   ]
  ],
- "Example2": [
+ "Change BField": [
   [
-   "Wait",
+   "Set B Field",
    {
-    "WaitTime": {
-     "DefaultValue": "1",
-     "Tooltip": "The time to wait",
+    "B": {
+     "DefaultValue": "0.1",
+     "Tooltip": "The magnetic field strength in T\nAcceptable range: (-1,1)",
      "Frozen": false,
      "ValueType": "Numerical",
      "InRange": true,
-     "Name": "WaitTime",
-     "Units": "s"
+     "Name": "B",
+     "Units": "T",
+     "Min": -1,
+     "Max": 1
+    },
+    "LogPath": {
+     "DefaultValue": "D:\\LabData\\BFieldLoop.csv",
+     "Tooltip": "",
+     "Frozen": true,
+     "ValueType": "String",
+     "InRange": true
     }
    },
-   true
+   false
   ],
   [
-   "Complex Function2",
+   "Turn B Field Off",
    {
-    "SomeBoolean": {
-     "DefaultValue": true,
-     "Tooltip": "A Boolean parameter produces a checkbox",
-     "Frozen": false,
-     "ValueType": "Boolean",
-     "InRange": true,
-     "Name": "SomeBoolean"
-    },
-    "SomeString": {
-     "DefaultValue": "String",
-     "Tooltip": "A String parameter produces a textbox",
-     "Frozen": false,
+    "LogPath": {
+     "DefaultValue": "D:\\LabData\\BFieldLoop.csv",
+     "Tooltip": "",
+     "Frozen": true,
      "ValueType": "String",
-     "InRange": true,
-     "Name": "SomeString"
-    },
-    "SomeFilePath": {
-     "DefaultValue": "C:\\",
-     "Tooltip": "A filepath parameter produces a 'browse' button",
-     "Frozen": false,
-     "ValueType": "File",
-     "InRange": true,
-     "Name": "SomeFilePath"
-    },
-    "SomeChoice": {
-     "DefaultValue": "Choice",
-     "Tooltip": "A Choice parameter produces a dropdown menu",
-     "Frozen": false,
-     "ValueType": "Choice",
-     "InRange": true,
-     "DefaultList": [
-      "Choice",
-      "Combo",
-      "3rd",
-      "4th"
-     ],
-     "Name": "SomeChoice"
+     "InRange": true
     }
    },
-   true
+   false
   ]
  ]
 }

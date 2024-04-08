@@ -1202,10 +1202,11 @@ class MyChooseSoftwareDialog(wx.Dialog):
             software = self.Parent.Systems[softwareIndex]
             self.Parent.Software = software
             self.Parent.MacroPath = self.Parent.MacroPaths[software]
+            SettingsDict = {"Software":software,'PauseAfterCancel':self.Parent.m_PauseAfterCancel.IsChecked(),'LaunchWithConnect':self.Parent.m_LaunchWithConnect.IsChecked()}
             if self.FunctionsToLoad is None:
-                SettingsDict = {"Software":software,'Functions':['General'],'PauseAfterCancel':self.Parent.m_PauseAfterCancel.IsChecked()}
+                SettingsDict['Functions'] = ['General']
             else:
-                SettingsDict = {"Software":software,'Functions':self.FunctionsToLoad,'PauseAfterCancel':self.Parent.m_PauseAfterCancel.IsChecked()}
+                SettingsDict['Functions'] = self.FunctionsToLoad
                 
             pd.Series(SettingsDict).to_csv(self.SavedSettingsFile,header=False)
             self.Parent.MakeFunctionButtons()

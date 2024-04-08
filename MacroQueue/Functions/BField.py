@@ -190,7 +190,9 @@ def BField_Spectrum(BField_End=-1, N_Datapoints=1024, Backwards=True,N_Repeat=0)
 ChannelDict = {'Y':0,'X':1,'Z':2}
 DirDict = {'p':0,'n':1}
 ZZero = None
-def Set_B_Field_Keep_Away(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
+
+# {"Name":"B","Units":"T","Min":-1,"Max":1,"Tooltip":"The magnetic field strength in T"}
+def Set_B_Field_Keep_Tip_Away(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
     try:
         STM = MacroQueueSelf.Functions[MacroQueueSelf.Software].STM
     except:

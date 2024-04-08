@@ -53,7 +53,7 @@ IconFileName = "MacroQueueIcon.ico"
 # TODO:
 # Show number of items in queue in status bar
 
-VersionNumber = "v0.3.0"
+VersionNumber = "v0.3.1"
 # VersionNumber also in conf.py & setup.py
 Date = "4/2024"
 
@@ -64,8 +64,15 @@ class MacroQueue(MyFrame):
         Systems = General.Systems
     except:
         Systems =['RHK','CreaTec','SXM',"Testing"]
+    try:
+        import General
+        IgnoreFiles = General.IgnoreFiles
+    except:
+        IgnoreFiles =["SXMRemote.py"]
+
     NotAuxFiles = [f"{system}.py" for system in Systems]
-    NotAuxFiles.append("SXMRemote.py")
+    for Ignorefile in IgnoreFiles:
+        NotAuxFiles.append(Ignorefile)
     MacroPaths = {system:f"Macros//{system}Macro.json" for system in Systems}
 
 # Scanning, fine motion, course motion, dI/dV scans, point spectra, tip form, 
@@ -132,6 +139,8 @@ class MacroQueue(MyFrame):
                 self.FunctionsLoaded = [string.replace(" ", "").replace("'", "") for string in (self.SettingsDict["Functions"][1:-1].split(','))]
             if "PauseAfterCancel" in self.SettingsDict.keys():
                 self.m_PauseAfterCancel.Check(self.SettingsDict['PauseAfterCancel'] != 'False')
+            if "LaunchWithConnect" in self.SettingsDict.keys():
+                self.m_LaunchWithConnect.Check(self.SettingsDict['LaunchWithConnect'] != 'False')
             self.Software = self.SettingsDict["Software"]
             ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
             ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))
@@ -175,7 +184,8 @@ class MacroQueue(MyFrame):
             # self.m_QueueWindow.Layout()
             self.m_QueueWindow.FitInside()
         self.m_QueueWindow.Bind( wx.EVT_SIZE, OnQueueSize )
-        self.AddConnectToQueue()
+        if self.m_LaunchWithConnect.IsChecked():
+            self.AddConnectToQueue()
         self.Show()
 
     def CheckQueue(self,event):
@@ -785,9 +795,13 @@ class MacroQueue(MyFrame):
         self.AddConnectToQueue()
         return
     def OnSoftware(self,i,event):
-        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
+        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
         ThisChooseSoftwareDialog.SetSoftware(i)
 
+    def OnLaunchConnect(self,event):
+        ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
+        ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))
+        pass
     def PauseAfterCancel(self,event):
         ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
         ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))

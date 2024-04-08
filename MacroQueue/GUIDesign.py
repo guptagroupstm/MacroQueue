@@ -34,6 +34,10 @@ class MyFrame ( wx.Frame ):
 		self.m_OptionsMenu.Append( self.m_PauseAfterCancel )
 		self.m_PauseAfterCancel.Check( True )
 
+		self.m_LaunchWithConnect = wx.MenuItem( self.m_OptionsMenu, wx.ID_ANY, u"Launch with Connect in Queue", wx.EmptyString, wx.ITEM_CHECK )
+		self.m_OptionsMenu.Append( self.m_LaunchWithConnect )
+		self.m_LaunchWithConnect.Check( True )
+
 		self.m_menuItem17 = wx.MenuItem( self.m_OptionsMenu, wx.ID_ANY, u"Reload Functions"+ u"\t" + u"CTRL+R", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_OptionsMenu.Append( self.m_menuItem17 )
 
@@ -61,7 +65,7 @@ class MyFrame ( wx.Frame ):
 		self.m_menubar1.Append( self.m_SystemMenu, u"System" )
 
 		self.m_NotSTMMenu = wx.Menu()
-		self.m_menubar1.Append( self.m_NotSTMMenu, u"Included Functions" )
+		self.m_menubar1.Append( self.m_NotSTMMenu, u"Auxiliary Functions" )
 
 		self.m_menu5 = wx.Menu()
 		self.m_menuItem10 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Basic Usage", wx.EmptyString, wx.ITEM_NORMAL )
@@ -143,6 +147,7 @@ class MyFrame ( wx.Frame ):
 		self.Bind( wx.EVT_IDLE, self.IdleLoop )
 		self.Bind( wx.EVT_SIZE, self.OnSize )
 		self.Bind( wx.EVT_MENU, self.OpenSourceFolder, id = self.m_SourceMenuItem.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnLaunchConnect, id = self.m_LaunchWithConnect.GetId() )
 		self.Bind( wx.EVT_MENU, self.ReloadFunctions, id = self.m_menuItem17.GetId() )
 		self.Bind( wx.EVT_MENU, self.StartMakeNewMacro, id = self.m_MakeMacroMenuItem.GetId() )
 		self.Bind( wx.EVT_MENU, self.OpenMacroFile, id = self.m_OpenMacroMenuItem.GetId() )
@@ -173,6 +178,9 @@ class MyFrame ( wx.Frame ):
 		event.Skip()
 
 	def OpenSourceFolder( self, event ):
+		event.Skip()
+
+	def OnLaunchConnect( self, event ):
 		event.Skip()
 
 	def ReloadFunctions( self, event ):
