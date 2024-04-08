@@ -9,7 +9,6 @@ except(IOError, ImportError):
   from pathlib import Path
   this_directory = Path(__file__).parent
   long_description = (this_directory / "README.md").read_text()
-print(long_description)
 setup(
   name = 'MacroQueue',         # How you named your package folder (MyLib)
   packages = ['MacroQueue'],   # Chose the same as "name"
