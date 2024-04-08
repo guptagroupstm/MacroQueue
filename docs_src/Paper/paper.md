@@ -26,8 +26,7 @@ Scanning Probe Microscopy (SPM) operators often use several instruments to fully
 
 Users can easily add python functions to control new and existing auxiliary equipment, in addition to new and existing SPM systems as long as they can be controlled via python.  Although any arbitary python function can be added, the base functions were created with the functional programming paradigm in mind, so the functions are small and each perform a single task.  For example, the function *Set RF Frequency*, changes the frequency on the RF generator and records the new value.  This allows the functions to be reused for many types of measurements.
 
-![The general procedure for using MacroQueue.\label{fig:GeneralProcedure}](Figure3.PNG)
-
+![The general procedure for using MacroQueue.\label{fig:GeneralProcedure}](Figure3.PNG =x50)
 
 The functions are grouped into a macro for each type of measurement.  Macros are added to a queue with different values for each parameter, e.g. bias, magnetic field, etc., to perform measurements throughout the parameter space.  Each measurement is performed consecutively on a seperate thread to allow measurements that are still in the queue to be modified.
 These features allow users to easily control several instruments in sync, add new instruments to a system, and perform long series of measurements with minimal input. 
