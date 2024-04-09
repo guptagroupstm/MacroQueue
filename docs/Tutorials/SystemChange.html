@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Changing Instruments &mdash; MacroQueue 0.2.0 documentation</title>
+  <title>Changing Instruments &mdash; MacroQueue 0.3.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="../_static/documentation_options.js?v=71d9d8e6"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -55,7 +55,10 @@
 <li class="toctree-l3"><a class="reference internal" href="WriteFunction.html">Writing a new function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="SpecialFunctions.html">Special Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ErrorHandling.html">Error Handling</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Changing Instruments</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Changing Instruments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#adding-a-new-system">Adding a New System</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="test.html">Automated test</a></li>
 </ul>
 </li>
@@ -100,6 +103,17 @@
 <p>When you change systems, the macros for the old system is automatically replaced with the macros for the new system.</p>
 <p>If you have several systems that use the same software, e.g. 2 different CreaTec systems, you can include other functions for other Instruments seperately.</p>
 <img alt="../_images/Change4.png" src="../_images/Change4.png" />
+<section id="adding-a-new-system">
+<h2>Adding a New System<a class="headerlink" href="#adding-a-new-system" title="Link to this heading"></a></h2>
+<p>You can specify that a python file under Functions is a new system instead of auxiliary equipment by adding it to the list of systems in <em>General.py</em>.</p>
+<p>For example, I created a new file called <em>Testing.py</em> in the Functions folder. I can make it a system by adding ‘Testing’ to the list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Systems</span> <span class="o">=</span><span class="p">[</span><span class="s1">&#39;RHK&#39;</span><span class="p">,</span><span class="s1">&#39;CreaTec&#39;</span><span class="p">,</span><span class="s1">&#39;SXM&#39;</span><span class="p">,</span><span class="s2">&quot;Testing&quot;</span><span class="p">]</span>
+<span class="n">IgnoreFiles</span> <span class="o">=</span><span class="p">[</span><span class="s2">&quot;SXMRemote.py&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/NewSystem1.png"><img alt="../_images/NewSystem1.png" src="../_images/NewSystem1.png" style="width: 250px;" /></a>
+<img alt="../_images/NewSystem2.png" src="../_images/NewSystem2.png" />
+</section>
 </section>
 
 

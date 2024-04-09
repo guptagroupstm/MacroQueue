@@ -31,7 +31,9 @@ When inputing numerical parameters, you may simultaneously add several items to 
 
 Which Functions will Run
 --------------------------
-It is important to note that when a user expands multiple parameters, the macros are created such that the loops are nested.  
+
+It is important to note that when a user inputs multiple values for numerical parameters, MacroQueue will 'expand' the macro into multiple macros, with each value, to the queue.  
+The macros are created as if there is a for loop at the expanding function and every function below the expanding function is inside the loop. 
 
 That is to say, if there are two functions each with 2 values, the first funciton will run twice and the second function will run four times (twice for each time the first function ran).
 

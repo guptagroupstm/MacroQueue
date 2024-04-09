@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multiple Parameters &mdash; MacroQueue 0.2.0 documentation</title>
+  <title>Multiple Parameters &mdash; MacroQueue 0.3.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="../../_static/documentation_options.js?v=71d9d8e6"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -119,7 +119,8 @@
 </section>
 <section id="which-functions-will-run">
 <h2>Which Functions will Run<a class="headerlink" href="#which-functions-will-run" title="Link to this heading"></a></h2>
-<p>It is important to note that when a user expands multiple parameters, the macros are created such that the loops are nested.</p>
+<p>It is important to note that when a user inputs multiple values for numerical parameters, MacroQueue will ‘expand’ the macro into multiple macros, with each value, to the queue.
+The macros are created as if there is a for loop at the expanding function and every function below the expanding function is inside the loop.</p>
 <p>That is to say, if there are two functions each with 2 values, the first funciton will run twice and the second function will run four times (twice for each time the first function ran).</p>
 <p>For example, let’s say I want to (1) change the setpoint, (2) wait some time, (3) change the bias, and (4) scan and I want 2 different setpoints and 2 different biases.</p>
 <img alt="../../_images/Expanding6.png" src="../../_images/Expanding6.png" />

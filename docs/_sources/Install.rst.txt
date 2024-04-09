@@ -20,9 +20,9 @@ Installation from pip (recommended)
 
     python -m MacroQueue
 
-4. (Optional) Create an executable by running the following command *in MacroQueue's folder*::
+5. (Optional) Create an executable.  It takes upwards of 15 minutes.
 
-    .\MakeExe.sh
+.. image:: ./MakeExe.png
 
     
 Installation from source (not recommended)
@@ -43,11 +43,10 @@ In particular, this is recommended if you want to use :doc:`Tutorials/test`.
 
 4. Start *MacroQueue* by the command below::
 
-    python MacroQueue
+    python MacroQueue.py
 
-5. (Optional) Create an executable by running the following command *in MacroQueue's folder*::
+5. (Optional) Create an executable.  It takes upwards of 15 minutes.
 
-    .\MakeExe.sh
 
 Library version
 -------------------------
