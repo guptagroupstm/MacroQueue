@@ -18,13 +18,10 @@
 # copyright recipe-577654-1
 # changed by Falk mailbox@anfatec.de
 
-import ctypes
 import threading
-import time
 #import win32event
-from win32 import win32event #manu 
-from ctypes import POINTER, WINFUNCTYPE, c_char_p, c_void_p, c_int, c_ulong, c_char_p
-from ctypes.wintypes import BOOL, DWORD, BYTE, INT, LPCWSTR, UINT, ULONG
+from ctypes import POINTER, WINFUNCTYPE, c_void_p, c_int, c_ulong, c_char_p
+from ctypes.wintypes import BOOL, DWORD, LPCWSTR, UINT
 
 import configparser
 
@@ -173,16 +170,16 @@ class DDEClient(object): #'self.' in whole class
         if not self._hConv:
             raise DDEError("Unable to establish a conversation with server", self._idInst)
 
-        self.advise("Scan");
-        self.advise('Command');
-        self.advise('SaveFileName');
-        self.advise('ScanLine');
-        self.advise('MicState');
-        self.advise('SpectSave');
+        self.advise("Scan")
+        self.advise('Command')
+        self.advise('SaveFileName')
+        self.advise('ScanLine')
+        self.advise('MicState')
+        self.advise('SpectSave')
         
         self.config=configparser.ConfigParser() #instantiate
-        self.NotGotAnswer = False;
-        self.LastAnswer = "";
+        self.NotGotAnswer = False
+        self.LastAnswer = ""
 
         
     def __del__(self):
@@ -194,7 +191,6 @@ class DDEClient(object): #'self.' in whole class
 
     def advise(self, item, stop=False):
         """Request updates when DDE data changes."""
-        from ctypes import byref
 
         hszItem = DDE.CreateStringHandle(self._idInst, item, 1200)
         hDdeData = DDE.ClientTransaction(LPBYTE(), 0, self._hConv, hszItem, CF_TEXT, XTYP_ADVSTOP if stop else XTYP_ADVSTART, TIMEOUT_ASYNC, LPDWORD())
@@ -207,9 +203,9 @@ class DDEClient(object): #'self.' in whole class
         """Execute a DDE command."""
         self.NotGotAnswer=True
         # Dec. 16 we need utf16 without heater!
-        command='begin\r\n  '+command+'\r\nend.\r\n';#create pascal style program
+        command='begin\r\n  '+command+'\r\nend.\r\n'#create pascal style program
         #print(command)
-        command=bytes(command, 'utf-16');     #falk
+        command=bytes(command, 'utf-16')     #falk
         command=command.strip(b"\xff")        #falk
         command=command.strip(b"\xfe")        #falk
         pData = c_char_p(command)
@@ -251,31 +247,31 @@ class DDEClient(object): #'self.' in whole class
         #value = str(value, 'utf-8') #Feb. 17
         #value = value.strip('\r\n') #Feb. 17
 
-        self.LastAnswer = value;
+        self.LastAnswer = value
         if (value.startswith(b'Scan on')):
             self.LastAnswer = 1
-            self.ScanOnCallBack ();     # print('on')
+            self.ScanOnCallBack ()     # print('on')
             return
         elif (value.startswith(b'Scan off')):
             self.LastAnswer = 0
-            self.ScanOffCallBack();     # print('off')
+            self.ScanOffCallBack()     # print('off')
             return
         elif (item.startswith(b'SaveFileName')):
             FileName=str(value,'utf-8').strip('\r\n')
-            self.SaveIsDone(FileName);  # print('SaveIsDone')
+            self.SaveIsDone(FileName)  # print('SaveIsDone')
             return
         elif (item.startswith(b'ScanLine')):
             value = str(value, 'utf-8').strip('\r\n')
-            self.Scan(value);           # print('ScanLine')
+            self.Scan(value)           # print('ScanLine')
             return
         elif (item.startswith(b'MicState')):
-            self.MicState(value);
+            self.MicState(value)
             return
         elif (item.startswith(b'SpectSave')):
-            self.SpectSave(value);
+            self.SpectSave(value)
             return
         elif (item.startswith(b'Command')): # echo of command
-            self.LastAnswer = value;
+            self.LastAnswer = value
             return
     
         else:
@@ -286,7 +282,7 @@ class DDEClient(object): #'self.' in whole class
         if wType == XTYP_XACT_COMPLETE:
             pass #print('XTYP_XACT_COMPLETE');
         elif wType == XTYP_DISCONNECT:
-            print('disconnect');
+            print('disconnect')
         elif wType == XTYP_ADVDATA:
             from ctypes import byref, create_string_buffer
 
@@ -297,23 +293,23 @@ class DDEClient(object): #'self.' in whole class
                 item = create_string_buffer(128)
                 DDE.QueryString(self._idInst, hsz2, item, 128, 1004)
                 self.callback(pData, item.value)
-                self.NotGotAnswer = False;
+                self.NotGotAnswer = False
                 DDE.UnaccessData(hDdeData)
                 #print("set false");
             return DDE_FACK
         else:
-            print('callback'+hex(wType));
+            print('callback'+hex(wType))
 
         return 0
     
     def ScanOnCallBack (self):
-        print('scan is on');
+        print('scan is on')
 
     def ScanOffCallBack (self) :
-        print('scan is off');
+        print('scan is off')
     
     def SaveIsDone (self, FileName) :
-        print(FileName);
+        print(FileName)
         
     def Scan (self, LineNr) :
         pass  #print(LineNr); # 1st letter is u/d/f/b for up/down/forward/backward
@@ -331,7 +327,7 @@ class DDEClient(object): #'self.' in whole class
 
     def GetIniEntry (self, section, item):
         #get current iniFile
-        IniName=self.request('IniFileName');
+        IniName=self.request('IniFileName')
         IniName=str(IniName,'utf-8')
         IniName=IniName.strip('\r\n')
         #config=configparser.ConfigParser() #instantiate
@@ -341,12 +337,12 @@ class DDEClient(object): #'self.' in whole class
 
     def GetChannel (self, ch):
         string="a:=GetChannel("+str(ch)+");\r\n  writeln(a);"
-        self.execute(string, 1000);
+        self.execute(string, 1000)
 
         while self.NotGotAnswer:
-            loop();
+            loop()
 
-        BackStr=self.LastAnswer;
+        BackStr=self.LastAnswer
         BackStr=str(BackStr,'utf-8').split('\r\n')
         if len(BackStr)>=2:
             NrStr=BackStr[1].replace(',','.')
@@ -355,18 +351,18 @@ class DDEClient(object): #'self.' in whole class
         return
 
     def SendWait(self, command):
-        self.execute(command, 1000);
+        self.execute(command, 1000)
         while self.NotGotAnswer:
-            loop();
+            loop()
 
 
     def GetPara (self, TopicItem):
-        self.execute(TopicItem, 1000);
+        self.execute(TopicItem, 1000)
 
         while self.NotGotAnswer:
-            loop();
+            loop()
 
-        BackStr=self.LastAnswer;
+        BackStr=self.LastAnswer
         BackStr=str(BackStr,'utf-8').split('\r\n')
         if len(BackStr)>=2:
             NrStr=BackStr[1].replace(',','.')

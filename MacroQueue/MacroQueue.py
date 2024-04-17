@@ -7,17 +7,15 @@ import queue
 import threading
 import importlib
 import importlib.util
-from inspect import getmembers, isfunction,getcomments
+from inspect import getmembers, isfunction
+from typing import TYPE_CHECKING
 
-import PyInstaller
-import wx
-import pyvisa
-import pythoncom
-from datetime import datetime
 import shutil
  
-from time import time as timer
 
+import json
+from PyInstaller.__main__ import run as PyInstall
+from functools import partial
 application_path = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
 sys.path.append(application_path)
 try:
@@ -34,14 +32,9 @@ except ModuleNotFoundError:
     from GUIDesign import MyFrame
     
 # from GUIDesign import MacroDialog
-from inspect import getmembers, isfunction
 
 sys.path.append(os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else __file__)+"\\Functions")
 
-import json
-
-from PyInstaller.__main__ import run as PyInstall
-from functools import partial
 
 
 IconFileName = "MacroQueueIcon.ico"
@@ -62,12 +55,12 @@ class MacroQueue(MyFrame):
     try:
         import General
         Systems = General.Systems
-    except:
+    except AttributeError:
         Systems =['RHK','CreaTec','SXM',"Testing"]
     try:
         import General
         IgnoreFiles = General.IgnoreFiles
-    except:
+    except AttributeError:
         IgnoreFiles =["SXMRemote.py"]
 
     NotAuxFiles = [f"{system}.py" for system in Systems]
@@ -277,16 +270,16 @@ class MacroQueue(MyFrame):
             try:
                 self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),FunctionName[:-3])         
                 # self.Functions[f"{FunctionName[:-3]}"] = import_source_file(os.path.abspath(f'Functions\\{FunctionName}'),os.path.abspath(f'Functions\\{FunctionName}'))         
-            except Exception as e:
+            except Exception:
                 pass
         for file in self.NotAuxFiles:
             try:
                 FunctionNames.remove(file)
-            except:
+            except ValueError:
                 pass
         try:
             FunctionNames.insert(0, FunctionNames.pop(FunctionNames.index("General.py")))
-        except:
+        except ValueError:
             pass
         for file in FunctionNames:
             
@@ -297,7 +290,7 @@ class MacroQueue(MyFrame):
             else:
                 MenuItems = self.m_NotSTMMenu.GetMenuItems()
                 MenuLabels = [MenuItem.GetItemLabel() for MenuItem in MenuItems ]
-                if not file[:-3] in MenuLabels:
+                if file[:-3] not in MenuLabels:
                     CheckFunction = self.m_NotSTMMenu.AppendCheckItem(wx.ID_ANY,file[:-3])
                     self.Bind(wx.EVT_MENU,self.EditLoadedFunctionFiles,CheckFunction)
         self.EditLoadedFunctionFiles()
@@ -338,7 +331,7 @@ class MacroQueue(MyFrame):
             SkipMacro = False
             for function in Macro:
                 functionname = function[0]
-                if not functionname in FunctionList:
+                if functionname not in FunctionList:
                     SkipMacro = True
                     break
             if not SkipMacro:
@@ -497,10 +490,7 @@ class MacroQueue(MyFrame):
                 self.Cancel()
             else:
                 for Function,RemovePanel,Text in self.TheQueue:
-                    try:
-                        RemovePanel.Destroy()
-                    except:
-                        pass
+                    RemovePanel.Destroy()
                 self.TheQueue = []
             self.m_QueueWindow.FitInside()
     def Pause(self, event=None):
@@ -545,7 +535,7 @@ class MacroQueue(MyFrame):
             ExpandedInputSpace = {}
             for key, Parameter in Parameters.items():
                 value = Parameter['Value']
-                if type(value) != list:
+                if not isinstance(value,list):
                     value = [value]
                 #pair each input...
                 ListLength = len(value)
@@ -781,7 +771,7 @@ class MacroQueue(MyFrame):
             data.SetText(f"{Index}")
             dropSource = wx.DropSource(ThisPanel)
             dropSource.SetData(data)
-            result = dropSource.DoDragDrop()
+            dropSource.DoDragDrop()
     def AddConnectToQueue(self, event=None):
         Initialize = [['Initialize',{},True]]
         if not self.test:
@@ -933,7 +923,7 @@ def Set_Setpoint(Setpoint=100):
         return
     def OpenSourceFolder(self, event):
         if getattr(sys, 'frozen', False):
-            MyMessage = wx.MessageDialog(self,message=f"This will take you to the software source files for the MacroQueue.exe on this computer.  Any changes will be forgotten when the EXE file is remade or updated.\nWould you like to continue?.",caption="Warning - Exe Source Files",style=wx.YES_NO)
+            MyMessage = wx.MessageDialog(self,message="This will take you to the software source files for the MacroQueue.exe on this computer.  Any changes will be forgotten when the EXE file is remade or updated.\nWould you like to continue?.",caption="Warning - Exe Source Files",style=wx.YES_NO)
             YesOrNo = MyMessage.ShowModal()
             if YesOrNo == wx.ID_NO:
                 return
@@ -946,12 +936,12 @@ def Set_Setpoint(Setpoint=100):
         return
     def MakeExe(self,event):
         if getattr(sys, 'frozen', True):
-            MyMessage = wx.MessageDialog(self,message=f"This will package MacroQueue into an executable.  It will take a few minutes.\nWould you like to continue?.",caption="Create Exe",style=wx.YES_NO)
+            MyMessage = wx.MessageDialog(self,message="This will package MacroQueue into an executable.  It will take a few minutes.\nWould you like to continue?.",caption="Create Exe",style=wx.YES_NO)
             YesOrNo = MyMessage.ShowModal()
             if YesOrNo == wx.ID_YES:
                 try:
                     shutil.rmtree(f"{os.path.dirname(__file__)}\\dist\\")
-                except:
+                except Exception:
                     pass
 
                 PyInstall(['--onedir','--noconsole',f'--distpath={os.path.abspath(os.path.dirname(__file__))}\\dist',f'--icon={os.path.abspath("MacroQueueIcon.ico")}',f'--add-data={os.path.abspath("MacroQueueIcon.ico")};.',f'--add-data={os.path.abspath(f"{os.path.dirname(__file__)}/Bitmaps")}/*.bmp;Bitmaps','--exclude-module=Functions',f'--add-data={os.path.abspath(f"{os.path.dirname(__file__)}/Functions")}/*.py;Functions',f'--add-data={os.path.abspath(f"{os.path.dirname(__file__)}/Macros")}/*.json;Macros',f'{os.path.abspath("MacroQueue.py")}'])
@@ -960,7 +950,7 @@ def Set_Setpoint(Setpoint=100):
                     shutil.rmtree(f"{os.path.abspath(os.path.dirname(__file__))}\\__pycache__\\")
                     shutil.rmtree(f"{os.path.abspath(os.path.dirname(__file__))}\\build\\")
                     os.remove("MacroQueue.spec")
-                except:
+                except FileNotFoundError:
                     pass
                 shutil.move(f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\_internal\\Macros",f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\")
                 shutil.move(f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\_internal\\Functions",f"{os.path.abspath(os.path.dirname(__file__))}\\dist\\MacroQueue\\")
@@ -969,7 +959,7 @@ def Set_Setpoint(Setpoint=100):
                 os.startfile(os.path.abspath(f"{os.path.dirname(__file__)}\\dist\\MacroQueue\\"))
                 pass
         else:
-            MyMessage = wx.MessageDialog(self,message=f"MacroQueue is already an executable.",caption="Create Exe",style=wx.OK_DEFAULT)
+            MyMessage = wx.MessageDialog(self,message="MacroQueue is already an executable.",caption="Create Exe",style=wx.OK_DEFAULT)
 
     
 
@@ -1046,7 +1036,7 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                 Functions[FunctionFile] = self.Functions[FunctionFile]
             FunctionDict = {Name.replace("_"," "):Function for Name,Function in FunctionList}
             Functions[Software].OutgoingQueue = OutgoingQueue
-            if not FunctionsToLoad is None:
+            if FunctionsToLoad is not None:
                 for FunctionFile in FunctionsToLoad:
                     Functions[FunctionFile].MacroQueueSelf = self
                     Functions[FunctionFile].OutgoingQueue = OutgoingQueue
@@ -1057,8 +1047,8 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                     if "OnClose" in ClosingFunctionDict.keys():
                         # Runs the OnClose functions for the given softwares
                         ClosingFunctionDict["OnClose"]()
-                except:
-                    pass
+                except Exception as e:
+                    OutgoingQueue.put(("ExceptionThrown",[e,"OnClose"]))
             if self.Closing:
                 # Breaks out of the while loop which finishes/closes this thread
                 break
@@ -1067,10 +1057,7 @@ def Thread(self,IncomingQueue,OutgoingQueue):
             Name = None
             try:
                 Macro = Message[1]
-                try:
-                    Functions[Software].CurrentMacro = Macro
-                except:
-                    pass
+                Functions[Software].CurrentMacro = Macro
                 for ThisFunction,Included in Macro:
                     # Runs each function
                     if Included:
@@ -1083,23 +1070,17 @@ def Thread(self,IncomingQueue,OutgoingQueue):
                             Function(**Parameters)
                 OutgoingQueue.put(("FunctionFinished",None))
                 
-                try:
-                    Functions[Software].Cancel = False
-                    for FunctionFile in FunctionsToLoad:
-                        Functions[FunctionFile].Cancel = False
-                except:
-                    pass
-                OutgoingQueue.put(("SetStatus",(f"",1)))
+
+                Functions[Software].Cancel = False
+                for FunctionFile in FunctionsToLoad:
+                    Functions[FunctionFile].Cancel = False
+                OutgoingQueue.put(("SetStatus",("",1)))
 
 
             except Exception as e:
                 OutgoingQueue.put(("ExceptionThrown",[e,Name]))
 
 
-import importlib.util
-import sys
-from pathlib import Path
-from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:

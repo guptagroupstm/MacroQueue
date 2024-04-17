@@ -1,8 +1,8 @@
 
-from MacroQueue.Dialogs import MyMacroDialog as MacroDialog
-from MacroQueue.Dialogs import MyMacroSettingsDialog as MacroSettingsDialog
-from MacroQueue.Dialogs import MyStartMacroDialog as StartMacroDialog
-from MacroQueue.Dialogs import MyChooseSoftwareDialog as ChooseSoftwareDialog
+from MacroQueue.Dialogs import MyMacroDialog
+from MacroQueue.Dialogs import MyMacroSettingsDialog
+from MacroQueue.Dialogs import MyStartMacroDialog
+from MacroQueue.Dialogs import MyChooseSoftwareDialog
 from MacroQueue.GUIDesign import MyFrame
 from MacroQueue.GUIDesign import MacroDialog
 from MacroQueue.GUIDesign import MacroSettingsDialog

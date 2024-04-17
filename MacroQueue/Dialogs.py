@@ -1,4 +1,4 @@
-from numpy import array, floor, log10
+from numpy import floor, log10
 import wx
 from inspect import getmembers, isfunction,getcomments
 import inspect
@@ -162,9 +162,9 @@ class MyMacroDialog ( MacroDialog ):
                 else:
                     return "String"
             try:
-                FloatValue = float(Value)
+                float(Value)
                 return "Numerical"
-            except:
+            except (ValueError,TypeError):
                 raise TypeError(f'The default variable, {Value}, cannot be put into one of the type categories.  It is of type {ValueType}.')
             
         self.FunctionInfoList = {}
@@ -212,9 +212,9 @@ class MyMacroDialog ( MacroDialog ):
                                     Parameters[parameter] = {**Parameters[parameter],**ParameterDict}
                                     if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
                                         Parameters[parameter]['Tooltip'] += f"\nAcceptable range: ({ParameterDict['Min']},{ParameterDict['Max']})"
-                                    if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
+                                    if "Max" in ParameterDict.keys() and "Min" not in ParameterDict.keys():
                                         Parameters[parameter]['Tooltip'] += f"\nMaximum value: {ParameterDict['Max']}"
-                                    if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                    if "Max" not in ParameterDict.keys() and "Min" in ParameterDict.keys():
                                         Parameters[parameter]['Tooltip'] += f"\nMinimum value: {ParameterDict['Min']}"
                             else:
                                 for parameter in Parameters.keys():
@@ -550,7 +550,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
         self.UpdateTheMacro()
         MacroName = self.m_MacroTextCtrl.GetValue()
         if len(MacroName) == 0:
-            MyMessage = wx.MessageDialog(self,message=f"Macro Name cannot be empty.",caption="Warning - Invalid Macro Name")
+            MyMessage = wx.MessageDialog(self,message="Macro Name cannot be empty.",caption="Warning - Invalid Macro Name")
             MyMessage.ShowModal()
         else:
             def WriteFile(AllTheMacros):
@@ -625,9 +625,9 @@ class MyStartMacroDialog(StartMacroDialog):
                 else:
                     return "String"
             try:
-                FloatValue = float(Value)
+                float(Value)
                 return "Numerical"
-            except:
+            except (ValueError,TypeError):
                 raise TypeError(f'The default variable, {Value}, cannot be put into one of the type categories.  It is of type {ValueType}.')
         self.TheFunctionInfos = {}
         FunctionList = GetFunctionList(self.Parent.Functions[self.Parent.Software])
@@ -648,9 +648,9 @@ class MyStartMacroDialog(StartMacroDialog):
                             Parameters[parameter] = {**Parameters[parameter],**ParameterDict}
                             if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
                                 Parameters[parameter]['Tooltip'] += f"\nAcceptable range: ({ParameterDict['Min']},{ParameterDict['Max']})"
-                            if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
+                            if "Max" in ParameterDict.keys() and "Min" not in ParameterDict.keys():
                                 Parameters[parameter]['Tooltip'] += f"\nMaximum value: {ParameterDict['Max']}"
-                            if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                            if "Max" not in ParameterDict.keys() and "Min" in ParameterDict.keys():
                                 Parameters[parameter]['Tooltip'] += f"\nMinimum value: {ParameterDict['Min']}"
                     else:
                         for parameter in Parameters.keys():
@@ -850,7 +850,7 @@ class MyStartMacroDialog(StartMacroDialog):
                                 ThisTextCtrl.SetValue(NewText)
                             else:
                                 ThisPanel = event.GetEventObject().GetParent()
-                                OldToolTip = ThisTextCtrl.GetToolTip().GetTip()
+                                
                                 FirstLine = ParameterDict['Tooltip']
                                 FirstLine += "\n"
                                 TranslatedText,Numbers, NCalls = self.TranslateNumerical(Text,DefaultValue)
@@ -864,9 +864,9 @@ class MyStartMacroDialog(StartMacroDialog):
                                         ThisTextCtrl.SetBackgroundColour(wx.Colour("Yellow"))
                                 if "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
                                     AcceptableNumber(ParameterDict['Max'] >= MaxNumber and ParameterDict['Min'] <= MinNumber)
-                                if "Max" in ParameterDict.keys() and not "Min" in ParameterDict.keys():
+                                if "Max" in ParameterDict.keys() and "Min" not in ParameterDict.keys():
                                     AcceptableNumber(ParameterDict['Max'] >= MaxNumber)
-                                if not "Max" in ParameterDict.keys() and "Min" in ParameterDict.keys():
+                                if "Max" not in ParameterDict.keys() and "Min" in ParameterDict.keys():
                                     AcceptableNumber(ParameterDict['Min'] <= MinNumber)
                                 wx.Window.Refresh(ThisTextCtrl)
                                 ThisFunction['Parameters'][ParameterName]['Value'] = Numbers
@@ -968,9 +968,9 @@ class MyStartMacroDialog(StartMacroDialog):
                             ParameterValueText.Bind( wx.EVT_CHOICE, ThisUpdateParameters)
                         elif ParameterInfo['ValueType'] == 'Boolean':
                             ParameterValueText = wx.CheckBox( ParameterPanel, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, 0 )
-                            if type(ParameterInfo['DefaultValue']) == bool:
+                            if isinstance(ParameterInfo['DefaultValue'],bool):
                                 ParameterValueText.SetValue(ParameterInfo['DefaultValue'])
-                            elif type(ParameterInfo['DefaultValue']) == str:
+                            elif isinstance(ParameterInfo['DefaultValue'],str):
                                 ParameterValueText.SetValue(ParameterInfo['DefaultValue'] == 'True')
                             ThisUpdateParameters = partial(UpdateParameters,Name,Function,ParameterName,m_FunctionTextCheck)
                             ParameterValueText.Bind( wx.EVT_CHECKBOX, ThisUpdateParameters)
@@ -1040,9 +1040,9 @@ class MyStartMacroDialog(StartMacroDialog):
         def CleanNumber(String):
             String = ScrubNumber(String)
             try:
-                a = float(String)
+                float(String)
                 return String
-            except:
+            except (ValueError, TypeError):
                 return None
         OldString = ScrubNumber(OldString)
         while OldString is None or len(OldString) == 0:

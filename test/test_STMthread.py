@@ -5,7 +5,7 @@ import sys
 import os
 application_path = os.path.dirname(__file__)
 sys.path.append(os.path.realpath(application_path+'\\..\\MacroQueue\\'))
-from MacroQueue import *
+from MacroQueue import MacroQueue
 
 
 class STMThread_test(unittest.TestCase):

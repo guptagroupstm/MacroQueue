@@ -1,5 +1,4 @@
 import SXMRemote
-import numpy as np
 import time
 import os
 
@@ -33,8 +32,8 @@ def Set_Setpoint(Setpoint=100):
 # YOffset=nm;The Y center of the image in nm
 def Set_Scan_Window_Position(XOffset=0,YOffset=0):
     #no case sensitivity (can use x and Y: let's use X and Y to stay consistent)
-    MySXM.SendWait(f"ScanPara('X',{XOffset});");
-    MySXM.SendWait(f"ScanPara('Y',{YOffset});");
+    MySXM.SendWait(f"ScanPara('X',{XOffset});")
+    MySXM.SendWait(f"ScanPara('Y',{YOffset});")
     time.sleep(0.1)
     
 # ImageSize=nm;The length of a row and column in nm
@@ -82,7 +81,7 @@ def Scan(FolderPath="C:\\Users\\Supervisor\\Desktop\\Data"):
     time.sleep(1)
 
     MySXM.SendWait("ScanPara('Scan',1);") #<>0 = start
-    OutgoingQueue.put(("SetStatus",(f"The scan has started",2)))  
+    OutgoingQueue.put(("SetStatus",("The scan has started",2)))  
     time.sleep(1)
 
     # NFiles = len(os.listdir(FolderPath))
@@ -133,7 +132,7 @@ def Set_Spectra_Delay(Delay1=100):
     time.sleep(0.1)
     
 # AquT=ms;The time for one data point
-def Set_Spectra_Delay(AquT=50):
+def Set_Spectra_Datapoint_time(AquT=50):
     MySXM.SendWait("SpectPara(4, "+str(AquT)+");") 
     time.sleep(0.1)
 
@@ -169,7 +168,7 @@ def Start_Spectra(FolderPath="C:\\Users\\Supervisor\\Desktop\\Data"):
     time.sleep(0.1)
     MySXM.SendWait("SpectStart;")
     time.sleep(0.1)
-    OutgoingQueue.put(("SetStatus",(f"The Spectrum has started",2)))  
+    OutgoingQueue.put(("SetStatus",("The Spectrum has started",2)))  
     time.sleep(1)
 
     NFiles = 0

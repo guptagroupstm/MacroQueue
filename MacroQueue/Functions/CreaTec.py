@@ -2,11 +2,7 @@ import numpy as np
 import time
 import win32com.client
 from time import time as timer
-import pyvisa
 import pythoncom
-import os
-import pandas as pd
-from datetime import datetime
 
 CurrentMacro = None
 OutgoingQueue = None
@@ -358,7 +354,7 @@ def Scan():
         # If the user cancelled the macro, stop the scan.
         STM.setp('STMAFM.BTN.STOP',"")
         time.sleep(0.1)
-        OutgoingQueue.put(("SetStatus",(f"",2)))
+        OutgoingQueue.put(("SetStatus",("",2)))
         while Status != 0:
             Status = STM.getp('STMAFM.SCANSTATUS','')
     else:

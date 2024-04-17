@@ -22,22 +22,22 @@ def Turn_On_RF_Generator():
         Connect_To_RF_Generator()
     else:
         try:
-            Stat = RFGenerator.query('OUTP:STAT?')
-        except:
+            RFGenerator.query('OUTP:STAT?')
+        except Exception:
             Connect_To_RF_Generator()
             RFGenerator=None
     RFGenerator.write(f'OUTP:STAT {1}')
     RFOn = True
-    FreqMode = RFGenerator.query(f'SOUR:FREQ:MODE?')
-    PowMode = RFGenerator.query(f'SOUR:POW:MODE?')
+    FreqMode = RFGenerator.query('SOUR:FREQ:MODE?')
+    PowMode = RFGenerator.query('SOUR:POW:MODE?')
     print(FreqMode,PowMode)
     if FreqMode =="CW":
-        Freq = float(RFGenerator.query(f'SOUR:FREQ?'))
+        Freq = float(RFGenerator.query('SOUR:FREQ?'))
         Edit_Memo_Line("RF_Freq",Freq)
     else:
         Edit_Memo_Line("RF_Freq",FreqMode)
     if PowMode =="CW":
-        Power = float(RFGenerator.query(f'SOUR:POW?'))
+        Power = float(RFGenerator.query('SOUR:POW?'))
         Edit_Memo_Line("RF_Power",Power)
     else:
         Edit_Memo_Line("RF_Power",PowMode)
@@ -64,7 +64,8 @@ def Turn_Off_RF_Generator():
 
 # {"Name":"Amplitude","Units":"mV","Min":10,"Max":7080,"Tooltip":"The amplitude for the RF generator in mV in continuous wave mode"}
 def Set_RF_Amplitude(Amplitude=10):
-    mVoltageToPower = lambda mV: 20*np.log10(mV / (1000 * (2**0.5 * (50/1000)**(0.5))))
+    def mVoltageToPower(mV): 
+        return 20*np.log10(mV / (1000 * (2**0.5 * (50/1000)**(0.5))))
     Set_RF_Power(mVoltageToPower(Amplitude))
 
 # {"Name":"Power","Units":"dBm","Min":-30,"Max":27,"Tooltip":"The amount of power for the RF generator in dBm in continuous wave mode"}
@@ -99,9 +100,9 @@ def Set_RF_Power_Mode(Mode=["CW","LIST","SWE"]):
     RFGenerator.write(f'SOUR:POW:MODE {Mode}')
     
     if Mode == "SWE":
-        Start = RFGenerator.query(f'SOUR:SWE:STAR?')
-        Stop = RFGenerator.query(f'SOUR:SWE:STOP?')
-        N_Datapoints = RFGenerator.query(f'SOUR:SWE:POIN?')
+        Start = RFGenerator.query('SOUR:SWE:STAR?')
+        Stop = RFGenerator.query('SOUR:SWE:STOP?')
+        N_Datapoints = RFGenerator.query('SOUR:SWE:POIN?')
         Edit_Memo_Line("SweepStart",f'{Start}')
         Edit_Memo_Line("SweepEnd",f'{Stop}')
         Edit_Memo_Line("SweepSteps",f'{N_Datapoints}')
@@ -117,7 +118,7 @@ def Set_RF_LIST_Count(count=1,Infinite = False):
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     if Infinite:
-        RFGenerator.write(f'SOUR:LIST:COUN INF') #Number of sweeps
+        RFGenerator.write('SOUR:LIST:COUN INF') #Number of sweeps
     else:
         RFGenerator.write(f'SOUR:LIST:COUN {count}') #Number of sweeps
 # {"Name":"count","Min":1,"Tooltip":"The number of sweeps to perform after a trigger"}
@@ -126,7 +127,7 @@ def Set_RF_SWE_Count(count=1,Infinite = False):
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     if Infinite:
-        RFGenerator.write(f'SOUR:SWE:COUN INF') #Number of sweeps
+        RFGenerator.write('SOUR:SWE:COUN INF') #Number of sweeps
     else:
         RFGenerator.write(f'SOUR:SWE:COUN {count}') #Number of sweeps
 
@@ -163,9 +164,9 @@ def Set_RF_SWE_Spacing(Spacing=["Linear","Log"]):
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     if Spacing == 'Linear':
-        RFGenerator.write(f'SOUR:SWE:SPAC LIN')
+        RFGenerator.write('SOUR:SWE:SPAC LIN')
     elif Spacing == 'Log':
-        RFGenerator.write(f'SOUR:SWE:SPAC LOG')
+        RFGenerator.write('SOUR:SWE:SPAC LOG')
 
 def Set_RF_SWE_Start(Start=1e8):
     global RFGenerator, RFOn
@@ -185,17 +186,17 @@ def Set_RF_SWE_Blanking(Blanking=False):
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     if Blanking:
-        RFGenerator.write(f'SOUR:SWE:BLAN 1')
+        RFGenerator.write('SOUR:SWE:BLAN 1')
     else:
-        RFGenerator.write(f'SOUR:SWE:BLAN 0')
+        RFGenerator.write('SOUR:SWE:BLAN 0')
 def Set_RF_LIST_Blanking(Blanking=False):
     global RFGenerator, RFOn
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     if Blanking:
-        RFGenerator.write(f'SOUR:LIST:BLAN 1')
+        RFGenerator.write('SOUR:LIST:BLAN 1')
     else:
-        RFGenerator.write(f'SOUR:LIST:BLAN 0')
+        RFGenerator.write('SOUR:LIST:BLAN 0')
 
 
 
@@ -204,8 +205,8 @@ def Set_RF_Trig_Sour(Trig=["EXT","IMM","KEY","BUS"]):
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     RFGenerator.write(f'TRIG:SOUR {Trig}')
-    RFGenerator.write(f'TRIG:TYPE NORM')
-    RFGenerator.write(f"INIT:CONT 1")
+    RFGenerator.write('TRIG:TYPE NORM')
+    RFGenerator.write("INIT:CONT 1")
 
 def Set_RF_Trig_Dir(Dir=["POS","NEG"]):
     global RFGenerator, RFOn

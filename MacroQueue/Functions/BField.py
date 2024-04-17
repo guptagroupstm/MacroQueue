@@ -38,10 +38,12 @@ def OnClose():
 
 # {"Name":"B","Units":"T","Min":-1,"Max":1,"Tooltip":"The magnetic field strength in T"}
 def Set_B_Field(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
+    STM = None
     try:
         STM = MacroQueueSelf.Functions[MacroQueueSelf.Software].STM
-    except:
-        STM = None
+    finally:
+        pass
+        
     if B < -1 or B > 1:
         raise Exception(f"Bfield, {B}, out of range. Must be between -1 and 1 T.")
     # Kepco BOP 400W bipolar power supply
@@ -55,13 +57,13 @@ def Set_B_Field(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
     if BFieldPowerControl is not None:
         try:
             CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
-        except:
+        except Exception:
             BFieldPowerControl=None
 
     if BFieldPowerControl is None:
         Connect_To_Power_Supply()
 
-    if eval(BFieldPowerControl.query('OUTPUT?'))==False:
+    if not eval(BFieldPowerControl.query('OUTPUT?')):
         BFieldPowerControl.write('FUNC:MODE VOLT')
         BFieldPowerControl.write('VOLT 0')
         BFieldPowerControl.write('CURR 10.1')
@@ -90,7 +92,7 @@ def Set_B_Field(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
         StartTime = timer()
         time.sleep(0.01)
         CurrentCurrent = float(BFieldPowerControl.query('MEAS:CURR?'))
-        MeasuredVoltage = float(BFieldPowerControl.query('MEAS:VOLT?'))
+        float(BFieldPowerControl.query('MEAS:VOLT?'))
         BField = CurrentCurrent/10
         if STM is not None:
             STM.setp('VERTMAN.MARKER',f'{BField}')
@@ -100,9 +102,9 @@ def Set_B_Field(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
         OutgoingQueue.put(("SetStatus",(f"Ramp {round(Percent,1)}% Complete",2)))
 
     if Cancel:
-        OutgoingQueue.put(("SetStatus",(f"",2)))
+        OutgoingQueue.put(("SetStatus",("",2)))
     else:
-        OutgoingQueue.put(("SetStatus",(f"Ramp 100% Complete",2)))
+        OutgoingQueue.put(("SetStatus",("Ramp 100% Complete",2)))
     Log_BField(LogPath)
     if STM is not None:
         Edit_Memo_Line("B",round(BField,2))
@@ -112,7 +114,7 @@ def Set_B_Field(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
 def Turn_B_Field_Off(LogPath='D:\\LabData\\BFieldLoop.csv'):
     try:
         STM = MacroQueueSelf.Functions[MacroQueueSelf.Software].STM
-    except:
+    except Exception:
         STM = None
     Set_B_Field(0,LogPath)
     global BField, BFieldPowerControl
@@ -121,68 +123,6 @@ def Turn_B_Field_Off(LogPath='D:\\LabData\\BFieldLoop.csv'):
     if STM is not None:
         Edit_Memo_Line("B",0)
 
-# BField_End=T;The final magnetic field strength
-# N_Datapoints=The number of datapoints in a single direction of the spectrum
-# Backwards=Scan the BField back to it's inital value.
-# N_Repeat=The number of times the spectrum will repeat.  Only if Backwards is checked.  Must be an integer.
-def BField_Spectrum(BField_End=-1, N_Datapoints=1024, Backwards=True,N_Repeat=0):    
-    global BField
-    if BField is not None:
-        StartingBField =  BField
-        Time_Single_Direction = np.abs(BField_End-StartingBField)*1020/1 # Changing 1 T takes 17 minutes (1020 seconds)
-    else:
-        StartingBField =  0
-        Time_Single_Direction = np.abs(BField_End)*1020/1 # Changing 1 T takes 17 minutes (1020 seconds)
-
-    TotalSpectrumTime = Time_Single_Direction
-    TotalN_Datapoints = N_Datapoints
-    N_Repeat = int(np.floor(N_Repeat))
-    if Backwards:
-        TotalSpectrumTime*=2
-        TotalSpectrumTime+=TotalSpectrumTime*N_Repeat
-
-        TotalN_Datapoints*=2
-        TotalN_Datapoints+=TotalN_Datapoints*N_Repeat
-
-    OriginalSpectraTable = STM.getp('VERTMAN.IVTABLE','')    
-    SpecListGrid = list(map(list,OriginalSpectraTable))
-    TableLength = len(SpecListGrid[0])
-    for i in range(5):
-        SpecListGrid[i] = [0 for j in range(TableLength)]
-    SpecListGrid[0][1] = TotalN_Datapoints
-    NewSpecGrid = tuple(map(tuple,SpecListGrid))
-    STM.setp('VERTMAN.IVTABLE',NewSpecGrid)    
-    OriginalLength = STM.getp('VERTMAN.SPECLENGTH.SEC','')
-    STM.setp('VERTMAN.SPECLENGTH.SEC',TotalSpectrumTime)
-    OriginalVFBMode = STM.getp('VERTMAN.VFB_MODE','')
-    STM.setp('VERTMAN.VFB_MODE',"z(V)")
-    OriginalVFBCurrent = STM.getp('VERTMAN.VFB_CURRENT.NAMP' ,'')
-    Setpoint = float(STM.getp('SCAN.SETPOINT.AMPERE',''))
-    STM.setp('VERTMAN.VFB_CURRENT.NAMP',Setpoint*1e9)
- 
-
-    OriginalChannels = STM.getp('VERTMAN.CHANNELS','')
-    NewChannels = [channel for channel in OriginalChannels] + ['Lock-in X','Marker']
-    STM.setp('VERTMAN.CHANNELS',NewChannels)
-
-
-    Pixels = float(STM.getp('SCAN.IMAGESIZE.PIXEL.X',''))
-    STM.btn_vertspec(int(Pixels//2)+1,0)
-
-    memo = f'BField Spectrum from {StartingBField} T to {BField_End} T'
-    STM.setp('MEMO.SET', memo)
-    Set_B_Field(BField_End)
-    if Backwards:
-        Set_B_Field(StartingBField)
-        for i in range(N_Repeat):
-            Set_B_Field(BField_End)
-            Set_B_Field(StartingBField)
-
-    STM.setp('VERTMAN.IVTABLE',OriginalSpectraTable)    
-    STM.setp('VERTMAN.CHANNELS',OriginalChannels)
-    STM.setp('VERTMAN.SPECLENGTH.SEC',OriginalLength)
-    STM.setp('VERTMAN.VFB_MODE',OriginalVFBMode)
-    STM.setp('VERTMAN.VFB_CURRENT.NAMP',OriginalVFBCurrent)
 
 
 
@@ -195,7 +135,7 @@ ZZero = None
 def Set_B_Field_Keep_Tip_Away(B=1,LogPath='D:\\LabData\\BFieldLoop.csv'):
     try:
         STM = MacroQueueSelf.Functions[MacroQueueSelf.Software].STM
-    except:
+    except Exception:
         STM = None
     global BField, BFieldPowerControl, Ramping, ZZero
     if BField is None:
@@ -275,7 +215,7 @@ def BField_Spectrum(BField_End=-1, Backwards=True,N_Repeat=0):
     global BField, Ramping
     try:
         STM = MacroQueueSelf.Functions[MacroQueueSelf.Software].STM
-    except:
+    except Exception:
         STM = None
         
     if BField is not None:
@@ -292,7 +232,7 @@ def BField_Spectrum(BField_End=-1, Backwards=True,N_Repeat=0):
         TotalSpectrumTime+=TotalSpectrumTime*N_Repeat
 
 
-    OriginalLength = STM.getp('VERTMAN.SPECLENGTH.SEC','')
+    STM.getp('VERTMAN.SPECLENGTH.SEC','')
     STM.setp('VERTMAN.SPECLENGTH.SEC',TotalSpectrumTime)
  
 
@@ -302,7 +242,7 @@ def BField_Spectrum(BField_End=-1, Backwards=True,N_Repeat=0):
 
     Ramping = True
 
-    Edit_Memo_Line("B",f'Ramping')
+    Edit_Memo_Line("B",'Ramping')
 
 
     ImageSize = float(STM.getp('SCAN.IMAGESIZE.NM.X',""))
