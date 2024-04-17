@@ -8,7 +8,7 @@ from MacroQueue import MacroQueue
 
 class MainFrame_test(unittest.TestCase):
     def test_GUI(self):
-        wx.App() 
+        app = wx.App() 
         MyMainFrame = MacroQueue(test=True)
         MyMainFrame.CheckQueue(event=None)
         MyMainFrame.IdleLoop(event=None)
