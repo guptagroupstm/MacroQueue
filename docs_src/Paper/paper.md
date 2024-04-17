@@ -13,7 +13,7 @@ authors:
     corresponding: true 
     affiliation: 1
 affiliations:
- - name: The Ohio State University, USA
+ - name: The Ohio State University, United States of America
    index: 1
 date: 21 Feburary 2024
 bibliography: paper.bib
