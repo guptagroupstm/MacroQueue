@@ -7,7 +7,7 @@ MacroQueue's Documentation
 ======================================
 
 
-Scanning Probe Microscopy operators often use several different instruments for a single measurement; such as, an external lock-in amplifer, an electromagnet, a RF generator, etc..  Often, these intruments have to be manually controlled and then their parameters have to be manually recorded.  MacroQueue is a modular software designed for controlling and automating SPM systems and various other laboratory equipment in sync.  It provides a single GUI to control the 3 major commerical SPMs, CreaTec, RHK, and Scienta Omicron in combination with any other instruments that are a part of the systems.  
+Laboratory measurements for systems with high-dimensional parameter spaces often require several different instruments for a single measurement; such as, an external lock-in amplifer, an electromagnet, a RF generator, etc..  Often, these intruments have to be manually controlled and then their parameters have to be manually recorded.  MacroQueue is a modular software designed for controlling and automating various laboratory instruments in sync.
 
 
 Users can easily add python functions to control new and existing equipment.  Although any arbitary python function can be added, the base functions were created with the functional programming paradigm in mind, so the functions are small and each perform a single task.  For example, the function "Set RF Frequency", changes the frequency on the RF generator and records the new value.  This allows the functions to be reused for many types of measurements.
