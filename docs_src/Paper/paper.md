@@ -1,5 +1,5 @@
 ---
-title: 'MacroQueue: Automating Scanning Probe Microscopy'
+title: 'MacroQueue: Automating Measurements in High-Dimensional Parameter Spaces'
 tags:
   - Python
   - Scanning Probe Microscopy
