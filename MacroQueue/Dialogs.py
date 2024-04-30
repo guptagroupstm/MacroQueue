@@ -1153,7 +1153,7 @@ class MyStartMacroDialog(StartMacroDialog):
 
 class MyChooseSoftwareDialog(wx.Dialog):
     def __init__(self, parent,FunctionsToLoad=None):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Choose the STM Software", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Choose your System", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
 
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
         self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
@@ -1162,7 +1162,7 @@ class MyChooseSoftwareDialog(wx.Dialog):
         fgSizer12.SetFlexibleDirection( wx.BOTH )
         fgSizer12.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-        self.m_ChooseSoftwareText = wx.StaticText( self, wx.ID_ANY, u"Please select the STM Software you wish to use", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_ChooseSoftwareText = wx.StaticText( self, wx.ID_ANY, u"Please select the System you wish to use", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_ChooseSoftwareText.Wrap( -1 )
 
         fgSizer12.Add( self.m_ChooseSoftwareText, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )

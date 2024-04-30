@@ -1,7 +1,7 @@
 Changing Instruments
 ==================================================
 
-When lauching MacroQueue for the first time, you will be asked what STM software you will be using:
+When lauching MacroQueue for the first time, you will be asked what system you will be using:
 
 .. image:: ./Change1.png
     :width: 250
