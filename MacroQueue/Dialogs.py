@@ -1162,7 +1162,7 @@ class MyChooseSoftwareDialog(wx.Dialog):
         fgSizer12.SetFlexibleDirection( wx.BOTH )
         fgSizer12.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-        self.m_ChooseSoftwareText = wx.StaticText( self, wx.ID_ANY, u"Please select the System you wish to use", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_ChooseSoftwareText = wx.StaticText( self, wx.ID_ANY, u"Please select the system you wish to use", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_ChooseSoftwareText.Wrap( -1 )
 
         fgSizer12.Add( self.m_ChooseSoftwareText, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
