@@ -1,5 +1,11 @@
 *.csv
 *.exe
+*/CreaTec.py
+*/RF.py
+*/RHK.py
+*/BField.py
+*/SXM.py
+*/SXMRemote.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

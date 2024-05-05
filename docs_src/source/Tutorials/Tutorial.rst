@@ -10,6 +10,14 @@ Basic: Required for all users
    AddToQueue
    Expanding/Expanding
 
+Intermediate: Required for the inital set-up
+----------------------------------------------
+.. toctree::
+   :maxdepth: 1
+
+   SystemChange   
+   WriteFunction
+
 
 Advanced: Read if it is needed
 ----------------------------------
@@ -18,10 +26,8 @@ Advanced: Read if it is needed
 
    LogParameters
    DefineMacro/DefineMacro
-   WriteFunction
    SpecialFunctions
    ErrorHandling
-   SystemChange   
    test
 
 

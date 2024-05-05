@@ -1,4 +1,4 @@
-Changing Instruments
+Changing Systems & Adding a new one
 ==================================================
 
 When lauching MacroQueue for the first time, you will be asked what system you will be using:
