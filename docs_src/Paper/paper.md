@@ -21,7 +21,7 @@ bibliography: paper.bib
 
 # Summary
 
-Laboratory measurements often use several instruments to fully explore the relavent parameter space; such as, an external lock-in amplifer, an electromagnet, a RF generator, etc..  Ordinarily, these intruments have to be individually controlled and their parameters have to be manually recorded.  MacroQueue enables effortless measurements throughout these high-dimensional parameter space systems.  MacroQueue is a modular software designed for controlling and automating various laboratory equipment in sync without requiring significant coding ability.  It can be extended to automate any system that can be controlled via Python.
+Laboratory measurements often use several instruments to fully explore the relavent parameter space; such as, an external lock-in amplifier, an electromagnet, a RF generator, etc..  Ordinarily, these instruments have to be individually controlled and their parameters have to be manually recorded.  MacroQueue enables effortless measurements throughout these high-dimensional parameter space systems.  MacroQueue is a modular software designed for controlling and automating various laboratory equipment in sync without requiring significant coding ability.  It can be extended to automate any system that can be controlled via Python.
 
 
 Users can easily add python functions to control new and existing auxiliary equipment, in addition to new and existing systems, as long as they can be controlled via python.  Although any arbitary python function can be added, it is preferable that functions are written with the functional programming paradigm in mind, so they are small and each perform a single task.  This allows the functions to be reused for many types of measurements.

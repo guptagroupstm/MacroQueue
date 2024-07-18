@@ -48,7 +48,7 @@ IconFileName = "MacroQueueIcon.ico"
 
 VersionNumber = "v0.4.0"
 # VersionNumber also in conf.py & setup.py
-Date = "4/2024"
+Date = "7/2024"
 
 
 class MacroQueue(MyFrame):
@@ -126,23 +126,27 @@ class MacroQueue(MyFrame):
 
         # Read the saved settings file here
         if os.path.exists(self.SavedSettingsFile) and not self.test:
-            SettingsSeries = pd.read_csv(self.SavedSettingsFile,names=['key','value'])
-            self.SettingsDict = SettingsSeries.set_index('key').T.iloc[0].to_dict()
-            if "Functions" in self.SettingsDict.keys():
-                self.FunctionsLoaded = [string.replace(" ", "").replace("'", "") for string in (self.SettingsDict["Functions"][1:-1].split(','))]
-            if "PauseAfterCancel" in self.SettingsDict.keys():
-                self.m_PauseAfterCancel.Check(self.SettingsDict['PauseAfterCancel'] != 'False')
-            if "LaunchWithConnect" in self.SettingsDict.keys():
-                self.m_LaunchWithConnect.Check(self.SettingsDict['LaunchWithConnect'] != 'False')
-            self.Software = self.SettingsDict["Software"]
-            ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
-            ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))
-            
-            for item in self.m_NotSTMMenu.GetMenuItems():
-                if item.GetItemLabel() in self.FunctionsLoaded:
-                    item.Check()
-                else:
-                    item.Check(False)
+            try:
+                SettingsSeries = pd.read_csv(self.SavedSettingsFile,names=['key','value'])
+                self.SettingsDict = SettingsSeries.set_index('key').T.iloc[0].to_dict()
+                if "Functions" in self.SettingsDict.keys():
+                    self.FunctionsLoaded = [string.replace(" ", "").replace("'", "") for string in (self.SettingsDict["Functions"][1:-1].split(','))]
+                if "PauseAfterCancel" in self.SettingsDict.keys():
+                    self.m_PauseAfterCancel.Check(self.SettingsDict['PauseAfterCancel'] != 'False')
+                if "LaunchWithConnect" in self.SettingsDict.keys():
+                    self.m_LaunchWithConnect.Check(self.SettingsDict['LaunchWithConnect'] != 'False')
+                self.Software = self.SettingsDict["Software"]
+                ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self,self.FunctionsLoaded)
+                ThisChooseSoftwareDialog.SetSoftware(self.Systems.index(self.Software))
+                
+                for item in self.m_NotSTMMenu.GetMenuItems():
+                    if item.GetItemLabel() in self.FunctionsLoaded:
+                        item.Check()
+                    else:
+                        item.Check(False)
+                except:
+                    ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
+                    ThisChooseSoftwareDialog.ShowModal()
         else:
             if not self.test:
                 ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
