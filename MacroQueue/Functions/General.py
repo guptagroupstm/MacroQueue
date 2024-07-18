@@ -1,7 +1,7 @@
 from time import sleep
 
-Systems =['Example','Testing']
-IgnoreFiles =[]
+Systems =['RHK','CreaTec','SXM',"Testing"]
+IgnoreFiles =["SXMRemote.py"]
 
 
 Cancel = False
