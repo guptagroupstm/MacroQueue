@@ -46,7 +46,7 @@ IconFileName = "MacroQueueIcon.ico"
 # TODO:
 # Show number of items in queue in status bar
 
-VersionNumber = "v0.4.0"
+VersionNumber = "v0.4.1"
 # VersionNumber also in conf.py & setup.py
 Date = "7/2024"
 
@@ -144,9 +144,9 @@ class MacroQueue(MyFrame):
                         item.Check()
                     else:
                         item.Check(False)
-                except:
-                    ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
-                    ThisChooseSoftwareDialog.ShowModal()
+            except:
+                ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
+                ThisChooseSoftwareDialog.ShowModal()
         else:
             if not self.test:
                 ThisChooseSoftwareDialog = MyChooseSoftwareDialog(self)
