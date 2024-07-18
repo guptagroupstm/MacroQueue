@@ -1,4 +1,5 @@
 pandas>=2.0.3
+importlib_metadata>=3.5.0
 wxPython>=4.2.1
 numpy>=1.24.4
 pyinstaller>=6.2.0
