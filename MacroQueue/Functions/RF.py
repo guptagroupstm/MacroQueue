@@ -6,7 +6,8 @@ CurrentMacro = None
 OutgoingQueue = None
 Cancel = False
 MacroQueueSelf = None
-
+RFOn=False
+RFGenerator=None
 def Connect_To_RF_Generator(RF_Name='USB0::0x03EB::0xAFFF::481-34B6D0608-2368::INSTR'):
     global RFGenerator
 
@@ -17,7 +18,7 @@ def Connect_To_RF_Generator(RF_Name='USB0::0x03EB::0xAFFF::481-34B6D0608-2368::I
     pass
 
 def Turn_On_RF_Generator():
-    global RFGenerator, RFOn
+    global RFGenerator, RFOn, OutgoingQueue
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     else:
@@ -25,22 +26,24 @@ def Turn_On_RF_Generator():
             Stat = RFGenerator.query('OUTP:STAT?')
         except:
             Connect_To_RF_Generator()
-            RFGenerator=None
+
     RFGenerator.write(f'OUTP:STAT {1}')
     RFOn = True
-    FreqMode = RFGenerator.query(f'SOUR:FREQ:MODE?')
-    PowMode = RFGenerator.query(f'SOUR:POW:MODE?')
-    print(FreqMode,PowMode)
-    if FreqMode =="CW":
-        Freq = float(RFGenerator.query(f'SOUR:FREQ?'))
-        Edit_Memo_Line("RF_Freq",Freq)
-    else:
-        Edit_Memo_Line("RF_Freq",FreqMode)
-    if PowMode =="CW":
-        Power = float(RFGenerator.query(f'SOUR:POW?'))
-        Edit_Memo_Line("RF_Power",Power)
-    else:
-        Edit_Memo_Line("RF_Power",PowMode)
+    try:
+        FreqMode = RFGenerator.query(f'SOUR:FREQ:MODE?')
+        PowMode = RFGenerator.query(f'SOUR:POW:MODE?')
+        if FreqMode =="FIX":
+            Freq = RFGenerator.query(f'SOUR:FREQ?')
+            Edit_Memo_Line("RF_Freq",Freq)
+        else:
+            Edit_Memo_Line("RF_Freq","Not_CW")
+        if PowMode =="FIX":
+            Power = RFGenerator.query(f'SOUR:POW?')
+            Edit_Memo_Line("RF_Power",Power)
+        else:
+            Edit_Memo_Line("RF_Power","Not_CW")
+    except:
+        print("Umm why tho")
 
 
 
@@ -74,7 +77,7 @@ def Set_RF_Power(Power=-10):
         Connect_To_RF_Generator()
     RFGenerator.write(f'SOUR:POW {Power}')
     if RFOn:
-        Edit_Memo_Line("Power",Power)
+        Edit_Memo_Line("RF_Power",Power)
 
 # {"Name":"Freq","Units":"Hz","Min":1e5,"Max":30e9,"Tooltip":"The RF frequency in Hz in continuous wave mode"}
 def Set_RF_Freq(Freq=1e9):
@@ -83,7 +86,7 @@ def Set_RF_Freq(Freq=1e9):
         Connect_To_RF_Generator()
     RFGenerator.write(f'SOUR:FREQ {Freq}')
     if RFOn:
-        Edit_Memo_Line("RF Freq",Freq)
+        Edit_Memo_Line("RF_Freq",Freq)
 
 
 def Set_RF_Freq_Mode(Mode=["CW","LIST","SWE"]):
@@ -102,9 +105,9 @@ def Set_RF_Power_Mode(Mode=["CW","LIST","SWE"]):
         Start = RFGenerator.query(f'SOUR:SWE:STAR?')
         Stop = RFGenerator.query(f'SOUR:SWE:STOP?')
         N_Datapoints = RFGenerator.query(f'SOUR:SWE:POIN?')
-        Edit_Memo_Line("SweepStart",f'{Start}')
-        Edit_Memo_Line("SweepEnd",f'{Stop}')
-        Edit_Memo_Line("SweepSteps",f'{N_Datapoints}')
+        Edit_Memo_Line("SweepStart",f'{float(Start)}')
+        Edit_Memo_Line("SweepEnd",f'{float(Stop)}')
+        Edit_Memo_Line("SweepSteps",f'{float(N_Datapoints)}')
 
 
 
@@ -144,7 +147,7 @@ def Set_RF_SWE_Points(points=3000):
     if RFGenerator is None: 
         Connect_To_RF_Generator()
     RFGenerator.write(f'SOUR:SWE:POIN {points}')
-    Edit_Memo_Line("SweepSteps",f'{points}')
+    Edit_Memo_Line("SweepSteps",f'{float(points)}')
 # {"Name":"dwell","Units":"s","Tooltip":"Dwell time on each point.  RF On time."}
 def Set_RF_SWE_Dwell(dwell=0.1):
     global RFGenerator, RFOn
@@ -167,18 +170,33 @@ def Set_RF_SWE_Spacing(Spacing=["Linear","Log"]):
     elif Spacing == 'Log':
         RFGenerator.write(f'SOUR:SWE:SPAC LOG')
 
-def Set_RF_SWE_Start(Start=1e8):
+def Set_RF_PowerSWE_Start(Start=1e8):
     global RFGenerator, RFOn
     if RFGenerator is None: 
         Connect_To_RF_Generator()
-    RFGenerator.write(f'SOUR:SWE:STAR {Start}')
-    Edit_Memo_Line("SweepStart",f'{Start}')
+    RFGenerator.write(f'SOUR:POW:STAR {Start}')
+    Edit_Memo_Line("SweepStart",f'{float(Start)}')
 
-def Set_RF_SWE_Stop(Stop=26e9):
+def Set_RF_PowerSWE_Stop(Stop=26e9):
     global RFGenerator, RFOn
     if RFGenerator is None: 
         Connect_To_RF_Generator()
-    RFGenerator.write(f'SOUR:SWE:STOP {Stop}')
+    RFGenerator.write(f'SOUR:POW:STOP {Stop}')
+    Edit_Memo_Line("SweepEnd",f'{float(Stop)}')
+
+def Set_RF_FREQSWE_Start(Start=1e8):
+    global RFGenerator, RFOn
+    if RFGenerator is None: 
+        Connect_To_RF_Generator()
+    RFGenerator.write(f'SOUR:FREQ:STAR {Start}')
+    Edit_Memo_Line("SweepStart",f'{float(Start)}')
+
+def Set_RF_FREQSWE_Stop(Stop=26e9):
+    global RFGenerator, RFOn
+    if RFGenerator is None: 
+        Connect_To_RF_Generator()
+    RFGenerator.write(f'SOUR:FREQ:STOP {Stop}')
+    Edit_Memo_Line("SweepEnd",f'{float(Stop)}')
 
 def Set_RF_SWE_Blanking(Blanking=False):
     global RFGenerator, RFOn
@@ -225,3 +243,15 @@ def RF_Write(Command="OUTP:STAT 0"):
     if RFGenerator is None: 
         Connect_To_RF_Generator()
         RFGenerator.write(Command)
+
+if __name__ == "__main__":
+    Connect_To_RF_Generator()
+    # Turn_On_RF_Generator()
+    # Turn_Off_RF_Generator()
+    # Set_RF_Freq_Mode(Mode="SWE")
+    # freqmode = RFGenerator.query(f'SOUR:FREQ:MODE?')
+    # print(freqmode )
+    # Set_RF_Trig_Type("NORM")
+    # Set_RF_Trig_Sour("EXT")
+    # FREQSTART = RFGenerator.query(f'TRIG:SOUR?')
+    # print(FREQSTART)
