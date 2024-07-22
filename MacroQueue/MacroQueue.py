@@ -46,7 +46,7 @@ IconFileName = "MacroQueueIcon.ico"
 # TODO:
 # Show number of items in queue in status bar
 
-VersionNumber = "v0.4.3"
+VersionNumber = "v0.4.4"
 # VersionNumber also in conf.py & setup.py
 Date = "7/2024"
 
