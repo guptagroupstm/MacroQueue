@@ -68,6 +68,7 @@ class SettingsDialog(wx.Dialog):
             elif self.DefaultSettingsType[label][0] == "Choice":
                 Choices = self.DefaultSettingsType[label][1]
                 self.CtrlDict[label] = wx.Choice( panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, Choices )
+                self.CtrlDict[label].Bind( wx.EVT_MOUSEWHEEL, lambda event: ' ')
                 if value in Choices:
                     self.CtrlDict[label].SetStringSelection(value)
                 else:
@@ -502,6 +503,7 @@ class MyMacroSettingsDialog(MacroSettingsDialog):
                         ParameterDefaultValueText = wx.FilePickerCtrl( self.ParameterPanel, wx.ID_ANY, ParameterInfo['DefaultValue'], pos=wx.DefaultPosition, size=wx.DefaultSize ,style=wx.FLP_USE_TEXTCTRL )
                     elif ParameterInfo['ValueType'] == 'Choice':
                         ParameterDefaultValueText = wx.Choice( self.ParameterPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ParameterInfo['DefaultList'] )
+                        ParameterDefaultValueText.Bind( wx.EVT_MOUSEWHEEL, lambda event: ' ')
                         ParameterDefaultValueText.SetStringSelection(ParameterInfo['DefaultValue'])
                     ParameterDefaultValueText.SetToolTip(f"Set the Default value for {ParameterName}."+"\n"+Tooltip)
                     DefaultValueSizer.Add( ParameterDefaultValueText, 1, wx.ALL, 5 )
@@ -963,9 +965,12 @@ class MyStartMacroDialog(StartMacroDialog):
                             ParameterValueText.Bind( wx.EVT_TEXT, ThisRemoveNonNumbers)
                         elif ParameterInfo['ValueType'] == 'Choice':
                             ParameterValueText = wx.Choice( ParameterPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.TheFunctionInfos[Name][1][ParameterName]['DefaultValue'])
+
                             ParameterValueText.SetStringSelection(ParameterInfo['DefaultValue'])
                             ThisUpdateParameters = partial(UpdateChoiceParameters,Name,Function,ParameterName,m_FunctionTextCheck)
                             ParameterValueText.Bind( wx.EVT_CHOICE, ThisUpdateParameters)
+                            ParameterValueText.Bind( wx.EVT_MOUSEWHEEL, lambda event: ' ')
+
                         elif ParameterInfo['ValueType'] == 'Boolean':
                             ParameterValueText = wx.CheckBox( ParameterPanel, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, 0 )
                             if isinstance(ParameterInfo['DefaultValue'],bool):
